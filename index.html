@@ -2,9 +2,23 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<title>Title</title>
+	<title>Escape The LightRooms</title>
+	<script type="text/javascript" src="./libs/jquery.js"></script>
+	<script type="importmap">
+    	{ "imports": { "three": "./libs/three.module.js" } }
+    </script>
+	<script type="module" src="./src/EscapeTheLightrooms.js"></script>
+	<style>
+        body
+		{
+            margin: 0;
+            overflow: hidden;
+        }
+	</style>
 </head>
 <body>
-
+	<!-- Div which will hold the Output -->
+	<div id="WebGL-output">
+	</div>
 </body>
 </html>
