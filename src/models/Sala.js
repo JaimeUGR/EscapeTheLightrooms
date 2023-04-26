@@ -8,6 +8,22 @@ const Sala_GrosorPared = 3
 
 class Sala extends THREE.Object3D
 {
+	static AnchoPuerta()
+	{
+		return Sala_PuertaAncho
+	}
+
+	static AltoPuerta()
+	{
+		return Sala_PuertaAlto
+	}
+
+	static GrosorPared()
+	{
+		return Sala_GrosorPared
+	}
+
+
 	constructor(largoParedX, largoParedZ, alturaPared, puertas = {
 		"Down": false,
 		"Up": false,
@@ -86,6 +102,63 @@ class Sala extends THREE.Object3D
 	recortarPuerta(paredGeo, material, puerta)
 	{
 		return new CSG().union([new THREE.Mesh(paredGeo, material)]).subtract([puerta]).toGeometry()
+	}
+
+	// Añadir método para meter un pasillo
+	aniadePasillo(largoPasillo, orientacion, desplazamiento)
+	{
+		// Crear el pasillo
+
+		// Trasladar a su posición
+
+		// Añadirlo
+
+		// Devolver el pasillo creado
+
+	}
+}
+
+class Pasillo extends THREE.Object3D
+{
+	static OrientacionX()
+	{
+		return 0;
+	}
+
+	static OrientacionZ()
+	{
+		return 1;
+	}
+
+	static DesplazamientoPositivo()
+	{
+		return 0;
+	}
+
+	static DesplazamientoNegativo()
+	{
+		return 1
+	}
+
+	constructor(largoPasillo, orientacion, desplazamiento) // El ancho, alto, etc lo toma de las constantes de la Sala
+	{
+		super()
+
+		this.largoPasillo = largoPasillo
+
+		let paredAbajo = new THREE.BoxGeometry()
+		let paredArriba = new THREE.BoxGeometry()
+
+	}
+
+	bloquear()
+	{
+
+	}
+
+	desbloquear()
+	{
+
 	}
 }
 

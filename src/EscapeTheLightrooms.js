@@ -18,9 +18,12 @@ import {OBJLoader} from "../libs/OBJLoader.js";
 import * as TWEEN from '../libs/tween.esm.js'
 
 // Clases del Proyecto
+
 import {Sala} from "./models/Sala.js"
-
-
+import {SalaPrincipal} from "./SalaPrincipal.js"
+import {SalaIzquierda} from "./SalaIzquierda.js"
+import {SalaDerecha} from "./SalaDerecha.js"
+import {SalaSuperior} from "./SalaSuperior.js"
 
 
 /**
@@ -68,11 +71,11 @@ class EscapeTheLightrooms extends THREE.Scene
 		// la gui y el texto bajo el que se agruparán los controles de la interfaz que añada el modelo.
 		//this.add(new THREE.Mesh(new THREE.BoxGeometry(5, 5, 5), new THREE.MeshBasicMaterial({color: 0xff00ff})))
 
-		this.add(new Sala(150, 110, 40, {
-			"Up" : true,
-			"Right": true,
-			"Down": true
-		}))
+		//
+		// Crear las salas
+		//
+
+		this.crearSalas()
 
 		let aCaja = 15
 		let cajaGeo = new THREE.BoxGeometry(30, aCaja, 10)
@@ -82,6 +85,63 @@ class EscapeTheLightrooms extends THREE.Scene
 
 		this.clock.start()
 	}
+
+	// Crear las salas, unirlas y colocarlas
+
+	crearSalas()
+	{
+		// Temporal
+		let largoPasillo = 20
+
+		// Crear las salas
+		this.salaPrincipal = new SalaPrincipal(150, 110, 40, {
+			"Up": true,
+			"Down": true,
+			"Left": true,
+			"Right": true
+		})
+
+		this.salaIzquierda = new SalaIzquierda(150, 110, 40, {
+			"Right": true
+		})
+
+		this.salaDerecha = new SalaDerecha(150, 110, 40, {
+			"Left": true
+		})
+
+		this.salaSuperior = new SalaSuperior(150, 110, 40, {
+			"Down": true
+		})
+
+
+		// Colocar las salas en su posición final
+		// Centrar las salas
+		this.salaPrincipal.translateX(-this.salaPrincipal.largoParedX/2)
+		this.salaIzquierda.translateX(-this.salaIzquierda.largoParedX/2)
+		this.salaDerecha.translateX(-this.salaDerecha.largoParedX/2)
+		this.salaSuperior.translateX(-this.salaSuperior.largoParedX/2)
+
+		// Posicionamos las salas adyacentes a la principal
+		this.salaIzquierda.translateX(this.salaIzquierda.largoParedX/2 +
+			this.salaPrincipal.largoParedX/2 + 2*Sala.GrosorPared() + largoPasillo)
+
+		this.salaDerecha.translateX(-(this.salaDerecha.largoParedX/2 +
+			this.salaPrincipal.largoParedX/2 + 2*Sala.GrosorPared() + largoPasillo))
+
+		this.salaSuperior.translateZ(this.salaPrincipal.largoParedZ
+			+ 2*Sala.GrosorPared() + largoPasillo)
+
+		// Añadir los pasillos de conexión
+
+
+		this.add(this.salaPrincipal)
+		this.add(this.salaIzquierda)
+		this.add(this.salaDerecha)
+		this.add(this.salaSuperior)
+	}
+
+
+	//
 
 	createCamera()
 	{
@@ -102,6 +162,12 @@ class EscapeTheLightrooms extends THREE.Scene
 		this.cameraControl.lookSpeed = 0.4
 		this.cameraControl.noFly = true
 		this.cameraControl.lookVertical = true
+
+		this.cameraControl.constrainVertical = true
+		this.cameraControl.minVerticalAngle = (Math.PI / 180) * 5
+		this.cameraControl.maxVerticalAngle = (Math.PI / 180) * 5
+		this.cameraControl.minPolarAngle = (Math.PI / 180) * 5;
+		this.cameraControl.maxPolarAngle = (Math.PI / 180) * 5;
 
 		// Para el control de cámara usamos una clase que ya tiene implementado los movimientos de órbita
 		/*this.cameraControl = new TrackballControls (this.camera, this.renderer.domElement);
@@ -145,7 +211,7 @@ class EscapeTheLightrooms extends THREE.Scene
 
 		folder.add(this.guiControls, 'fpsLimit')
 			.name('Límite FPS : ')
-			.onChange((value) => FPSLimit = value)
+			.onChange((value) => FPSLimit = value).listen()
 
 		return gui;
 	}
