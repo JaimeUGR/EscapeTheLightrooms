@@ -17,7 +17,7 @@ import {OBJLoader} from "../libs/OBJLoader.js";
 import * as TWEEN from '../libs/tween.esm.js'
 
 // Clases del Proyecto
-
+import {Sala} from "./models/Sala.js"
 
 
 
@@ -59,7 +59,12 @@ class EscapeTheLightrooms extends THREE.Scene
 		// Por último creamos el modelo.
 		// El modelo puede incluir su parte de la interfaz gráfica de usuario. Le pasamos la referencia a
 		// la gui y el texto bajo el que se agruparán los controles de la interfaz que añada el modelo.
-		this.add(new THREE.Mesh(new THREE.BoxGeometry(5, 5, 5), new THREE.MeshBasicMaterial({color: 0xff00ff})))
+		//this.add(new THREE.Mesh(new THREE.BoxGeometry(5, 5, 5), new THREE.MeshBasicMaterial({color: 0xff00ff})))
+
+		this.add(new Sala(100, 70, 30, {
+			"Up" : true,
+			"Right": true
+		}))
 	}
 
 	createCamera()
