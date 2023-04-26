@@ -61,10 +61,22 @@ class EscapeTheLightrooms extends THREE.Scene
 		// la gui y el texto bajo el que se agruparán los controles de la interfaz que añada el modelo.
 		//this.add(new THREE.Mesh(new THREE.BoxGeometry(5, 5, 5), new THREE.MeshBasicMaterial({color: 0xff00ff})))
 
-		this.add(new Sala(100, 70, 30, {
+		this.add(new Sala(150, 110, 40, {
 			"Up" : true,
-			"Right": true
+			"Right": true,
+			"Down": true
 		}))
+
+		let aCaja = 15
+		let cajaGeo = new THREE.BoxGeometry(30, aCaja, 10)
+		cajaGeo.translate(15, aCaja/2, 5)
+
+		this.add(new THREE.Mesh(cajaGeo, new THREE.MeshBasicMaterial({color: 0xf7fa2a})))
+
+		cajaGeo = new THREE.BoxGeometry(150, 1, 110)
+		cajaGeo.translate(75, -0.5, 55)
+
+		this.add(new THREE.Mesh(cajaGeo, new THREE.MeshBasicMaterial({color: 0x44fa2a})))
 	}
 
 	createCamera()
