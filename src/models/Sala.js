@@ -2,27 +2,32 @@
 import * as THREE from '../../libs/three.module.js'
 import {CSG} from "../../libs/CSG-v2.js";
 
-const Sala_PuertaAncho = 12
-const Sala_PuertaAlto = 20
+const Sala_PuertaAncho = 20
+const Sala_PuertaAlto = 30
 const Sala_PuertaFondo = 1
+const Sala_GrosorPared = 1
 
 class Sala extends THREE.Object3D
 {
 	constructor(largoParedX, largoParedZ, alturaPared, puertas = {
-		"Down": null,
-		"Up": null,
-		"Left": null,
-		"Right": null
+		"Down": false,
+		"Up": false,
+		"Left": false,
+		"Right": false
 	})
 	{
 		super()
+
+		this.largoParedX = largoParedX
+		this.largoParedZ = largoParedZ;
+		this.alturaPared = alturaPared;
 
 		// Material temporal. Luego será la textura de las paredes.
 		let material = new THREE.MeshBasicMaterial({color: 0x223322})
 
 		// Construir la puerta
 		let geoPuerta = new THREE.BoxGeometry(Sala_PuertaAncho, Sala_PuertaAlto, Sala_PuertaFondo)
-		geoPuerta.translate(0, Sala_PuertaAncho/2, 0)
+		geoPuerta.translate(0, Sala_PuertaAlto/2, 0)
 		let puerta = new THREE.Mesh(geoPuerta, material)
 
 		// Construir las paredes
@@ -37,16 +42,16 @@ class Sala extends THREE.Object3D
 		paredDchaGeo.translate(0, alturaPared/2, 0)
 
 		// Se debería añadir un marquito a la puerta, por la zona interna de la sala
-		if (puertas["Down"] != null)
+		if (puertas["Down"])
 			paredAbajoGeo = this.recortarPuerta(paredAbajoGeo, material, puerta)
 
-		if (puertas["Up"] != null)
+		if (puertas["Up"])
 			paredArribaGeo = this.recortarPuerta(paredArribaGeo, material, puerta)
 
-		if (puertas["Left"] != null)
+		if (puertas["Left"])
 			paredIzdaGeo = this.recortarPuerta(paredIzdaGeo, material, puerta)
 
-		if (puertas["Right"] != null)
+		if (puertas["Right"])
 			paredDchaGeo = this.recortarPuerta(paredDchaGeo, material, puerta)
 
 		// Colocar las paredes en su posición final
