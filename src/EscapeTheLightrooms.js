@@ -4,6 +4,7 @@
 import * as THREE from '../libs/three.module.js'
 import { GUI } from '../libs/dat.gui.module.js'
 import { TrackballControls } from '../libs/TrackballControls.js'
+import { FirstPersonControls } from "../libs/FirstPersonControls.js";
 import {
 	BufferGeometry,
 	MeshPhongMaterial,
@@ -26,6 +27,10 @@ import {Sala} from "./models/Sala.js"
  * Clase que hereda de THREE.Scene, con la que se gestionará todo el juego
  */
 
+let FPSLimit = false
+let myDeltaTime = 1/30.0
+let myDelta = 0
+
 class EscapeTheLightrooms extends THREE.Scene
 {
 	// Recibe el  div  que se ha creado en el  html  que va a ser el lienzo en el que mostrar
@@ -33,6 +38,8 @@ class EscapeTheLightrooms extends THREE.Scene
 	constructor(myCanvas)
 	{
 		super();
+
+		this.clock = new THREE.Clock(false)
 
 		// Lo primero, crear el visualizador, pasándole el lienzo sobre el que realizar los renderizados.
 		this.renderer = this.createRenderer(myCanvas);
@@ -73,10 +80,7 @@ class EscapeTheLightrooms extends THREE.Scene
 
 		this.add(new THREE.Mesh(cajaGeo, new THREE.MeshBasicMaterial({color: 0xf7fa2a})))
 
-		cajaGeo = new THREE.BoxGeometry(150, 1, 110)
-		cajaGeo.translate(75, -0.5, 55)
-
-		this.add(new THREE.Mesh(cajaGeo, new THREE.MeshBasicMaterial({color: 0x44fa2a})))
+		this.clock.start()
 	}
 
 	createCamera()
@@ -87,21 +91,27 @@ class EscapeTheLightrooms extends THREE.Scene
 		//   Los planos de recorte cercano y lejano
 		this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
 		// También se indica dónde se coloca
-		this.camera.position.set (25, 3, 25);
+		this.camera.position.set (25, 20, 25);
 		// Y hacia dónde mira
-		var look = new THREE.Vector3 (0,0,0);
-		this.camera.lookAt(look);
+		//var look = new THREE.Vector3 (0,0,0);
+		//this.camera.lookAt(look);
 		this.add (this.camera);
 
+		this.cameraControl = new FirstPersonControls(this.camera, this.renderer.domElement)
+		this.cameraControl.movementSpeed = 20
+		this.cameraControl.lookSpeed = 0.4
+		this.cameraControl.noFly = true
+		this.cameraControl.lookVertical = true
+
 		// Para el control de cámara usamos una clase que ya tiene implementado los movimientos de órbita
-		this.cameraControl = new TrackballControls (this.camera, this.renderer.domElement);
+		/*this.cameraControl = new TrackballControls (this.camera, this.renderer.domElement);
 
 		// Se configuran las velocidades de los movimientos
 		this.cameraControl.rotateSpeed = 5;
 		this.cameraControl.zoomSpeed = -2;
 		this.cameraControl.panSpeed = 0.5;
 		// Debe orbitar con respecto al punto de mira de la cámara
-		this.cameraControl.target = look;
+		this.cameraControl.target = look;*/
 	}
 
 
@@ -116,7 +126,8 @@ class EscapeTheLightrooms extends THREE.Scene
 		this.guiControls = {
 			// En el contexto de una función   this   alude a la función
 			lightIntensity : 0.5,
-			axisOnOff : true
+			axisOnOff : true,
+			fpsLimit: false
 		}
 
 		// Se crea una sección para los controles de esta clase
@@ -131,6 +142,10 @@ class EscapeTheLightrooms extends THREE.Scene
 		folder.add (this.guiControls, 'axisOnOff')
 			.name ('Mostrar ejes : ')
 			.onChange ( (value) => this.setAxisVisible (value) );
+
+		folder.add(this.guiControls, 'fpsLimit')
+			.name('Límite FPS : ')
+			.onChange((value) => FPSLimit = value)
 
 		return gui;
 	}
@@ -211,12 +226,29 @@ class EscapeTheLightrooms extends THREE.Scene
 
 	update()
 	{
-		//console.log("UPDATE")
-		// Le decimos al renderizador "visualiza la escena que te indico usando la cámara que te estoy pasando"
-		this.renderer.render (this, this.getCamera());
+		let currentDelta = this.clock.getDelta()
+
+		if (FPSLimit)
+		{
+			myDelta += currentDelta
+
+			if (myDelta >= myDeltaTime)
+			{
+				myDelta -= myDeltaTime
+
+				// Le decimos al renderizador "visualiza la escena que te indico usando la cámara que te estoy pasando"
+				this.renderer.render (this, this.getCamera());
+			}
+		}
+		else
+		{
+			this.renderer.render (this, this.getCamera());
+		}
+
+
 
 		// Se actualiza la posición de la cámara según su controlador
-		this.cameraControl.update();
+		this.cameraControl.update(currentDelta);
 
 		// Actualizar modelos
 		TWEEN.update()
