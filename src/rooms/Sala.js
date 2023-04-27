@@ -25,10 +25,10 @@ class Sala extends THREE.Object3D
 
 
 	constructor(largoParedX, largoParedZ, alturaPared, puertas = {
-		"Down": false,
-		"Up": false,
-		"Left": false,
-		"Right": false
+		down: false,
+		up: false,
+		left: false,
+		right: false
 	})
 	{
 		super()
@@ -59,16 +59,16 @@ class Sala extends THREE.Object3D
 		paredDchaGeo.translate(0, alturaPared/2, 0)
 
 		// Se debería añadir un marquito a la puerta, por la zona interna de la sala
-		if (puertas["Down"])
+		if (puertas.down)
 			paredAbajoGeo = this.recortarPuerta(paredAbajoGeo, materialPared, puerta)
 
-		if (puertas["Up"])
+		if (puertas.up)
 			paredArribaGeo = this.recortarPuerta(paredArribaGeo, materialPared, puerta)
 
-		if (puertas["Left"])
+		if (puertas.left)
 			paredIzdaGeo = this.recortarPuerta(paredIzdaGeo, materialPared, puerta)
 
-		if (puertas["Right"])
+		if (puertas.right)
 			paredDchaGeo = this.recortarPuerta(paredDchaGeo, materialPared, puerta)
 
 		// Colocar las paredes en su posición final

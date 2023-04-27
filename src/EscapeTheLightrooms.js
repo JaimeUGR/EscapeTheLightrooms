@@ -19,18 +19,19 @@ import * as TWEEN from '../libs/tween.esm.js'
 
 // Clases del Proyecto
 
-import {Sala} from "./models/Sala.js"
-import {SalaPrincipal} from "./SalaPrincipal.js"
-import {SalaIzquierda} from "./SalaIzquierda.js"
-import {SalaDerecha} from "./SalaDerecha.js"
-import {SalaSuperior} from "./SalaSuperior.js"
+import {GestorCamaras} from "./cameras/GestorCamaras.js"
+import {Sala} from "./rooms/Sala.js"
+import {SalaPrincipal} from "./rooms/SalaPrincipal.js"
+import {SalaIzquierda} from "./rooms/SalaIzquierda.js"
+import {SalaDerecha} from "./rooms/SalaDerecha.js"
+import {SalaSuperior} from "./rooms/SalaSuperior.js"
 
 
 /**
  * Clase que hereda de THREE.Scene, con la que se gestionará todo el juego
  */
 
-let FPSLimit = false
+let FPSLimit = true
 let myDeltaTime = 1/30.0
 let myDelta = 0
 
@@ -59,9 +60,6 @@ class EscapeTheLightrooms extends THREE.Scene
 		// Tendremos una cámara con un control de movimiento con el ratón
 		this.createCamera ();
 
-		// Un suelo
-		//this.createGround ();
-
 		// Y unos ejes. Imprescindibles para orientarnos sobre dónde están las cosas
 		this.axis = new THREE.AxesHelper (50);
 		this.add (this.axis);
@@ -76,6 +74,10 @@ class EscapeTheLightrooms extends THREE.Scene
 		//
 
 		this.crearSalas()
+
+		//
+		// Añadir las cámaras
+		//
 
 		let aCaja = 15
 		let cajaGeo = new THREE.BoxGeometry(30, aCaja, 10)
@@ -95,22 +97,22 @@ class EscapeTheLightrooms extends THREE.Scene
 
 		// Crear las salas
 		this.salaPrincipal = new SalaPrincipal(150, 110, 40, {
-			"Up": true,
-			"Down": true,
-			"Left": true,
-			"Right": true
+			up: true,
+			down: true,
+			left: true,
+			right: true
 		})
 
 		this.salaIzquierda = new SalaIzquierda(150, 110, 40, {
-			"Right": true
+			right: true
 		})
 
 		this.salaDerecha = new SalaDerecha(150, 110, 40, {
-			"Left": true
+			left: true
 		})
 
 		this.salaSuperior = new SalaSuperior(150, 110, 40, {
-			"Down": true
+			down: true
 		})
 
 
@@ -145,6 +147,11 @@ class EscapeTheLightrooms extends THREE.Scene
 
 	createCamera()
 	{
+		this.gestorCamaras = new GestorCamaras(this)
+
+		return
+
+
 		// Para crear una cámara le indicamos
 		//   El ángulo del campo de visión vértical en grados sexagesimales
 		//   La razón de aspecto ancho/alto
@@ -268,7 +275,7 @@ class EscapeTheLightrooms extends THREE.Scene
 	{
 		// En principio se devuelve la única cámara que tenemos
 		// Si hubiera varias cámaras, este método decidiría qué cámara devuelve cada vez que es consultado
-		return this.camera;
+		return this.gestorCamaras.getCamaraActiva();
 	}
 
 	setCameraAspect(ratio)
@@ -314,7 +321,7 @@ class EscapeTheLightrooms extends THREE.Scene
 
 
 		// Se actualiza la posición de la cámara según su controlador
-		this.cameraControl.update(currentDelta);
+		this.gestorCamaras.update(currentDelta);
 
 		// Actualizar modelos
 		TWEEN.update()

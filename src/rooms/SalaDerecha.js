@@ -1,13 +1,12 @@
+import {Sala} from "./Sala.js";
 
-import {Sala} from "./models/Sala.js";
-
-class SalaPrincipal extends Sala
+class SalaDerecha extends Sala
 {
 	constructor(largoParedX, largoParedZ, alturaPared, puertas = {
-		"Down": false,
-		"Up": false,
-		"Left": false,
-		"Right": false
+		down: false,
+		up: false,
+		left: false,
+		right: false
 	})
 	{
 		super(largoParedX, largoParedZ, alturaPared, puertas)
@@ -46,4 +45,4 @@ class SalaPrincipal extends Sala
 	}
 }
 
-export {SalaPrincipal}
+export {SalaDerecha}
