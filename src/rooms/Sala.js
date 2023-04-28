@@ -185,7 +185,8 @@ class Pasillo extends THREE.Object3D
 
 	desbloquear()
 	{
-
+		console.log("ME DESBLOQUEAN")
+		this.meshCierre.translateX(this.espacioInterno)
 	}
 }
 

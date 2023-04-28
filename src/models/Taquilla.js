@@ -1,185 +1,151 @@
+
 import * as THREE from "../../libs/three.module.js";
 import {CSG} from "../../libs/CSG-v2.js";
-
 
 class Taquilla extends THREE.Object3D
 {
 	constructor(dimensiones = {
-		anchoTaq: 1,
-		altoTaq: 1,
-		fondoTaq: 1,
-		borde: 1,
-		fondoPuerta: 1,
-		anchoRejilla: 1,
-		altoRejilla: 1,
+		taquillaX: 15, // x interna
+		taquillaY: 20, // y interna
+		taquillaZ: 15, // z interna
+		taquillaBorde: 2,
+		numEstantes: 1,
+		estanteY: 1,
+		separacionInferiorEstantes: 1,
+		puertaZ: 1, // <= borde
+		rejillaX: 10, // <= x interna
+		rejillaY: 2,
 		separacionRejillas: 1,
-		separacionInicial: 1
-
+		separacionSuperiorRejillas: 1
 	})
 	{
 		super()
 
-		this.anchoTaq = dimensiones.anchoTaq
-		this.altoTaq = dimensiones.altoTaq
-		this.fondoTaq = dimensiones.fondoTaq
-		this.fondoPuerta = dimensiones.fondoPuerta
+		this.taquillaX = dimensiones.taquillaX
+		this.taquillaY = dimensiones.taquillaY
+		this.taquillaZ = dimensiones.taquillaZ
+		this.puertaZ = dimensiones.puertaZ
 
-		this.borde = dimensiones.borde
-		this.anchoRejilla = dimensiones.anchoRejilla
-		this.altoRejilla = dimensiones.altoRejilla
+		this.numEstantes = dimensiones.numEstantes
+		this.estanteY = dimensiones.estanteY
+		this.separacionInferiorEstantes = dimensiones.separacionInferiorEstantes
+
+		this.taquillaBorde = dimensiones.taquillaBorde
+		this.rejillaX = dimensiones.rejillaX
+		this.rejillaY = dimensiones.rejillaY
 		this.separacionRejillas = dimensiones.separacionRejillas
-		this.separacionInicial = dimensiones.separacionInicial
+		this.separacionSuperiorRejillas = dimensiones.separacionSuperiorRejillas
 
-
-
-		// Material temporal. Luego será la textura de las paredes.
-		this.taquillaMaterial = new THREE.MeshNormalMaterial({color: 0Xf1f1f1,opacity: 0.5,transparent: true})
-		this.huecoMaterial2 = new THREE.MeshBasicMaterial( { color: 0x122345 } )
-		this.huecoMaterial3 =  new THREE.MeshNormalMaterial({color: 0Xf1f1f1})
-
-		let taquillaGeometry = new THREE.BoxGeometry(this.anchoTaq,this.altoTaq,this.fondoTaq)
-		taquillaGeometry.translate(0,this.altoTaq/2,0)
-
-		let taquilla = new THREE.Mesh(taquillaGeometry,this.taquillaMaterial)
-
-		//this.add(taquilla)
-
-		 this.anchoHueco= this.anchoTaq -2*this.borde
-		 this.altoHueco =  this.altoTaq -2*this.borde
-		 this.fondoHueco = this.fondoTaq -this.borde
-
-		let huecoGeometry = new THREE.BoxGeometry(this.anchoHueco,this.altoHueco,this.fondoHueco)
-		huecoGeometry.translate(0,this.altoHueco/2+this.borde,this.borde/2)
-
-		let hueco = new THREE.Mesh(huecoGeometry,this.huecoMaterial3)
-
-		//this.add(hueco)
-
-		//this.add(hueco)
-
-		let taquillaHueco = this.recortarCaja(taquilla,hueco)
-
-		this.add(taquillaHueco)
-
-		let estante1 = this.createEstante()
-
-		this.add(estante1)
-
-		estante1.position.y= 2* this.borde/2 + 2*this.borde
-
-		let estante2 = this.createEstante()
-		this.add(estante2)
-
-		estante2.position.y=  4*(2* this.borde/2 + 2*this.borde)
-
-		let estante3 = this.createEstante()
-		estante3.position.y= 2.5*(2*this.borde/2 + 2*this.borde)
-
-		this.add(estante3)
-
-
-		let puertaGeometry = new THREE.BoxGeometry(this.anchoHueco,this.altoHueco,this.fondoPuerta)
-		//puertaGeometry.translate(0,this.altoHueco/2+this.borde,/*this.fondoTaq/2-this.fondoPuerta*/this.fondoHueco-this.fondoPuerta/2-1.5*this.borde)
-		puertaGeometry.translate(0,this.altoHueco/2+this.borde,0);
-		puertaGeometry.translate(0,0,this.fondoPuerta/2 + this.fondoHueco/2+this.borde/4)
-
-
-		this.puertaMesh = new THREE.Mesh(puertaGeometry,this.huecoMaterial3)
-
-
-		//this.add(puerta)
-
-		//puerta.position.x= -this.anchoHueco/2
-		//puerta.position.z= this.fondoPuerta/2 + this.fondoHueco/2+this.borde/4
-
-
-		//puerta.rotateY(-Math.PI/2)
-
-
-		let geoRejilla = new THREE.BoxGeometry(this.anchoRejilla, this.altoRejilla, this.fondoPuerta)
-		geoRejilla.translate(0,-this.altoRejilla/2 + this.altoTaq,this.fondoPuerta/2 + this.fondoHueco/2+this.borde/4 )
-		geoRejilla.translate(0,-this.borde - this.separacionInicial,0)
-
-
-		let csg = new CSG()
-
-		csg.union([this.puertaMesh])
-		csg.subtract([new THREE.Mesh(geoRejilla,null)])
-
-		//this.add(new THREE.Mesh(geoRejilla.clone(),this.huecoMaterial3))
 		//
-		geoRejilla.translate(0,-this.separacionRejillas-this.altoRejilla,0)
+		this.estantes = []
 
-		csg.subtract([new THREE.Mesh(geoRejilla,null)])
+		// TODO Material temporal. Luego será la textura de las paredes.
+		this.taquillaMaterial = new THREE.MeshNormalMaterial({color: 0xf1f1f1, opacity: 0.5, transparent: true})
 
-		//this.add(new THREE.Mesh(geoRejilla.clone(),this.huecoMaterial3))
 		//
-		geoRejilla.translate(0,-this.separacionRejillas-this.altoRejilla,0)
+		//
+		//
 
-		csg.subtract([new THREE.Mesh(geoRejilla,null)])
+		// Crear la caja de la taquilla
+		let geoTaquilla = new THREE.BoxGeometry(this.taquillaX + 2*this.taquillaBorde,
+			this.taquillaY + 2*this.taquillaBorde, this.taquillaZ + 2*this.taquillaBorde)
+		geoTaquilla.translate(0, this.taquillaY/2 + this.taquillaBorde, 0)
 
+		// Recortar el hueco interno
+		let geoHueco = new THREE.BoxGeometry(this.taquillaX, this.taquillaY, this.taquillaZ + this.taquillaBorde)
+		geoHueco.translate(0, this.taquillaY/2 + this.taquillaBorde, this.taquillaBorde/2)
 
-		this.puertaMesh= csg.toMesh()
-		this.puertaMesh.position.set(this.anchoHueco/2,0,-(this.fondoPuerta/2 + this.fondoHueco/2+this.borde/4))
+		geoTaquilla = new CSG()
+			.union([new THREE.Mesh(geoTaquilla, this.taquillaMaterial)])
+			.subtract([new THREE.Mesh(geoHueco, null)])
+			.toGeometry()
 
-		let puerta = new THREE.Object3D()
-		puerta.position.set(-this.anchoHueco/2,0,(this.fondoPuerta/2 + this.fondoHueco/2+this.borde/4))
-		puerta.rotateY(-Math.PI/2)
-		puerta.add(this.puertaMesh)
+		this.add(new THREE.Mesh(geoTaquilla, this.taquillaMaterial))
 
-		this.add(puerta)
-		//this.add(new THREE.Mesh(geoRejilla,this.huecoMaterial3))
+		//
+		//
+		//
 
-
-
-
-
-	}
-
-
-
-	createEstante()
-	{
+		// Colocar la estantería base
 		let estante = new THREE.Object3D()
+		estante.translateY(this.taquillaBorde)
 
-		let boxGeometry = new THREE.BoxGeometry(this.anchoHueco,this.borde,this.fondoHueco-this.borde)
-		boxGeometry.translate(0,0,this.borde/2)
+		this.estantes.push(estante)
+		this.add(estante)
 
-		let box = new THREE.Mesh(boxGeometry,this.taquillaMaterial)
+		// Colocar las estanterías
+		if (this.numEstantes > 1)
+		{
+			// Calculamos la separación entre los estantes
+			let separacionEstantes = (this.taquillaY - this.separacionInferiorEstantes - (this.numEstantes - 1)*this.estanteY)  / this.numEstantes
 
-		estante.add(box)
+			// Creamos el estante (mesh)
+			estante = this.crearEstante()
+			estante.translateY(this.taquillaBorde + this.separacionInferiorEstantes)
 
+			for (let i = 1; i < this.numEstantes; i++)
+			{
+				estante.translateY(separacionEstantes + this.estanteY)
+				this.add(estante)
+				this.estantes.push(estante)
 
+				estante = estante.clone()
+			}
+		}
 
-		return estante
+		//
+		//
+		//
+
+		// Crear la puerta de la taquilla
+		this.puerta = this.crearPuerta() // TODO: este es el mesh que recibe RY para abrir o cerrar
+		this.puerta.rotateY(-Math.PI/2)
+
+		// Crear el objeto con el mesh de la puerta y trasladarlo
+		let puertaObject = new THREE.Object3D()
+		puertaObject.add(this.puerta)
+
+		puertaObject.translateX(-this.taquillaX/2)
+		puertaObject.translateY(this.taquillaBorde)
+		puertaObject.translateZ(-this.puertaZ/2 + this.taquillaZ/2 + this.taquillaBorde)
+
+		this.add(puertaObject)
 	}
 
-	createRejilla(){
-		let rejilla = new THREE.Object3D()
-
-		let rejillaGeometry = new THREE.BoxGeometry(this.anchoRejilla,this.altoRejilla,this.fondoPuerta)
-		rejillaGeometry.translate(0,this.altoRejilla/2 ,this.fondoPuerta/2)
-
-		let rejillaMesh = new THREE.Mesh(rejillaGeometry,this.huecoMaterial3)
-		rejilla.add(rejillaMesh)
-
-		return rejilla
-	}
-
-
-	recortarCaja(caja, hueco)
+	crearEstante()
 	{
-		let cajaHueco = new CSG();
+		let geoEstante = new THREE.BoxGeometry(this.taquillaX, this.estanteY, this.taquillaZ)
+		geoEstante.translate(0, -this.estanteY/2, this.taquillaBorde/2)
 
-		cajaHueco.union([caja])
-
-		cajaHueco.subtract([hueco])
-
-		return cajaHueco.toMesh()
+		return new THREE.Mesh(geoEstante, this.taquillaMaterial)
 	}
 
+	crearPuerta()
+	{
+		let geoPuerta = new THREE.BoxGeometry(this.taquillaX, this.taquillaY, this.puertaZ)
+		geoPuerta.translate(0, this.taquillaY/2, 0)
 
+		// Preparar el recorte de huecos
+		let csg = new CSG().union([new THREE.Mesh(geoPuerta, this.taquillaMaterial)])
 
+		let geoHueco = new THREE.BoxGeometry(this.rejillaX, this.rejillaY, this.puertaZ)
+		geoHueco.translate(0, -this.rejillaY/2, 0)
+
+		// Empezar desde arriba
+		geoHueco.translate(0, this.taquillaY - this.separacionSuperiorRejillas, 0)
+		csg.subtract([new THREE.Mesh(geoHueco, null)])
+
+		for (let i = 1; i < 3; i++)
+		{
+			geoHueco.translate(0, -(this.separacionRejillas + this.rejillaY), 0)
+			csg.subtract([new THREE.Mesh(geoHueco, null)])
+		}
+
+		geoPuerta = csg.toGeometry()
+		geoPuerta.translate(this.taquillaX/2, 0, 0)
+
+		return new THREE.Mesh(geoPuerta, this.taquillaMaterial)
+	}
 }
 
 export {Taquilla}

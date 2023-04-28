@@ -1,5 +1,9 @@
 
-import {Pasillo, Sala} from "./Sala.js";
+import {Pasillo, Sala} from "./Sala.js"
+
+import {Mesa} from "../models/Mesa.js"
+import {Cajonera} from "../models/Cajonera.js";
+import {Taquilla} from "../models/Taquilla.js";
 
 class SalaPrincipal extends Sala
 {
@@ -52,6 +56,9 @@ class SalaPrincipal extends Sala
 		this.add(pIzda)
 		this.add(pDcha)
 		this.add(pSup)
+
+		// TODO TEMPORAL
+		this.pasilloSuperior.desbloquear()
 	}
 
 	colocarMateriales()
@@ -66,7 +73,23 @@ class SalaPrincipal extends Sala
 
 	colocarModelos()
 	{
-
+		let taq = new Taquilla({
+			taquillaX: 15, // x interna
+			taquillaY: 25, // y interna
+			taquillaZ: 15, // z interna
+			taquillaBorde: 2,
+			puertaZ: 1, // <= borde
+			numEstantes: 4,
+			estanteY: 2,
+			separacionInferiorEstantes: 5,
+			rejillaX: 10, // <= x interna
+			rejillaY: 2,
+			separacionRejillas: 3,
+			separacionSuperiorRejillas: 5
+		})
+		//taq.position.set(taq.taquillaX/2 + taq.taquillaBorde, 0, taq.taquillaZ/2 + taq.taquillaBorde)
+		taq.position.set(0, 50, 0)
+		this.add(taq)
 	}
 
 	colocarPuzles()

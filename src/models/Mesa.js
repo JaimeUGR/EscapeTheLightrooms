@@ -1,5 +1,5 @@
-import * as THREE from "../../libs/three.module.js";
 
+import * as THREE from "../../libs/three.module.js";
 
 class Mesa extends THREE.Object3D
 {
@@ -13,7 +13,6 @@ class Mesa extends THREE.Object3D
 		 fondoInf: 1,
 
 		separacion: 1
-
 	})
 	{
 		super()
@@ -21,8 +20,6 @@ class Mesa extends THREE.Object3D
 		this.anchoSup = dimensiones.anchoSup
 		this.altoSup = dimensiones.altoSup
 		this.fondoSup = dimensiones.fondoSup
-
-
 		this.anchoInf = dimensiones.anchoInf
 		this.altoInf = dimensiones.altoInf
 		this.fondoInf = dimensiones.fondoInf
@@ -62,15 +59,7 @@ class Mesa extends THREE.Object3D
 		this.add(pata2)
 		this.add(pata3)
 		this.add(pata4)
-
-
-
-
-
-
 	}
-
-
 }
 
 export {Mesa}
