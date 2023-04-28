@@ -12,6 +12,21 @@ class ControladorCamara
 
 	}
 
+	onMouseMove(event)
+	{
+
+	}
+
+	onKeyDown(event)
+	{
+
+	}
+
+	onKeyUp(event)
+	{
+
+	}
+
 	enable()
 	{
 		this.enabled = true

@@ -1,5 +1,5 @@
 
-import {Sala} from "./Sala.js";
+import {Pasillo, Sala} from "./Sala.js";
 
 class SalaPrincipal extends Sala
 {
@@ -12,6 +12,8 @@ class SalaPrincipal extends Sala
 	{
 		super(largoParedX, largoParedZ, alturaPared, puertas)
 
+		this.crearPasillos()
+
 		// Colocar los materiales
 		this.colocarMateriales()
 
@@ -23,6 +25,33 @@ class SalaPrincipal extends Sala
 
 		// Añadir los puzles
 		this.colocarPuzles()
+	}
+
+	crearPasillos()
+	{
+		let pIzda = new Pasillo(90, 40, 30, -Math.PI/2)
+		let pDcha = new Pasillo(80, 40, 30, -3*Math.PI/2)
+		let pSup = new Pasillo(50, 40, 30, -Math.PI)
+
+		this.pasilloIzquierda = pIzda
+		this.pasilloDerecha = pDcha
+		this.pasilloSuperior = pSup
+
+		pIzda.position.set(
+			this.largoParedX + 2*Sala.GrosorPared() + pIzda.largoPasillo/2
+			, 0, this.largoParedZ/2)
+
+		pDcha.position.set(
+			-(2*Sala.GrosorPared() + pDcha.largoPasillo/2)
+			, 0, this.largoParedZ/2)
+
+		pSup.position.set(
+			this.largoParedX/2
+			, 0, this.largoParedZ + 2*Sala.GrosorPared() + pSup.largoPasillo/2)
+
+		this.add(pIzda)
+		this.add(pDcha)
+		this.add(pSup)
 	}
 
 	colocarMateriales()

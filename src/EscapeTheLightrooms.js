@@ -20,7 +20,7 @@ import * as TWEEN from '../libs/tween.esm.js'
 // Clases del Proyecto
 
 import {GestorCamaras} from "./cameras/GestorCamaras.js"
-import {Sala} from "./rooms/Sala.js"
+import {Sala, Pasillo} from "./rooms/Sala.js"
 import {SalaPrincipal} from "./rooms/SalaPrincipal.js"
 import {SalaIzquierda} from "./rooms/SalaIzquierda.js"
 import {SalaDerecha} from "./rooms/SalaDerecha.js"
@@ -79,11 +79,15 @@ class EscapeTheLightrooms extends THREE.Scene
 		// Añadir las cámaras
 		//
 
-		let aCaja = 15
+		/*let aCaja = 15
 		let cajaGeo = new THREE.BoxGeometry(30, aCaja, 10)
 		cajaGeo.translate(15, aCaja/2, 5)
 
-		this.add(new THREE.Mesh(cajaGeo, new THREE.MeshBasicMaterial({color: 0xf7fa2a})))
+		this.add(new THREE.Mesh(cajaGeo, new THREE.MeshBasicMaterial({color: 0xf7fa2a})))*/
+
+		// TODO: TEMPORAL
+		//this.gestorCamaras.cambiarControladorCamara(0)
+		//
 
 		this.clock.start()
 	}
@@ -103,15 +107,15 @@ class EscapeTheLightrooms extends THREE.Scene
 			right: true
 		})
 
-		this.salaIzquierda = new SalaIzquierda(150, 110, 40, {
+		this.salaIzquierda = new SalaIzquierda(150, 100, 40, {
 			right: true
 		})
 
-		this.salaDerecha = new SalaDerecha(150, 110, 40, {
+		this.salaDerecha = new SalaDerecha(250, 50, 40, {
 			left: true
 		})
 
-		this.salaSuperior = new SalaSuperior(150, 110, 40, {
+		this.salaSuperior = new SalaSuperior(75, 110, 60, {
 			down: true
 		})
 
@@ -125,13 +129,15 @@ class EscapeTheLightrooms extends THREE.Scene
 
 		// Posicionamos las salas adyacentes a la principal
 		this.salaIzquierda.translateX(this.salaIzquierda.largoParedX/2 +
-			this.salaPrincipal.largoParedX/2 + 2*Sala.GrosorPared() + largoPasillo)
+			this.salaPrincipal.largoParedX/2 + 4*Sala.GrosorPared() + this.salaPrincipal.pasilloIzquierda.largoPasillo)
+		this.salaIzquierda.translateZ(this.salaPrincipal.largoParedZ/2 - this.salaIzquierda.largoParedZ/2)
 
 		this.salaDerecha.translateX(-(this.salaDerecha.largoParedX/2 +
-			this.salaPrincipal.largoParedX/2 + 2*Sala.GrosorPared() + largoPasillo))
+			this.salaPrincipal.largoParedX/2 + 4*Sala.GrosorPared() + this.salaPrincipal.pasilloDerecha.largoPasillo))
+		this.salaDerecha.translateZ(this.salaPrincipal.largoParedZ/2 - this.salaDerecha.largoParedZ/2)
 
 		this.salaSuperior.translateZ(this.salaPrincipal.largoParedZ
-			+ 2*Sala.GrosorPared() + largoPasillo)
+			+ 4*Sala.GrosorPared() + this.salaPrincipal.pasilloSuperior.largoPasillo)
 
 		// Añadir los pasillos de conexión
 
@@ -142,12 +148,24 @@ class EscapeTheLightrooms extends THREE.Scene
 		this.add(this.salaSuperior)
 	}
 
-
 	//
+	cambiarCamara(event)
+	{
+		console.log("Me hacen click e")
+		this.gestorCamaras.cambiarAControladorPrincipal()
+	}
 
 	createCamera()
 	{
 		this.gestorCamaras = new GestorCamaras(this)
+
+		// TEMPORAL
+		this.pantallaPausa = document.getElementById("pantalla")
+		this.pantallaPausa.addEventListener('click', this.cambiarCamara.bind(this))
+
+		document.addEventListener('keydown', this.gestorCamaras.onKeyDown.bind(this.gestorCamaras))
+		document.addEventListener('keyup', this.gestorCamaras.onKeyUp.bind(this.gestorCamaras) )
+		document.addEventListener('mousemove', this.gestorCamaras.onMouseMove.bind(this.gestorCamaras))
 
 		return
 
@@ -200,7 +218,7 @@ class EscapeTheLightrooms extends THREE.Scene
 			// En el contexto de una función   this   alude a la función
 			lightIntensity : 0.5,
 			axisOnOff : true,
-			fpsLimit: false
+			fpsLimit: FPSLimit
 		}
 
 		// Se crea una sección para los controles de esta clase
@@ -280,6 +298,11 @@ class EscapeTheLightrooms extends THREE.Scene
 
 	setCameraAspect(ratio)
 	{
+		// TODO
+
+		this.gestorCamaras.setCameraAspect(ratio)
+		return
+
 		// Cada vez que el usuario modifica el tamaño de la ventana desde el gestor de ventanas de
 		// su sistema operativo hay que actualizar el ratio de aspecto de la cámara
 		this.camera.aspect = ratio;

@@ -103,52 +103,79 @@ class Sala extends THREE.Object3D
 	{
 		return new CSG().union([new THREE.Mesh(paredGeo, material)]).subtract([puerta]).toGeometry()
 	}
-
-	// Añadir método para meter un pasillo
-	aniadePasillo(largoPasillo, orientacion, desplazamiento)
-	{
-		// Crear el pasillo
-
-		// Trasladar a su posición
-
-		// Añadirlo
-
-		// Devolver el pasillo creado
-
-	}
 }
+
+const Pasillo_Cierre_Grosor = 5
 
 class Pasillo extends THREE.Object3D
 {
-	static OrientacionX()
-	{
-		return 0;
-	}
-
-	static OrientacionZ()
-	{
-		return 1;
-	}
-
-	static DesplazamientoPositivo()
-	{
-		return 0;
-	}
-
-	static DesplazamientoNegativo()
-	{
-		return 1
-	}
-
-	constructor(largoPasillo, orientacion, desplazamiento) // El ancho, alto, etc lo toma de las constantes de la Sala
+	constructor(largoPasillo, alturaPasillo, espacioInterno, orientacion = 0)
 	{
 		super()
 
 		this.largoPasillo = largoPasillo
+		this.alturaPasillo = alturaPasillo
+		this.espacioInterno = espacioInterno
+		this.orientacion = orientacion
 
-		let paredAbajo = new THREE.BoxGeometry()
-		let paredArriba = new THREE.BoxGeometry()
+		let materialSuelo = new THREE.MeshBasicMaterial({color: 0x852a3b})
+		let materialCierre = new THREE.MeshBasicMaterial({color: 0x455382})
+		let materialPared = new THREE.MeshBasicMaterial({color: 0x257355})
+		let materialTecho = new THREE.MeshBasicMaterial({color: 0x35a78b})
 
+		// Puerta
+		let geoPuerta = new THREE.BoxGeometry(Sala_PuertaAncho, Sala_PuertaAlto, Sala_GrosorPared)
+		geoPuerta.translate(0, Sala_PuertaAlto/2, 0)
+
+		// Pared Superior e Inferior
+		let geoParedFrontal = new THREE.BoxGeometry(espacioInterno, alturaPasillo, Sala_GrosorPared)
+		geoParedFrontal.translate(0, alturaPasillo/2, 0)
+		geoParedFrontal = new CSG()
+			.union([new THREE.Mesh(geoParedFrontal, materialPared)])
+			.subtract([new THREE.Mesh(geoPuerta, null)])
+			.toGeometry()
+
+		geoParedFrontal.translate(0, 0, Sala_GrosorPared/2 + largoPasillo/2)
+		this.add(new THREE.Mesh(geoParedFrontal.clone(), materialPared))
+
+		geoParedFrontal.translate(0, 0, -(largoPasillo + Sala_GrosorPared))
+		this.add(new THREE.Mesh(geoParedFrontal, materialPared))
+
+		// Pared Derecha
+		let geoParedDcha = new THREE.BoxGeometry(Sala_GrosorPared, alturaPasillo, largoPasillo)
+		geoParedDcha.translate(-(Sala_GrosorPared/2 + espacioInterno/2), alturaPasillo/2, 0)
+
+		// Pared Izquierda
+		let geoParedIzda = new THREE.BoxGeometry(Sala_GrosorPared, alturaPasillo, largoPasillo/2 - Pasillo_Cierre_Grosor/2)
+		geoParedIzda.translate(Sala_GrosorPared/2 + espacioInterno/2, alturaPasillo/2, -(Pasillo_Cierre_Grosor/4 + largoPasillo/4))
+		this.add(new THREE.Mesh(geoParedIzda.clone(), materialPared))
+
+		geoParedIzda.translate(0, 0, largoPasillo/2 + Pasillo_Cierre_Grosor/2)
+
+		this.add(new THREE.Mesh(geoParedDcha, materialPared))
+		this.add(new THREE.Mesh(geoParedIzda.clone(), materialPared))
+
+		// Cierre
+		let geoCierre = new THREE.BoxGeometry(Sala_GrosorPared + espacioInterno, alturaPasillo, Pasillo_Cierre_Grosor)
+		geoCierre.translate(Sala_GrosorPared/2, alturaPasillo/2, 0)
+
+		this.meshCierre = new THREE.Mesh(geoCierre, materialCierre)
+
+		this.add(this.meshCierre)
+
+		// Añadir el suelo
+		let sueloGeo = new THREE.BoxGeometry(espacioInterno, 1, largoPasillo)
+		sueloGeo.translate(0, -0.5, 0)
+
+		this.add(new THREE.Mesh(sueloGeo, materialSuelo))
+
+		// Añadir el techo
+		let techoGeo = sueloGeo.clone()
+		techoGeo.translate(0, alturaPasillo + 1, 0)
+
+		this.add(new THREE.Mesh(techoGeo, materialTecho))
+
+		this.rotateY(orientacion)
 	}
 
 	bloquear()
@@ -162,4 +189,4 @@ class Pasillo extends THREE.Object3D
 	}
 }
 
-export {Sala}
+export {Sala, Pasillo}

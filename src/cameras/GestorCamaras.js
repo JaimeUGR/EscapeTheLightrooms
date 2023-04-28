@@ -27,14 +27,12 @@ class GestorCamaras
 
 		// Añadir la cámara cinemática
 		this._crearControladorCinematica()
-
-		console.log(this.activeController)
 	}
 
 	_crearControladorPrincipal()
 	{
 		// Crear el controlador
-		let controladorCam = new ControladorCamaraPrincipal(this.camaraPrincipal)
+		let controladorCam = new ControladorCamaraPrincipal(this.camaraPrincipal, this.game.renderer.domElement)
 
 		// Añadir el controlador a la lista
 		this.aniadeControlador(controladorCam)
@@ -95,6 +93,7 @@ class GestorCamaras
 		this.activeCameraID = id
 		this.activeController = this.controladoresCamaras[this.activeCameraID]
 
+		console.log(this.activeCameraID)
 		console.log(this.activeController)
 
 		this.activeController.enable()
@@ -110,6 +109,30 @@ class GestorCamaras
 	getCamaraActiva()
 	{
 		return this.activeController.camara
+	}
+
+	setCameraAspect(ratio)
+	{
+		this.controladoresCamaras.forEach((controladorCam) => {
+			controladorCam.camara.aspect = ratio
+			controladorCam.camara.updateProjectionMatrix()
+		})
+	}
+
+	// Eventos
+	onKeyUp(event)
+	{
+		this.activeController.onKeyUp(event)
+	}
+
+	onKeyDown(event)
+	{
+		this.activeController.onKeyDown(event)
+	}
+
+	onMouseMove(event)
+	{
+		this.activeController.onMouseMove(event)
 	}
 
 	update(deltaTime)
