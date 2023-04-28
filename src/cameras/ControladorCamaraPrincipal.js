@@ -74,9 +74,11 @@ class ControladorCamaraPrincipal extends ControladorCamara
 			case 'KeyD':
 				this.moveRight = true
 				break
+			case 'KeyR':
 			case 'Space':
 				this.moveUp = true
 				break
+			case 'KeyF':
 			case 'ShiftLeft':
 				this.moveDown = true
 				break
@@ -106,9 +108,11 @@ class ControladorCamaraPrincipal extends ControladorCamara
 			case 'KeyD':
 				this.moveRight = false
 				break
+			case 'KeyR':
 			case 'Space':
 				this.moveUp = false
 				break
+			case 'KeyF':
 			case 'ShiftLeft':
 				this.moveDown = false
 				break
