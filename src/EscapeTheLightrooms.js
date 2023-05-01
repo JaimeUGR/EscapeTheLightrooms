@@ -10,7 +10,7 @@ import {
 	MeshPhongMaterial,
 	LineBasicMaterial,
 	ExtrudeGeometry,
-	ObjectLoader
+	ObjectLoader, Vector3
 } from "../libs/three.module.js";
 import {CSG} from '../libs/CSG-v2.js'
 import {MTLLoader} from "../libs/MTLLoader.js";
@@ -25,6 +25,13 @@ import {SalaPrincipal} from "./rooms/SalaPrincipal.js"
 import {SalaIzquierda} from "./rooms/SalaIzquierda.js"
 import {SalaDerecha} from "./rooms/SalaDerecha.js"
 import {SalaSuperior} from "./rooms/SalaSuperior.js"
+import {QuadTreeContainer} from "./structures/QuadTree.js"
+import {Rect} from "./structures/Rect.js"
+
+import {Cajonera} from "./models/Cajonera.js"
+import {Taquilla} from "./models/Taquilla.js"
+import {GameState} from "./GameState.js";
+import {SistemaColisiones} from "./systems/SistemaColisiones.js";
 
 
 /**
@@ -51,6 +58,9 @@ class EscapeTheLightrooms extends THREE.Scene
 		// Se crea la interfaz gráfica de usuario
 		this.gui = this.createGUI ();
 
+
+		this.inicializarGameState()
+
 		// Construimos los distinos elementos que tendremos en la escena
 
 		// Todo elemento que se desee sea tenido en cuenta en el renderizado de la escena debe pertenecer a esta. Bien como hijo de la escena (this en esta clase) o como hijo de un elemento que ya esté en la escena.
@@ -75,6 +85,8 @@ class EscapeTheLightrooms extends THREE.Scene
 
 		this.crearSalas()
 
+		this.debugQuadTree()
+
 		//
 		// Añadir las cámaras
 		//
@@ -92,13 +104,90 @@ class EscapeTheLightrooms extends THREE.Scene
 		this.clock.start()
 	}
 
+	inicializarGameState()
+	{
+		GameState.Initialize()
+
+		this.collisionSystem = new SistemaColisiones()
+		this.add(this.collisionSystem.debugNode)
+
+		// Colocar los sistemas
+		GameState.systems.collision = this.collisionSystem
+	}
+
+	debugQuadTree()
+	{
+		// Colocar dos modelos
+
+		let taq = new Taquilla({
+			taquillaX: 15, // x interna
+			taquillaY: 25, // y interna
+			taquillaZ: 15, // z interna
+			taquillaBorde: 2,
+			puertaZ: 1, // <= borde
+			numEstantes: 4,
+			estanteY: 2,
+			separacionInferiorEstantes: 5,
+			rejillaX: 10, // <= x interna
+			rejillaY: 2,
+			separacionRejillas: 3,
+			separacionSuperiorRejillas: 5
+		})
+		//taq.position.set(taq.taquillaX/2 + taq.taquillaBorde, 0, taq.taquillaZ/2 + taq.taquillaBorde)
+		taq.position.set(0, 100, 0)
+		this.add(taq)
+
+		let caj = new Cajonera({
+			cajoneraX: 20, // x interna
+			cajoneraY: 25, // y interna
+			cajoneraZ: 40, // z interna
+			cajoneraBorde: 1.5, // Borde en todos los lados (también es la separación entre cajones)
+
+			numCajones: 6,
+
+			cajonFrontalZ: 0.5,
+			cajonSueloY: 0.01,
+			cajonTraseraZ: 1,
+			cajonLateralX: 2,
+			cajonLateralY: 0.5,
+
+			cajonAsaX: 1,
+			cajonAsaY: 1,
+			cajonAsaZ: 1,
+		})
+
+		caj.position.set(0, 50, 0)
+		this.add(caj)
+
+		//
+
+		this.quadTreeNodeObject = new THREE.Object3D()
+		this.quadTree = new QuadTreeContainer(new Rect(new THREE.Vector2(200, -50),
+			new THREE.Vector2(400, 400)), 8)
+
+		// Creamos un plano con el tamaño del rect
+		let geoPlano = new THREE.PlaneGeometry(this.quadTree.rect.size.x, this.quadTree.rect.size.y)
+
+		geoPlano.rotateX(Math.PI/2)
+		geoPlano.translate(-this.quadTree.rect.size.x/2, 0, this.quadTree.rect.size.y/2)
+		geoPlano.translate(this.quadTree.rect.pos.x, 0, this.quadTree.rect.pos.y)
+
+
+
+		let geoWireFrame = new THREE.WireframeGeometry(geoPlano)
+		this.quadTreeNodeObject.add(new THREE.LineSegments(geoWireFrame, new THREE.LineBasicMaterial({
+			color: 0x33468f
+		})))
+
+		this.quadTreeNodeObject.translateY(150)
+
+		this.add(this.quadTreeNodeObject)
+	}
+
 	// Crear las salas, unirlas y colocarlas
 
 	crearSalas()
 	{
-		// Temporal
-		let largoPasillo = 20
-
 		// Crear las salas
 		this.salaPrincipal = new SalaPrincipal(150, 110, 40, {
 			up: true,
@@ -340,8 +429,6 @@ class EscapeTheLightrooms extends THREE.Scene
 		{
 			this.renderer.render (this, this.getCamera());
 		}
-
-
 
 		// Se actualiza la posición de la cámara según su controlador
 		this.gestorCamaras.update(currentDelta);

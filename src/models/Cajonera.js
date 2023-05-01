@@ -5,168 +5,173 @@ import {CSG} from "../../libs/CSG-v2.js";
 class Cajonera extends THREE.Object3D
 {
 	constructor(dimensiones = {
-
-		ancho: 1,
-		alto: 1,
-		fondo: 1,
+		cajoneraX: 1, // x interna
+		cajoneraY: 1, // y interna
+		cajoneraZ: 1, // z interna
+		cajoneraBorde: 1, // Borde en todos los lados
 
 		numCajones: 1,
-		borde: 1,
 
-		altoSuelo: 1,
+		cajonFrontalZ: 1,
+		cajonSueloY: 0.125,
+		cajonTraseraZ:1,
+		cajonLateralX: 1,
+		cajonLateralY: 1,
 
-		anchoCara: 1,
-		fondoCara: 1,
-
-		anchoPared: 1,
-		altoPared: 1,
-
-
-		anchoCaraTrasera: 1,
-		fondoCaraTrasera:1,
-
-		anchoAsa: 1,
-		altoAsa: 1,
-		fondoAsa: 1,
-
+		cajonAsaX: 1,
+		cajonAsaY: 1,
+		cajonAsaZ: 1,
 	})
 	{
 		//TODO: Añadir Mesh encima de la cajonera y añadir lista de Mesh de los cajones
 		super()
 
-		this.ancho = dimensiones.ancho
-		this.alto = dimensiones.alto
-		this.fondo = dimensiones.fondo
+		// Dimensiones
+		this.cajoneraX = dimensiones.cajoneraX
+		this.cajoneraY = dimensiones.cajoneraY
+		this.cajoneraZ = dimensiones.cajoneraZ
+		this.cajoneraBorde = dimensiones.cajoneraBorde
 
-		this.borde= dimensiones.borde
-		this.separacion = this.borde //TODO
-
-		this.altoSuelo = dimensiones.altoSuelo
-
-		this.anchoCara = dimensiones.anchoCara
-		this.fondoCara = dimensiones.fondoCara
-
-		this.anchoAsa = dimensiones.anchoAsa
-		this.altoAsa = dimensiones.altoAsa
-		this.fondoAsa = dimensiones.fondoAsa
-
-		this.anchoCaraTrasera = dimensiones.anchoCara
-		this.fondoCaraTrasera = dimensiones.fondoCaraTrasera
-
-		this.anchoPared = dimensiones.anchoPared
-
-		this.fondoSuelo = this.fondo - (this.borde + this.fondoCara + this.fondoCaraTrasera)
-		this.anchoSuelo = this.anchoCara - 2*this.anchoPared
-
+		this.separacionCajones = dimensiones.separacionCajones
 		this.numCajones = dimensiones.numCajones
-		this.altoCara = ((this.alto - 2*this.borde) - ((this.numCajones -1) * this.separacion)) / this.numCajones
 
-		this.altoPared = this.altoCara * dimensiones.altoPared
+		this.cajonFrontalZ = dimensiones.cajonFrontalZ
+		this.cajonSueloY = dimensiones.cajonSueloY
+		this.cajonLateralX = dimensiones.cajonLateralX
+		this.cajonLateralY = dimensiones.cajonLateralY
+		this.cajonTraseraZ = dimensiones.cajonTraseraZ
 
+		this.cajonAsaX = dimensiones.cajonAsaX
+		this.cajonAsaY = dimensiones.cajonAsaY
+		this.cajonAsaZ = dimensiones.cajonAsaZ
+
+		// Dimensiones calculadas
+		this.cajonSueloX = this.cajoneraX - 2*this.cajonLateralX
+		this.cajonSueloZ = this.cajoneraZ + this.cajoneraBorde - (this.cajonFrontalZ + this.cajonTraseraZ)
+		this.cajonFrontalY = this.cajoneraY / this.numCajones - this.cajoneraBorde + this.cajoneraBorde/this.numCajones
+
+		// Otros
+		this.cajonAperturaZ = this.cajoneraZ + this.cajoneraBorde - this.cajonTraseraZ
+		this.cajones = []
 
 		// Materiales
-		//this.cajonMaterial = new THREE.MeshNormalMaterial({color: 0Xf1f1f1,opacity: 0.5,transparent: true})
-		this.cajonMaterial1 = new THREE.MeshBasicMaterial({color: 0x349f21})
-		this.cajonMaterial2 = new THREE.MeshBasicMaterial({color: 0x825a65})
-		this.cajonMaterial3 = new THREE.MeshBasicMaterial({color: 0x71989a})
-		this.cajonMaterial4= new THREE.MeshBasicMaterial({color: 0xaf94fa})
+		this.cajoneraMaterial = new THREE.MeshNormalMaterial({color: 0xf1f1f1, opacity: 0.5, transparent: true})//new THREE.MeshBasicMaterial({color: 0x349f21})
+		this.cajonFrontalMaterial = new THREE.MeshNormalMaterial({color: 0xf1f1f1, opacity: 0.5, transparent: true})//new THREE.MeshBasicMaterial({color: 0x825a65})
+		this.cajonParedesMaterial = new THREE.MeshNormalMaterial({color: 0xf1f1f1, opacity: 0.5, transparent: true})//new THREE.MeshBasicMaterial({color: 0x71989a})
+		this.cajonSueloMaterial = new THREE.MeshNormalMaterial({color: 0xf1f1f1, opacity: 0.5, transparent: true})//new THREE.MeshBasicMaterial({color: 0xaf94fa})
+		this.cajonAsaMaterial = new THREE.MeshNormalMaterial({color: 0xf1f1f1, opacity: 0.5, transparent: true})//new THREE.MeshBasicMaterial({color: 0xaf94fa})
 
+		//
+		//
+		//
 
-		let cajoneraGeometry = new THREE.BoxGeometry(this.ancho, this.alto, this.fondo)
-		cajoneraGeometry.translate(0, this.alto/2, 0)
+		// Crear la cajonera
+		let geoCajonera = new THREE.BoxGeometry(this.cajoneraX + 2*this.cajoneraBorde,
+			this.cajoneraY + 2*this.cajoneraBorde, this.cajoneraZ + 2*this.cajoneraBorde)
+		geoCajonera.translate(0, this.cajoneraY/2 + this.cajoneraBorde, 0)
 
-		let cajonera = new THREE.Mesh(cajoneraGeometry, this.cajonMaterial1)
+		// Crear el hueco
+		let geoHuecoCajon = new THREE.BoxGeometry(this.cajoneraX, this.cajonFrontalY, this.cajoneraZ + this.cajoneraBorde)
+		geoHuecoCajon.translate(0, this.cajonFrontalY/2 + this.cajoneraBorde, this.cajoneraBorde/2)
 
-		let cajaTempGeometry = new THREE.BoxGeometry(this.anchoCara,this.altoCara,this.fondoCara+this.fondoSuelo+this.fondoCaraTrasera)
+		// Hacer los huecos y colocar los cajones
+		let cajon = this.crearCajon()
+		cajon.position.set(0, this.cajonSueloY/2 + this.cajoneraBorde, this.cajoneraBorde - this.cajonFrontalZ)
 
-		cajaTempGeometry.translate(0,this.altoCara/2,this.borde/2)
-		cajaTempGeometry.translate(0,this.borde,0)
+		let csg = new CSG().union([new THREE.Mesh(geoCajonera, this.cajoneraMaterial)])
 
-		let csg = new CSG()
-		csg.union([cajonera])
-
-		for(let i= 0; i < this.numCajones; i++)
+		for (let i = 0; i < this.numCajones; i++)
 		{
-			csg.subtract([new THREE.Mesh(cajaTempGeometry,null)])
-			cajaTempGeometry.translate(0,this.altoCara+this.separacion,0)
+			csg.subtract([new THREE.Mesh(geoHuecoCajon, null)])
+			geoHuecoCajon.translate(0, 0, 0)
+
+			this.add(cajon)
+			this.cajones.push(cajon)
+
+			cajon = cajon.clone()
+			geoHuecoCajon.translate(0, this.cajonFrontalY + this.cajoneraBorde, 0)
+			cajon.translateY(this.cajonFrontalY + this.cajoneraBorde)
 		}
 
-		cajonera= csg.toMesh()
-		let cajon = this.createCajon()
-		cajon.translateY(this.borde)
-		cajon.translateZ(this.borde/2-this.fondoCara/2+this.fondoCaraTrasera/2)
-
-		for(let i= 0; i < this.numCajones; i++)
-		{
-			this.add(cajon.clone())
-			cajon.position.y += this.altoCara + this.separacion
-		}
-
-		this.add(cajonera)
-		this.position.set(this.ancho/2, 0, this.fondo/2)
+		this.add(csg.toMesh())
 	}
 
-	createCajon()
+	// TODO: Animacion
+	abrirCajon(numCajon)
 	{
+		this.cajones[numCajon].translateZ(this.cajonAperturaZ)
+	}
 
-		let cajon = new THREE.Object3D();
+	// TODO: Animacion
+	cerrarCajon(numCajon)
+	{
+		this.cajones[numCajon].translateZ(-this.cajonAperturaZ)
+	}
 
-		let sueloGeometry = new THREE.BoxGeometry(this.anchoSuelo,this.altoSuelo,this.fondoSuelo)
-		sueloGeometry.translate(0,-this.altoSuelo/2,0)
-		let suelo = new THREE.Mesh(sueloGeometry, this.cajonMaterial4)
+	// TODO: Para la interacción, probablemente necesitemos que sea su propia clase con una
+	// NOTE: PRIMERO: Pensar si, con añadir una referencia al padre que tiene el objeto colocado
+	// (pe destornillador) y  llamando a padre.remove(this) se puede hacer.
+	// Entonces no sería necesaria una clase propia.
+	crearCajon()
+	{
+		// Object cajón
+		let cajon = new THREE.Object3D()
 
-		let caraDelanteraGeometry = new THREE.BoxGeometry(this.anchoCara,this.altoCara,this.fondoCara)
-		caraDelanteraGeometry.translate(0,this.altoCara/2-this.altoSuelo,this.fondoSuelo/2+this.fondoCara/2)
-		let caraDelantera = new THREE.Mesh(caraDelanteraGeometry,this.cajonMaterial2)
+		// Crear el suelo
+		let geoSuelo = new THREE.BoxGeometry(this.cajonSueloX, this.cajonSueloY, this.cajonSueloZ)
+		geoSuelo.translate(0, -this.cajonSueloY/2, 0)
 
-		let caraTraseraGeometry = new THREE.BoxGeometry(this.anchoCaraTrasera,this.altoCara,this.fondoCaraTrasera)
-		caraTraseraGeometry.translate(0,this.altoCara/2-this.altoSuelo,-this.fondoCaraTrasera/2-this.fondoSuelo/2)
-		let caraTrasera = new THREE.Mesh(caraTraseraGeometry,this.cajonMaterial2)
+		cajon.add(new THREE.Mesh(geoSuelo, this.cajonSueloMaterial))
 
-		let paredIzqGeometry = new THREE.BoxGeometry(this.anchoPared,this.altoPared,this.fondoSuelo)
-		paredIzqGeometry.translate(-this.anchoPared/2 -this.anchoSuelo/2,this.altoPared/2-this.altoSuelo,0)
+		// Crear los laterales del cajón
+		let geoParedLateral = new THREE.BoxGeometry(this.cajonLateralX, this.cajonLateralY, this.cajonSueloZ)
+		geoParedLateral.translate(-(this.cajonLateralX/2 + this.cajonSueloX/2) ,
+			this.cajonLateralY/2 - this.cajonSueloY/2, 0)
 
-		let paredIzq = new THREE.Mesh(paredIzqGeometry,this.cajonMaterial3)
+		cajon.add(new THREE.Mesh(geoParedLateral.clone(), this.cajonParedesMaterial))
 
-		let paredDchaGeometry = new THREE.BoxGeometry(this.anchoPared,this.altoPared,this.fondoSuelo)
-		paredDchaGeometry.translate(this.anchoPared/2 +this.anchoSuelo/2,this.altoPared/2-this.altoSuelo,0)
+		geoParedLateral.translate(this.cajonSueloX + this.cajonLateralX, 0, 0)
+		cajon.add(new THREE.Mesh(geoParedLateral, this.cajonParedesMaterial))
 
-		let paredDcha = new THREE.Mesh(paredDchaGeometry,this.cajonMaterial3)
+		// Crear la pared trasera del cajón
+		let geoParedTrasera = new THREE.BoxGeometry(this.cajoneraX, this.cajonFrontalY, this.cajonTraseraZ)
+		geoParedTrasera.translate(0, this.cajonFrontalY/2 - this.cajonSueloY/2, -(this.cajonTraseraZ/2 + this.cajonSueloZ/2))
 
-		this.asa = this.createAsa()
+		cajon.add(new THREE.Mesh(geoParedTrasera, this.cajonParedesMaterial))
 
-		cajon.add(suelo)
-		cajon.add(caraDelantera)
-		cajon.add(caraTrasera)
-		cajon.add(paredIzq)
-		cajon.add(paredDcha)
-		cajon.add(this.asa)
+		// Crear la pared frontal del cajón
+		let geoParedFrontal = new THREE.BoxGeometry(this.cajoneraX, this.cajonFrontalY, this.cajonFrontalZ)
+		geoParedFrontal.translate(0, this.cajonFrontalY/2 - this.cajonSueloY/2, this.cajonFrontalZ/2 + this.cajonSueloZ/2)
 
-		return cajon;
+		cajon.add(new THREE.Mesh(geoParedFrontal, this.cajonFrontalMaterial))
+
+		// Añadir el asa TODO
+
+		return cajon
 	}
 
 	createAsa() {
 
 		let asa = new THREE.Object3D();
 
-		let asaFrontalGeometry = new THREE.BoxGeometry(this.anchoAsa,this.altoAsa,this.fondoAsa);
-		asaFrontalGeometry.translate(0,this.altoAsa/2 + this.altoCara/2,this.fondoSuelo/2 + 3*this.fondoAsa  + this.fondoCara );
+		let asaFrontalGeometry = new THREE.BoxGeometry(this.cajonAsaX,this.cajonAsaY,this.cajonAsaZ);
+		asaFrontalGeometry.translate(0,this.cajonAsaY/2 + this.altoCara/2,this.fondoSuelo/2 + 3*this.cajonAsaZ  + this.cajonFrontalZ );
 
-		let asaFrontal = new THREE.Mesh(asaFrontalGeometry,this.cajonMaterial4);
-
-		asa.add(asaFrontal)
-
-		let asaIzqGeometry = new THREE.BoxGeometry(this.anchoAsa/4,this.altoAsa,3*this.fondoAsa);
-		asaIzqGeometry.translate(((-this.anchoAsa/4)/2) - this.anchoAsa/2,this.altoAsa/2 + this.altoCara/2,(3*this.fondoAsa)/2 + this.fondoSuelo/2  + this.fondoCara);
-
-		let asaIzq = new THREE.Mesh(asaIzqGeometry,this.cajonMaterial4);
+		let asaFrontal = new THREE.Mesh(asaFrontalGeometry,this.cajonSueloMaterial);
 
 		asa.add(asaFrontal)
 
-		let asaDchaGeometry = new THREE.BoxGeometry(this.anchoAsa/4,this.altoAsa,3*this.fondoAsa);
-		asaDchaGeometry.translate(((this.anchoAsa/4)/2) + this.anchoAsa/2,this.altoAsa/2 + this.altoCara/2,(3*this.fondoAsa)/2 + this.fondoSuelo/2 + this.fondoCara);
+		let asaIzqGeometry = new THREE.BoxGeometry(this.cajonAsaX/4,this.cajonAsaY,3*this.cajonAsaZ);
+		asaIzqGeometry.translate(((-this.cajonAsaX/4)/2) - this.cajonAsaX/2,this.cajonAsaY/2 + this.altoCara/2,(3*this.cajonAsaZ)/2 + this.fondoSuelo/2  + this.cajonFrontalZ);
 
-		let asaDcha = new THREE.Mesh(asaDchaGeometry,this.cajonMaterial4);
+		let asaIzq = new THREE.Mesh(asaIzqGeometry,this.cajonSueloMaterial);
+
+		asa.add(asaFrontal)
+
+		let asaDchaGeometry = new THREE.BoxGeometry(this.cajonAsaX/4,this.cajonAsaY,3*this.cajonAsaZ);
+		asaDchaGeometry.translate(((this.cajonAsaX/4)/2) + this.cajonAsaX/2,this.cajonAsaY/2 + this.altoCara/2,(3*this.cajonAsaZ)/2 + this.fondoSuelo/2 + this.cajonFrontalZ);
+
+		let asaDcha = new THREE.Mesh(asaDchaGeometry,this.cajonSueloMaterial);
 
 		asa.add(asaFrontal)
 		asa.add(asaIzq)

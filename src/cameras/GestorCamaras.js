@@ -2,6 +2,7 @@
 import {PerspectiveCamera} from "../../libs/three.module.js";
 import {ControladorCamaraPrincipal} from "./ControladorCamaraPrincipal.js";
 import {ControladorCamaraCinematica} from "./ControladorCamaraCinematica.js";
+import {GameState} from "../GameState.js";
 
 const ID_CAMARA_PRINCIPAL = 0
 const ID_CAMARA_CINEMATICA = 1
@@ -19,8 +20,10 @@ class GestorCamaras
 
 		// Crear la cámara principal
 		this.camaraPrincipal = new PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000)
-		// TODO: Será la posición del jugador en el GameState
-		this.camaraPrincipal.position.set(25, 20, 25)
+
+		// Colocar la cámara en la posición del jugador inicial
+		this.camaraPrincipal.position.set(GameState.player.position.x, GameState.player.position.y, GameState.player.position.z)
+		this.camaraPrincipal.lookAt(GameState.player.position.x, GameState.player.position.y, GameState.player.position.z + 1)
 
 		// Añadir el controlador principal
 		this._crearControladorPrincipal()

@@ -2,8 +2,8 @@
 import {Pasillo, Sala} from "./Sala.js"
 
 import {Mesa} from "../models/Mesa.js"
-import {Cajonera} from "../models/Cajonera.js";
-import {Taquilla} from "../models/Taquilla.js";
+import {Cajonera} from "../models/Cajonera.js"
+import {Taquilla} from "../models/Taquilla.js"
 
 class SalaPrincipal extends Sala
 {
@@ -88,8 +88,30 @@ class SalaPrincipal extends Sala
 			separacionSuperiorRejillas: 5
 		})
 		//taq.position.set(taq.taquillaX/2 + taq.taquillaBorde, 0, taq.taquillaZ/2 + taq.taquillaBorde)
-		taq.position.set(0, 50, 0)
+		taq.position.set(0, 100, 0)
 		this.add(taq)
+
+		let caj = new Cajonera({
+			cajoneraX: 20, // x interna
+			cajoneraY: 25, // y interna
+			cajoneraZ: 40, // z interna
+			cajoneraBorde: 1.5, // Borde en todos los lados (también es la separación entre cajones)
+
+			numCajones: 6,
+
+			cajonFrontalZ: 0.5,
+			cajonSueloY: 0.01,
+			cajonTraseraZ: 1,
+			cajonLateralX: 2,
+			cajonLateralY: 0.5,
+
+			cajonAsaX: 1,
+			cajonAsaY: 1,
+			cajonAsaZ: 1,
+		})
+
+		caj.position.set(0, 50, 0)
+		this.add(caj)
 	}
 
 	colocarPuzles()
