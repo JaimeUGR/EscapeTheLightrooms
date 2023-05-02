@@ -47,13 +47,11 @@ class ControladorCamaraPrincipal extends ControladorCamara
 	onMouseMove(event)
 	{
 		// TODO: Cuando se hace el desbloqueo, hay que ignorar esto o la cámara se moverá
-		console.log("A")
 		this.controlador._onMouseMove(event)
 	}
 
 	onKeyDown(event)
 	{
-		console.log(event.code)
 		switch (event.code)
 		{
 			case 'ArrowUp':

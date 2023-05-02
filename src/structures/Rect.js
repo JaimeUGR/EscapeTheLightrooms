@@ -5,13 +5,21 @@ class Rect
 {
 	/**
 	 *
-	 * @param position Vector(x, y) con la posición de la esquina inferior izquierda
+	 * @param position Vector(x, y) con la posición de la esquina inferior derecha
 	 * @param size Vector(x, y) con el tamaño
 	 */
 	constructor(position, size)
 	{
 		this.pos = position
 		this.size = size
+	}
+
+	set(position, size)
+	{
+		this.pos = position
+		this.size = size
+
+		return this
 	}
 
 	containsRectangle(r)

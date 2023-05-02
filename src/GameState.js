@@ -9,7 +9,7 @@ class GameState
 	{
 		this.player = {
 			position: new Vector3(0, 20, 5),
-			rect: new Rect(new Vector2(2.5, -2.5), new Vector2(5, 5)),
+			rect: new Rect(new Vector2(-2.5, -2.5), new Vector2(5, 5)),
 			movementVector: new Vector3(0, 0, 0)
 		}
 
