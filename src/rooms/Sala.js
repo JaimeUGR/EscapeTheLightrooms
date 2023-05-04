@@ -1,6 +1,10 @@
 
 import * as THREE from '../../libs/three.module.js'
 import {CSG} from "../../libs/CSG-v2.js";
+import {Rect} from "../structures/Rect.js";
+import {Vector2} from "../../libs/three.module.js";
+import {GameState} from "../GameState.js";
+import {SistemaColisiones} from "../systems/SistemaColisiones.js";
 
 const Sala_PuertaAncho = 20
 const Sala_PuertaAlto = 30
@@ -81,10 +85,121 @@ class Sala extends THREE.Object3D
 		paredDchaGeo.translate(-Sala_GrosorPared/2, 0, largoParedZ/2)
 
 		// Añadir las paredes
-		this.add(new THREE.Mesh(paredAbajoGeo, materialPared))
-		this.add(new THREE.Mesh(paredArribaGeo, materialPared))
-		this.add(new THREE.Mesh(paredIzdaGeo, materialPared))
-		this.add(new THREE.Mesh(paredDchaGeo, materialPared))
+		this.paredAbajo = new THREE.Mesh(paredAbajoGeo, materialPared)
+		this.paredArriba = new THREE.Mesh(paredArribaGeo, materialPared)
+		this.paredIzda = new THREE.Mesh(paredIzdaGeo, materialPared)
+		this.paredDcha = new THREE.Mesh(paredDchaGeo, materialPared)
+
+		// Calcular los colliders como box
+		this.baseColliders = []
+
+		let tmpBox = new THREE.Box3()
+		let tmpMin = null
+		let tmpMax = null
+		let tmpOffset = 0
+
+		// TODO: Limpiar esto
+
+		// Pared abajo
+		if (!puertas.down)
+			this.baseColliders.push(new THREE.Box3().setFromObject(this.paredAbajo))
+		else
+		{
+			// Calcular un collider intermedio
+			tmpBox.setFromObject(this.paredAbajo)
+			tmpMin = tmpBox.min
+			tmpMax = tmpBox.max
+
+			tmpOffset = largoParedX/2 + Sala_PuertaAncho/2
+
+			// Coger el collider izquierdo
+			let ladoDcha = new THREE.Box3(tmpMin.clone(), new THREE.Vector3(tmpMax.x - tmpOffset, tmpMax.y, tmpMax.z))
+
+			// Coger el collider derecho
+			let ladoIzda = ladoDcha.clone()
+			ladoDcha.max.x += tmpOffset
+			ladoDcha.min.x += tmpOffset
+
+			this.baseColliders.push(ladoIzda)
+			this.baseColliders.push(ladoDcha)
+		}
+
+		// Pared abajo
+		if (!puertas.up)
+			this.baseColliders.push(new THREE.Box3().setFromObject(this.paredArriba))
+		else
+		{
+			// Calcular un collider intermedio
+			tmpBox.setFromObject(this.paredArriba)
+			tmpMin = tmpBox.min
+			tmpMax = tmpBox.max
+
+			tmpOffset = largoParedX/2 + Sala_PuertaAncho/2
+
+			// Coger el collider izquierdo
+			let ladoDcha = new THREE.Box3(tmpMin.clone(), new THREE.Vector3(tmpMax.x - tmpOffset, tmpMax.y, tmpMax.z))
+
+			// Coger el collider derecho
+			let ladoIzda = ladoDcha.clone()
+			ladoDcha.max.x += tmpOffset
+			ladoDcha.min.x += tmpOffset
+
+			this.baseColliders.push(ladoIzda)
+			this.baseColliders.push(ladoDcha)
+		}
+
+		// Pared izda
+		if (!puertas.left)
+			this.baseColliders.push(new THREE.Box3().setFromObject(this.paredIzda))
+		else
+		{
+			// Calcular un collider intermedio
+			tmpBox.setFromObject(this.paredIzda)
+			tmpMin = tmpBox.min
+			tmpMax = tmpBox.max
+
+			tmpOffset = largoParedZ/2 + Sala_PuertaAncho/2
+
+			// Coger el collider izquierdo
+			let ladoAbajo = new THREE.Box3(tmpMin.clone(), new THREE.Vector3(tmpMax.x, tmpMax.y, tmpMax.z - tmpOffset))
+
+			// Coger el collider derecho
+			let ladoArriba = ladoAbajo.clone()
+			ladoArriba.max.z += tmpOffset
+			ladoArriba.min.z += tmpOffset
+
+			this.baseColliders.push(ladoAbajo)
+			this.baseColliders.push(ladoArriba)
+		}
+
+		// Pared dcha
+		if (!puertas.right)
+			this.baseColliders.push(new THREE.Box3().setFromObject(this.paredDcha))
+		else
+		{
+			// Calcular un collider intermedio
+			tmpBox.setFromObject(this.paredDcha)
+			tmpMin = tmpBox.min
+			tmpMax = tmpBox.max
+
+			tmpOffset = largoParedZ/2 + Sala_PuertaAncho/2
+
+			// Coger el collider izquierdo
+			let ladoAbajo = new THREE.Box3(tmpMin.clone(), new THREE.Vector3(tmpMax.x, tmpMax.y, tmpMax.z - tmpOffset))
+
+			// Coger el collider derecho
+			let ladoArriba = ladoAbajo.clone()
+			ladoArriba.max.z += tmpOffset
+			ladoArriba.min.z += tmpOffset
+
+			this.baseColliders.push(ladoAbajo)
+			this.baseColliders.push(ladoArriba)
+		}
+
+		this.add(this.paredAbajo)
+		this.add(this.paredArriba)
+		this.add(this.paredIzda)
+		this.add(this.paredDcha)
 
 		// Añadir el suelo
 		let sueloGeo = new THREE.BoxGeometry(largoParedX, 1, largoParedZ)
@@ -102,6 +217,30 @@ class Sala extends THREE.Object3D
 	recortarPuerta(paredGeo, material, puerta)
 	{
 		return new CSG().union([new THREE.Mesh(paredGeo, material)]).subtract([puerta]).toGeometry()
+	}
+
+	getRectColliders()
+	{
+		this.updateMatrixWorld(true)
+
+		/*for (let baseCollider of this.baseColliders)
+		{
+			let col = baseCollider.clone()
+			col.applyMatrix4(this.matrixWorld)
+			// Pared Inferior
+
+			let colliderTest = baseCollider
+			let colTestMin = colliderTest.min
+			let colTestMax = colliderTest.max
+
+			// Recalcular el collider con los tamaños
+			let miRect = new Rect(new Vector2(colTestMin.x, colTestMin.z), new Vector2(colTestMax.x - colTestMin.x, colTestMax.z - colTestMin.z))
+
+			GameState.systems.collision.aniadeBB(miRect)
+		}*/
+
+		// Devolver el array con los colliders
+		return SistemaColisiones.Box3ArrayToRectArray(this.baseColliders, this.matrixWorld)
 	}
 }
 
@@ -159,6 +298,7 @@ class Pasillo extends THREE.Object3D
 		let geoCierre = new THREE.BoxGeometry(Sala_GrosorPared + espacioInterno, alturaPasillo, Pasillo_Cierre_Grosor)
 		geoCierre.translate(Sala_GrosorPared/2, alturaPasillo/2, 0)
 
+		// Se utilizará para eliminar el collider cuando se abra
 		this.meshCierre = new THREE.Mesh(geoCierre, materialCierre)
 
 		this.add(this.meshCierre)
@@ -187,6 +327,8 @@ class Pasillo extends THREE.Object3D
 	{
 		console.log("ME DESBLOQUEAN")
 		this.meshCierre.translateX(this.espacioInterno)
+
+		// TODO: Cuando se abra, eliminar el collider
 	}
 }
 

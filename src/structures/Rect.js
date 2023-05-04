@@ -38,6 +38,14 @@ class Rect
 	{
 		return !(point.x < this.pos.x || point.y < this.pos.y || point.x >= (this.pos.x + this.size.x) || point.y >= (this.pos.y + this.size.y));
 	}
+
+	translate(valX, valY)
+	{
+		this.pos.x += valX
+		this.pos.y += valY
+	}
+
+	// TODO: Añadir un método de rotación que lo mantenga AABB
 }
 
 export {Rect}

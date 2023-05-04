@@ -10,7 +10,7 @@ import {
 	MeshPhongMaterial,
 	LineBasicMaterial,
 	ExtrudeGeometry,
-	ObjectLoader, Vector3
+	ObjectLoader, Vector3, Vector2
 } from "../libs/three.module.js";
 import {CSG} from '../libs/CSG-v2.js'
 import {MTLLoader} from "../libs/MTLLoader.js";
@@ -108,7 +108,12 @@ class EscapeTheLightrooms extends THREE.Scene
 	{
 		GameState.Initialize()
 
-		this.collisionSystem = new SistemaColisiones()
+		this.collisionSystem = new SistemaColisiones({
+			startPos: new Vector2(-500, -100),
+			size: new Vector2(1000, 1000),
+			maxDepth: 7
+		})
+
 		this.add(this.collisionSystem.debugNode)
 
 		// Colocar los sistemas
@@ -158,30 +163,6 @@ class EscapeTheLightrooms extends THREE.Scene
 
 		caj.position.set(0, 50, 0)
 		this.add(caj)
-
-		//
-
-		this.quadTreeNodeObject = new THREE.Object3D()
-		this.quadTree = new QuadTreeContainer(new Rect(new THREE.Vector2(200, -50),
-			new THREE.Vector2(400, 400)), 8)
-
-		// Creamos un plano con el tamaño del rect
-		let geoPlano = new THREE.PlaneGeometry(this.quadTree.rect.size.x, this.quadTree.rect.size.y)
-
-		geoPlano.rotateX(Math.PI/2)
-		geoPlano.translate(-this.quadTree.rect.size.x/2, 0, this.quadTree.rect.size.y/2)
-		geoPlano.translate(this.quadTree.rect.pos.x, 0, this.quadTree.rect.pos.y)
-
-
-
-		let geoWireFrame = new THREE.WireframeGeometry(geoPlano)
-		this.quadTreeNodeObject.add(new THREE.LineSegments(geoWireFrame, new THREE.LineBasicMaterial({
-			color: 0x33468f
-		})))
-
-		this.quadTreeNodeObject.translateY(150)
-
-		this.add(this.quadTreeNodeObject)
 	}
 
 	// Crear las salas, unirlas y colocarlas
@@ -235,6 +216,11 @@ class EscapeTheLightrooms extends THREE.Scene
 		this.add(this.salaIzquierda)
 		this.add(this.salaDerecha)
 		this.add(this.salaSuperior)
+
+		this.collisionSystem.aniadeRectColliders(this.salaPrincipal.uuid, this.salaPrincipal.getRectColliders())
+		this.collisionSystem.aniadeRectColliders(this.salaIzquierda.uuid, this.salaIzquierda.getRectColliders())
+		this.collisionSystem.aniadeRectColliders(this.salaDerecha.uuid, this.salaDerecha.getRectColliders())
+		this.collisionSystem.aniadeRectColliders(this.salaSuperior.uuid, this.salaSuperior.getRectColliders())
 	}
 
 	//
@@ -248,7 +234,7 @@ class EscapeTheLightrooms extends THREE.Scene
 	{
 		this.gestorCamaras = new GestorCamaras(this)
 
-		// TEMPORAL
+		// TODO: TEMPORAL
 		this.pantallaPausa = document.getElementById("pantalla")
 		this.pantallaPausa.addEventListener('click', this.cambiarCamara.bind(this))
 

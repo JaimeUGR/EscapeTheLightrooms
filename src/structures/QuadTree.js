@@ -41,7 +41,7 @@ class QuadTree
 						this.quads[i] = new QuadTree(this.quadAreas[i], this.maxDepth, this.depth + 1)
 					}
 
-					return this.quads[i].insert(index)
+					return this.quads[i].insert(rect, index)
 				}
 			}
 		}
@@ -68,12 +68,12 @@ class QuadTree
 		return replacedGlobalIndex
 	}
 
-	searchArea(rect, resultItems)
+	searchArea(rect, allItems, resultItems)
 	{
 		// Comprobamos si mis items tienen overlap con el área
 		for (let i = 0; i < this.items.length; i++)
 		{
-			if (this.items[i].overlapsRectangle(rect))
+			if (allItems[this.items[i]].rect.overlapsRectangle(rect))
 				resultItems.push(this.items[i])
 		}
 
@@ -89,7 +89,7 @@ class QuadTree
 				// If child overlaps with search area then checks need
 				// to be made
 			else if (this.quadAreas[i].overlapsRectangle(rect))
-				this.quads[i].searchArea(rect, resultItems);
+				this.quads[i].searchArea(rect, allItems, resultItems);
 			}
 		}
 	}
@@ -118,14 +118,12 @@ class QuadTreeContainer
 	{
 		this.allObjects = []
 		this.root = new QuadTree(rect, maxDepth, depth)
-		this.rect = rect
 	}
 
 	// Devuelve el objInfo
-	insert(obj, rect)
+	insert(rect)
 	{
 		let objInfo = {
-			obj: obj,
 			rect: rect,
 			globalIndex: this.allObjects.length,
 			localIndex: -1,
@@ -148,20 +146,43 @@ class QuadTreeContainer
 		return objInfo
 	}
 
+	// Asumiremos que los rectángulos serán diferentes
+	update(globalIdx, newRect)
+	{
+		// Eliminamos el objeto actual y actualizamos el intercambiado si se ha intercambiado
+		let objInfo = this.allObjects[globalIdx]
+		let replacedGlobalIndex = objInfo.localQuad.remove(objInfo.localIndex)
+
+		if (replacedGlobalIndex !== -1)
+		{
+			// Actualizamos el índice local de este objeto
+			this.allObjects[replacedGlobalIndex].localIndex = objInfo.localIndex
+		}
+
+		// Usando su mismo índice global, lo reinserto
+		let insertResult = this.root.insert(newRect, objInfo.globalIndex)
+
+		objInfo.localIndex = insertResult[0]
+		objInfo.localQuad = insertResult[1]
+
+		// Actualizamos el rect
+		objInfo.rect = newRect
+
+		return objInfo
+	}
+
 	searchArea(rect)
 	{
 		// Devuelve la objInfo de todos los objetos del area
 		let indexBuffer = []
 
-		this.root.searchArea(rect, indexBuffer)
+		this.root.searchArea(rect, this.allObjects, indexBuffer)
 
-		let resultBuffer = new Array(indexBuffer.length)
+		let resultBuffer = []//new Array(indexBuffer.length)
 
 		// Añadimos los objInfo
 		for (let i = 0; i < indexBuffer.length; i++)
-		{
-			resultBuffer.push(this.allObjects[indexBuffer[i]])
-		}
+			resultBuffer.push(this.allObjects[indexBuffer[i]].rect)
 
 		return resultBuffer
 	}
@@ -170,9 +191,7 @@ class QuadTreeContainer
 	remove(index)
 	{
 		// Eliminamos el item de la lista local correspondiente
-
 		let objInfo = this.allObjects[index]
-
 		let replacedGlobalIndex  = objInfo.localQuad.remove(objInfo.localIndex)
 
 		if (replacedGlobalIndex !== -1)
@@ -182,12 +201,14 @@ class QuadTreeContainer
 		}
 
 		// Ahora, para eliminar el item global, lo llevamos al final si su índice global no es el último
-
 		if (index < this.allObjects.length - 1)
 		{
 			let replacedObjData = this.allObjects[this.allObjects.length - 1]
+
 			replacedObjData.globalIndex = index
 			replacedObjData.localQuad.items[replacedObjData.localIndex] = index
+
+			this.allObjects[index] = replacedObjData
 		}
 
 		this.allObjects.pop()

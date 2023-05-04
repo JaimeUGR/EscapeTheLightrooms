@@ -5,6 +5,10 @@ import {Mesa} from "../models/Mesa.js"
 import {Cajonera} from "../models/Cajonera.js"
 import {Taquilla} from "../models/Taquilla.js"
 
+import {GameState} from "../GameState.js";
+import {Box2, Box3, Vector2, Vector3} from "../../libs/three.module.js";
+import {Rect} from "../structures/Rect.js"
+
 class SalaPrincipal extends Sala
 {
 	constructor(largoParedX, largoParedZ, alturaPared, puertas = {
@@ -59,6 +63,9 @@ class SalaPrincipal extends Sala
 
 		// TODO TEMPORAL
 		this.pasilloSuperior.desbloquear()
+
+		// TODO TEMPORAL
+		// Añadir un método para meter los colliders del pasillo, actualizando esta matriz de paso
 	}
 
 	colocarMateriales()
