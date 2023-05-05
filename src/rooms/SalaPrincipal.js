@@ -68,6 +68,15 @@ class SalaPrincipal extends Sala
 		// Añadir un método para meter los colliders del pasillo, actualizando esta matriz de paso
 	}
 
+	updateColliders()
+	{
+		super.updateColliders()
+
+		this.pasilloIzquierda.updateColliders()
+		this.pasilloDerecha.updateColliders()
+		this.pasilloSuperior.updateColliders()
+	}
+
 	colocarMateriales()
 	{
 

@@ -46,10 +46,6 @@ class SistemaColisiones
 		this.colliderTree = new QuadTreeContainer(new Rect(qtInfo.startPos, qtInfo.size), qtInfo.maxDepth)
 		this.colObjectMap = new Map()
 
-		this.debugObjectMap = new Map()
-
-		this.colliders = []
-
 		//
 		// Datos Cache
 		//
@@ -70,6 +66,7 @@ class SistemaColisiones
 		//
 		// DEBUG
 		//
+		this.debugObjectMap = new Map()
 		this.debugNode = new THREE.Object3D()
 		this.debugNode.translateY(50)
 		this.debugPlayerBB = null
@@ -77,8 +74,6 @@ class SistemaColisiones
 		let geoPlano = new THREE.PlaneGeometry(GameState.player.rect.size.x, GameState.player.rect.size.y)
 
 		geoPlano.rotateX(Math.PI/2)
-		/*geoPlano.translate(GameState.player.rect.size.x/2, 0, GameState.player.rect.size.y/2)
-		geoPlano.translate(GameState.player.rect.pos.x, 0, GameState.player.rect.pos.y)*/
 
 		this.debugPlayerBB = new THREE.LineSegments(new THREE.WireframeGeometry(geoPlano), new THREE.LineBasicMaterial({
 			color: 0xffde2b
@@ -86,10 +81,10 @@ class SistemaColisiones
 		this.debugNode.add(this.debugPlayerBB)
 
 		// Para hacer debug
-		this.aniadeBB(new Rect(new THREE.Vector2(10, 0), new THREE.Vector2(50, 20)))
-		//for (let i = 0; i < 200; i++)
-		this.aniadeBB(new Rect(new THREE.Vector2(15, 20), new THREE.Vector2(10, 30)))
-		//this.aniadeBB(new Rect(new THREE.Vector2(40, 50), new THREE.Vector2(30, 10)))
+		this.aniadeRectColliders("test", [
+			new Rect(new THREE.Vector2(10, 0), new THREE.Vector2(50, 20)),
+			new Rect(new THREE.Vector2(15, 20), new THREE.Vector2(10, 30))
+		])
 
 		this.debugTimerStart = 0
 		this.debugTimerEnd = 0
@@ -123,7 +118,7 @@ class SistemaColisiones
 		}
 
 		// Registramos este objeto y reservamos para los índices
-		arrayObjInfo = new Array(rects.length)
+		arrayObjInfo = []
 		this.colObjectMap.set(uuid, arrayObjInfo)
 
 		// Añadimos los colliders al árbol
@@ -132,9 +127,6 @@ class SistemaColisiones
 
 		// Solicitamos la debug update de los rect
 		this._debugUpdateRects(uuid, rects)
-
-		console.log(arrayObjInfo)
-
 	}
 
 	_debugUpdateRects(uuid, newRects)
@@ -159,30 +151,12 @@ class SistemaColisiones
 			geoPlano.translate(rect.pos.x, 0, rect.pos.y)
 
 			let meshPlano = new THREE.LineSegments(new THREE.WireframeGeometry(geoPlano), new THREE.LineBasicMaterial({
-				color: 0x33468f
+				color: 0x36ff6b
 			}))
 
 			arrayMeshes.push(meshPlano)
 			this.debugNode.add(meshPlano)
 		}
-	}
-
-	aniadeBB(rect)
-	{
-		this.colliders.push(rect)
-
-		// Añadir el nodo para visualizarlo
-		/*let geoPlano = new THREE.PlaneGeometry(rect.size.x, rect.size.y)
-
-		geoPlano.rotateX(Math.PI/2)
-
-		// Colocar en 0,0 la esquina inferior derecha
-		geoPlano.translate(rect.size.x/2, 0, rect.size.y/2)
-		geoPlano.translate(rect.pos.x, 0, rect.pos.y)
-
-		this.debugNode.add(new THREE.LineSegments(new THREE.WireframeGeometry(geoPlano), new THREE.LineBasicMaterial({
-			color: 0x33468f
-		})))*/
 	}
 
 	_RayVSRect(rayOrigin, rayDir, targetRect)
@@ -259,10 +233,11 @@ class SistemaColisiones
 		// Obtener el rectángulo que contiene al jugador y al objetivo
 		let searchRect = this.cached.rect
 
-		searchRect.pos.x = Math.min(playerRect.pos.x, movV.x)
-		searchRect.pos.y = Math.min(playerRect.pos.y, movV.y)
-		searchRect.size.x = Math.max(playerRect.pos.x + playerRect.size.x, movV.x) - searchRect.pos.x
-		searchRect.size.y = Math.max(playerRect.pos.y + playerRect.size.y, movV.y) - searchRect.pos.y
+		// Sacar las esquinas
+		searchRect.pos.x = Math.min(playerRect.pos.x, playerRect.pos.x + movV.x)
+		searchRect.pos.y = Math.min(playerRect.pos.y, playerRect.pos.y + movV.y)
+		searchRect.size.x = Math.max(playerRect.pos.x + playerRect.size.x, playerRect.pos.x + playerRect.size.x + movV.x) - searchRect.pos.x
+		searchRect.size.y = Math.max(playerRect.pos.y + playerRect.size.y, playerRect.pos.y + playerRect.size.y + movV.y) - searchRect.pos.y
 
 		let foundColliders = this.colliderTree.searchArea(searchRect)
 

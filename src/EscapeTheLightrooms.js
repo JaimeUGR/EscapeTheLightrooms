@@ -189,7 +189,6 @@ class EscapeTheLightrooms extends THREE.Scene
 			down: true
 		})
 
-
 		// Colocar las salas en su posición final
 		// Centrar las salas
 		this.salaPrincipal.translateX(-this.salaPrincipal.largoParedX/2)
@@ -210,17 +209,16 @@ class EscapeTheLightrooms extends THREE.Scene
 			+ 4*Sala.GrosorPared() + this.salaPrincipal.pasilloSuperior.largoPasillo)
 
 		// Añadir los pasillos de conexión
-
-
 		this.add(this.salaPrincipal)
 		this.add(this.salaIzquierda)
 		this.add(this.salaDerecha)
 		this.add(this.salaSuperior)
 
-		this.collisionSystem.aniadeRectColliders(this.salaPrincipal.uuid, this.salaPrincipal.getRectColliders())
-		this.collisionSystem.aniadeRectColliders(this.salaIzquierda.uuid, this.salaIzquierda.getRectColliders())
-		this.collisionSystem.aniadeRectColliders(this.salaDerecha.uuid, this.salaDerecha.getRectColliders())
-		this.collisionSystem.aniadeRectColliders(this.salaSuperior.uuid, this.salaSuperior.getRectColliders())
+		// NOTE: Importante cuándo llamamos a este método (debe ser después de meter los objetos al grafo)
+		this.salaPrincipal.updateColliders()
+		this.salaIzquierda.updateColliders()
+		this.salaDerecha.updateColliders()
+		this.salaSuperior.updateColliders()
 	}
 
 	//

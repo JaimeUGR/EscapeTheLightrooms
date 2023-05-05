@@ -1,10 +1,11 @@
 
 import * as THREE from '../../libs/three.module.js'
-import {CSG} from "../../libs/CSG-v2.js";
+import * as TWEEN from '../../libs/tween.esm.js'
+import {CSG} from "../../libs/CSG-v2.js"
 import {Rect} from "../structures/Rect.js";
-import {Vector2} from "../../libs/three.module.js";
-import {GameState} from "../GameState.js";
-import {SistemaColisiones} from "../systems/SistemaColisiones.js";
+import {Vector2} from "../../libs/three.module.js"
+import {GameState} from "../GameState.js"
+import {SistemaColisiones} from "../systems/SistemaColisiones.js"
 
 const Sala_PuertaAncho = 20
 const Sala_PuertaAlto = 30
@@ -219,28 +220,18 @@ class Sala extends THREE.Object3D
 		return new CSG().union([new THREE.Mesh(paredGeo, material)]).subtract([puerta]).toGeometry()
 	}
 
+	// Devuelve los colliders
 	getRectColliders()
 	{
 		this.updateMatrixWorld(true)
-
-		/*for (let baseCollider of this.baseColliders)
-		{
-			let col = baseCollider.clone()
-			col.applyMatrix4(this.matrixWorld)
-			// Pared Inferior
-
-			let colliderTest = baseCollider
-			let colTestMin = colliderTest.min
-			let colTestMax = colliderTest.max
-
-			// Recalcular el collider con los tamaños
-			let miRect = new Rect(new Vector2(colTestMin.x, colTestMin.z), new Vector2(colTestMax.x - colTestMin.x, colTestMax.z - colTestMin.z))
-
-			GameState.systems.collision.aniadeBB(miRect)
-		}*/
-
-		// Devolver el array con los colliders
 		return SistemaColisiones.Box3ArrayToRectArray(this.baseColliders, this.matrixWorld)
+	}
+
+	// Actualiza sus colliders en el sistema de colisiones
+	updateColliders()
+	{
+		this.updateMatrixWorld(true)
+		GameState.systems.collision.aniadeRectColliders(this.uuid, SistemaColisiones.Box3ArrayToRectArray(this.baseColliders, this.matrixWorld))
 	}
 }
 
@@ -256,6 +247,9 @@ class Pasillo extends THREE.Object3D
 		this.alturaPasillo = alturaPasillo
 		this.espacioInterno = espacioInterno
 		this.orientacion = orientacion
+
+		this.baseColliders = []
+		this.baseCierreCollider = null
 
 		let materialSuelo = new THREE.MeshBasicMaterial({color: 0x852a3b})
 		let materialCierre = new THREE.MeshBasicMaterial({color: 0x455382})
@@ -275,10 +269,12 @@ class Pasillo extends THREE.Object3D
 			.toGeometry()
 
 		geoParedFrontal.translate(0, 0, Sala_GrosorPared/2 + largoPasillo/2)
-		this.add(new THREE.Mesh(geoParedFrontal.clone(), materialPared))
+		this.paredFrontal = new THREE.Mesh(geoParedFrontal.clone(), materialPared)
+		this.add(this.paredFrontal)
 
 		geoParedFrontal.translate(0, 0, -(largoPasillo + Sala_GrosorPared))
-		this.add(new THREE.Mesh(geoParedFrontal, materialPared))
+		this.paredTrasera = new THREE.Mesh(geoParedFrontal, materialPared)
+		this.add(this.paredTrasera)
 
 		// Pared Derecha
 		let geoParedDcha = new THREE.BoxGeometry(Sala_GrosorPared, alturaPasillo, largoPasillo)
@@ -287,21 +283,30 @@ class Pasillo extends THREE.Object3D
 		// Pared Izquierda
 		let geoParedIzda = new THREE.BoxGeometry(Sala_GrosorPared, alturaPasillo, largoPasillo/2 - Pasillo_Cierre_Grosor/2)
 		geoParedIzda.translate(Sala_GrosorPared/2 + espacioInterno/2, alturaPasillo/2, -(Pasillo_Cierre_Grosor/4 + largoPasillo/4))
-		this.add(new THREE.Mesh(geoParedIzda.clone(), materialPared))
+		this.paredIzdaSup = new THREE.Mesh(geoParedIzda.clone(), materialPared)
+		this.add(this.paredIzdaSup)
 
 		geoParedIzda.translate(0, 0, largoPasillo/2 + Pasillo_Cierre_Grosor/2)
 
-		this.add(new THREE.Mesh(geoParedDcha, materialPared))
-		this.add(new THREE.Mesh(geoParedIzda.clone(), materialPared))
+		this.paredDcha = new THREE.Mesh(geoParedDcha, materialPared)
+		this.add(this.paredDcha)
+
+		this.paredIzdaInf = new THREE.Mesh(geoParedIzda, materialPared)
+		this.add(this.paredIzdaInf)
 
 		// Cierre
 		let geoCierre = new THREE.BoxGeometry(Sala_GrosorPared + espacioInterno, alturaPasillo, Pasillo_Cierre_Grosor)
 		geoCierre.translate(Sala_GrosorPared/2, alturaPasillo/2, 0)
 
-		// Se utilizará para eliminar el collider cuando se abra
-		this.meshCierre = new THREE.Mesh(geoCierre, materialCierre)
+		this.cierre = new THREE.Mesh(geoCierre, materialCierre)
+		this.add(this.cierre)
 
-		this.add(this.meshCierre)
+		//
+		// Colliders
+		//
+		this._crearColliders()
+		//
+		//
 
 		// Añadir el suelo
 		let sueloGeo = new THREE.BoxGeometry(espacioInterno, 1, largoPasillo)
@@ -316,19 +321,115 @@ class Pasillo extends THREE.Object3D
 		this.add(new THREE.Mesh(techoGeo, materialTecho))
 
 		this.rotateY(orientacion)
+
+		this._crearAnimaciones()
+	}
+
+	_crearColliders()
+	{
+		// Calculamos los colliders de las paredes
+		// Hay que partirlos en 2
+		// Calcular un collider intermedio
+		let tmpBox = new THREE.Box3()
+		let tmpMin = null, tmpMax = null
+		let tmpOffset = 0
+
+		// Pared frontal y trasera
+		tmpBox.setFromObject(this.paredFrontal)
+		tmpMin = tmpBox.min
+		tmpMax = tmpBox.max
+
+		tmpOffset = this.espacioInterno/2 + Sala_PuertaAncho/2
+
+		// Coger el collider izquierdo
+		let ladoDerechaInf = new THREE.Box3(tmpMin.clone(), new THREE.Vector3(tmpMax.x - tmpOffset, tmpMax.y, tmpMax.z))
+		let ladoDerechaSup = ladoDerechaInf.clone()
+		ladoDerechaSup.min.z -= (this.largoPasillo + Sala_GrosorPared)
+		ladoDerechaSup.max.z -= (this.largoPasillo + Sala_GrosorPared)
+
+		// Coger el collider derecho
+		let ladoIzquierdaInf = ladoDerechaInf.clone()
+		ladoIzquierdaInf.max.x += tmpOffset
+		ladoIzquierdaInf.min.x += tmpOffset
+
+		let ladoIzquierdaSup = ladoIzquierdaInf.clone()
+		ladoIzquierdaSup.min.z -= (this.largoPasillo + Sala_GrosorPared)
+		ladoIzquierdaSup.max.z -= (this.largoPasillo + Sala_GrosorPared)
+
+		this.baseColliders.push(ladoDerechaInf)
+		this.baseColliders.push(ladoDerechaSup)
+		this.baseColliders.push(ladoIzquierdaInf)
+		this.baseColliders.push(ladoIzquierdaSup)
+
+		// Se añaden directamente
+		this.baseColliders.push(new THREE.Box3().setFromObject(this.paredIzdaSup))
+		this.baseColliders.push(new THREE.Box3().setFromObject(this.paredIzdaInf))
+		this.baseColliders.push(new THREE.Box3().setFromObject(this.paredDcha))
+
+		// Collider de la puerta
+		this.baseCierreCollider = new THREE.Box3().setFromObject(this.cierre)
+	}
+
+	_crearAnimaciones()
+	{
+		let frameCerrada = {pos: 0}
+		let frameAbierta = {pos: this.espacioInterno}
+
+		this._animacionApertura = new TWEEN.Tween(frameCerrada)
+			.to(frameAbierta, 5000)
+			.onUpdate(() => {
+				this.cierre.position.set(frameCerrada.pos, 0, 0)
+
+				// Recalcular el collider
+				this._updateColliderPuerta()
+			})
+			.onComplete(() => {
+				frameCerrada.pos = 0
+			})
+
+		this._animacionCierre = new TWEEN.Tween(frameAbierta)
+			.to(frameCerrada, 2000)
+			.onUpdate(() => {
+				this.cierre.position.set(frameAbierta.pos, 0, 0)
+
+				// Recalcular el collider
+				this._updateColliderPuerta()
+			})
+			.onComplete(() => {
+				frameAbierta.pos = this.espacioInterno
+			})
+	}
+
+	updateColliders()
+	{
+		let colSys = GameState.systems.collision
+
+		// Añado mis colliders
+		this.updateMatrixWorld(true)
+		colSys.aniadeRectColliders(this.uuid,
+			SistemaColisiones.Box3ArrayToRectArray(this.baseColliders, this.matrixWorld))
+
+		// Añado los colliders de la puerta
+		this._updateColliderPuerta()
+	}
+
+	_updateColliderPuerta()
+	{
+		let colSys = GameState.systems.collision
+
+		this.cierre.updateMatrixWorld(true)
+		colSys.aniadeRectColliders(this.cierre.uuid,
+			[SistemaColisiones.Box3ToRect(this.baseCierreCollider, this.cierre.matrixWorld)])
 	}
 
 	bloquear()
 	{
-
+		this._animacionCierre.start()
 	}
 
 	desbloquear()
 	{
-		console.log("ME DESBLOQUEAN")
-		this.meshCierre.translateX(this.espacioInterno)
-
-		// TODO: Cuando se abra, eliminar el collider
+		this._animacionApertura.start()
 	}
 }
 
