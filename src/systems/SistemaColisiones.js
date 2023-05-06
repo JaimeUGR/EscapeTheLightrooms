@@ -230,25 +230,29 @@ class SistemaColisiones
 		let movV = this.cached.movV.set(movementVector.x, movementVector.z)
 		let colRes = null
 
-		// Obtener el rectángulo que contiene al jugador y al objetivo
-		let searchRect = this.cached.rect
-
-		// Sacar las esquinas
-		searchRect.pos.x = Math.min(playerRect.pos.x, playerRect.pos.x + movV.x)
-		searchRect.pos.y = Math.min(playerRect.pos.y, playerRect.pos.y + movV.y)
-		searchRect.size.x = Math.max(playerRect.pos.x + playerRect.size.x, playerRect.pos.x + playerRect.size.x + movV.x) - searchRect.pos.x
-		searchRect.size.y = Math.max(playerRect.pos.y + playerRect.size.y, playerRect.pos.y + playerRect.size.y + movV.y) - searchRect.pos.y
-
-		let foundColliders = this.colliderTree.searchArea(searchRect)
-
-		for (let i = 0; i < foundColliders.length; i++)
+		// TODO: Temporal
+		if (GameState.tmp.colsEnabled)
 		{
-			colRes = this._DynamicRectVSRect(playerRect, movV, foundColliders[i])
+			// Obtener el rectángulo que contiene al jugador y al objetivo
+			let searchRect = this.cached.rect
 
-			if (colRes != null)
+			// Sacar las esquinas
+			searchRect.pos.x = Math.min(playerRect.pos.x, playerRect.pos.x + movV.x)
+			searchRect.pos.y = Math.min(playerRect.pos.y, playerRect.pos.y + movV.y)
+			searchRect.size.x = Math.max(playerRect.pos.x + playerRect.size.x, playerRect.pos.x + playerRect.size.x + movV.x) - searchRect.pos.x
+			searchRect.size.y = Math.max(playerRect.pos.y + playerRect.size.y, playerRect.pos.y + playerRect.size.y + movV.y) - searchRect.pos.y
+
+			let foundColliders = this.colliderTree.searchArea(searchRect)
+
+			for (let i = 0; i < foundColliders.length; i++)
 			{
-				movementVector.x += Math.abs(movementVector.x) * colRes.contactNormal.x * (1 - colRes.tHitNear)
-				movementVector.z += Math.abs(movementVector.z) * colRes.contactNormal.y * (1 - colRes.tHitNear)
+				colRes = this._DynamicRectVSRect(playerRect, movV, foundColliders[i])
+
+				if (colRes != null)
+				{
+					movementVector.x += Math.abs(movementVector.x) * colRes.contactNormal.x * (1 - colRes.tHitNear)
+					movementVector.z += Math.abs(movementVector.z) * colRes.contactNormal.y * (1 - colRes.tHitNear)
+				}
 			}
 		}
 

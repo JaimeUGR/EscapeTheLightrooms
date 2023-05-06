@@ -1,6 +1,7 @@
 
-import * as THREE from "../../libs/three.module.js";
-import {CSG} from "../../libs/CSG-v2.js";
+import * as THREE from "../../libs/three.module.js"
+import * as TWEEN from '../../libs/tween.esm.js'
+import {CSG} from "../../libs/CSG-v2.js"
 
 class Taquilla extends THREE.Object3D
 {
@@ -99,7 +100,6 @@ class Taquilla extends THREE.Object3D
 
 		// Crear la puerta de la taquilla
 		this.puerta = this.crearPuerta() // TODO: este es el mesh que recibe RY para abrir o cerrar
-		this.puerta.rotateY(-Math.PI/2)
 
 		// Crear el objeto con el mesh de la puerta y trasladarlo
 		let puertaObject = new THREE.Object3D()
@@ -110,6 +110,20 @@ class Taquilla extends THREE.Object3D
 		puertaObject.translateZ(-this.puertaZ/2 + this.taquillaZ/2 + this.taquillaBorde)
 
 		this.add(puertaObject)
+
+		//
+		// Animación
+		//
+
+		this._crearAnimacion()
+
+		//
+		// Interacción
+		//
+
+		this.puerta.userData.interaction = {
+			interact: this._interactuar.bind(this)
+		}
 	}
 
 	crearEstante()
@@ -145,6 +159,64 @@ class Taquilla extends THREE.Object3D
 		geoPuerta.translate(this.taquillaX/2, 0, 0)
 
 		return new THREE.Mesh(geoPuerta, this.taquillaMaterial)
+	}
+
+	_crearAnimacion()
+	{
+		this._animating = false
+		this._estadoPuerta = 0 // 0 cerrada, 1 abierta
+
+		let frameCerrada = {r: 0}
+		let frameAbierta = {r: -Math.PI/2}
+
+		this._animacionAbrir = new TWEEN.Tween(frameCerrada)
+			.to(frameAbierta, 1500)
+			.onStart(() => {
+				this._animating = true
+			})
+			.onUpdate(() => {
+				this.puerta.rotation.y = frameCerrada.r
+			})
+			.onComplete(() => {
+				frameCerrada.r = 0
+				this._estadoPuerta = 1
+				this._animating = false
+			})
+
+		this._animacionCerrar = new TWEEN.Tween(frameAbierta)
+			.to(frameCerrada, 1500)
+			.onStart(() => {
+				this._animating = true
+			})
+			.onUpdate(() => {
+				this.puerta.rotation.y = frameAbierta.r
+			})
+			.onComplete(() => {
+				frameAbierta.r = -Math.PI/2
+				this._estadoPuerta = 0
+				this._animating = false
+			})
+	}
+
+	_interactuar(event)
+	{
+		if (this._animating)
+			return
+
+		if (this._estadoPuerta === 0) // Cerrada
+			this.abrirPuerta()
+		else
+			this.cerrarPuerta()
+	}
+
+	abrirPuerta()
+	{
+		this._animacionAbrir.start()
+	}
+
+	cerrarPuerta()
+	{
+		this._animacionCerrar.start()
 	}
 }
 

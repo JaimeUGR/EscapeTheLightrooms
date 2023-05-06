@@ -4,17 +4,17 @@
 import * as THREE from '../libs/three.module.js'
 import { GUI } from '../libs/dat.gui.module.js'
 import { TrackballControls } from '../libs/TrackballControls.js'
-import { FirstPersonControls } from "../libs/FirstPersonControls.js";
+import { FirstPersonControls } from "../libs/FirstPersonControls.js"
 import {
 	BufferGeometry,
 	MeshPhongMaterial,
 	LineBasicMaterial,
 	ExtrudeGeometry,
 	ObjectLoader, Vector3, Vector2
-} from "../libs/three.module.js";
+} from "../libs/three.module.js"
 import {CSG} from '../libs/CSG-v2.js'
-import {MTLLoader} from "../libs/MTLLoader.js";
-import {OBJLoader} from "../libs/OBJLoader.js";
+import {MTLLoader} from "../libs/MTLLoader.js"
+import {OBJLoader} from "../libs/OBJLoader.js"
 import * as TWEEN from '../libs/tween.esm.js'
 
 // Clases del Proyecto
@@ -32,6 +32,7 @@ import {Cajonera} from "./models/Cajonera.js"
 import {Taquilla} from "./models/Taquilla.js"
 import {GameState} from "./GameState.js";
 import {SistemaColisiones} from "./systems/SistemaColisiones.js";
+import {SistemaInteraccion} from "./systems/SistemaInteraccion.js";
 
 
 /**
@@ -85,8 +86,6 @@ class EscapeTheLightrooms extends THREE.Scene
 
 		this.crearSalas()
 
-		this.debugQuadTree()
-
 		//
 		// Añadir las cámaras
 		//
@@ -114,55 +113,14 @@ class EscapeTheLightrooms extends THREE.Scene
 			maxDepth: 7
 		})
 
+		this.interactionSystem = new SistemaInteraccion()
+
+		// Debug
 		this.add(this.collisionSystem.debugNode)
 
 		// Colocar los sistemas
 		GameState.systems.collision = this.collisionSystem
-	}
-
-	debugQuadTree()
-	{
-		// Colocar dos modelos
-
-		let taq = new Taquilla({
-			taquillaX: 15, // x interna
-			taquillaY: 25, // y interna
-			taquillaZ: 15, // z interna
-			taquillaBorde: 2,
-			puertaZ: 1, // <= borde
-			numEstantes: 4,
-			estanteY: 2,
-			separacionInferiorEstantes: 5,
-			rejillaX: 10, // <= x interna
-			rejillaY: 2,
-			separacionRejillas: 3,
-			separacionSuperiorRejillas: 5
-		})
-		//taq.position.set(taq.taquillaX/2 + taq.taquillaBorde, 0, taq.taquillaZ/2 + taq.taquillaBorde)
-		taq.position.set(0, 100, 0)
-		this.add(taq)
-
-		let caj = new Cajonera({
-			cajoneraX: 20, // x interna
-			cajoneraY: 25, // y interna
-			cajoneraZ: 40, // z interna
-			cajoneraBorde: 1.5, // Borde en todos los lados (también es la separación entre cajones)
-
-			numCajones: 6,
-
-			cajonFrontalZ: 0.5,
-			cajonSueloY: 0.01,
-			cajonTraseraZ: 1,
-			cajonLateralX: 2,
-			cajonLateralY: 0.5,
-
-			cajonAsaX: 1,
-			cajonAsaY: 1,
-			cajonAsaZ: 1,
-		})
-
-		caj.position.set(0, 50, 0)
-		this.add(caj)
+		GameState.systems.interaction = this.interactionSystem
 	}
 
 	// Crear las salas, unirlas y colocarlas
@@ -224,8 +182,19 @@ class EscapeTheLightrooms extends THREE.Scene
 	//
 	cambiarCamara(event)
 	{
-		console.log("Me hacen click e")
-		this.gestorCamaras.cambiarAControladorPrincipal()
+		console.log("Recibo click")
+
+		// TODO: Temporal
+		if (!GameState.tmp.gameStarted)
+		{
+			GameState.tmp.gameStarted = true
+			console.log("Iniciando...")
+			this.gestorCamaras.cambiarAControladorPrincipal()
+		}
+		else
+		{
+			this.interactionSystem.onMouseClick(event, this.gestorCamaras.getCamaraActiva())
+		}
 	}
 
 	createCamera()
@@ -234,48 +203,12 @@ class EscapeTheLightrooms extends THREE.Scene
 
 		// TODO: TEMPORAL
 		this.pantallaPausa = document.getElementById("pantalla")
-		this.pantallaPausa.addEventListener('click', this.cambiarCamara.bind(this))
+		//this.pantallaPausa.addEventListener('click', this.cambiarCamara.bind(this))
+		window.addEventListener('click', this.cambiarCamara.bind(this))
 
 		document.addEventListener('keydown', this.gestorCamaras.onKeyDown.bind(this.gestorCamaras))
 		document.addEventListener('keyup', this.gestorCamaras.onKeyUp.bind(this.gestorCamaras) )
 		document.addEventListener('mousemove', this.gestorCamaras.onMouseMove.bind(this.gestorCamaras))
-
-		return
-
-
-		// Para crear una cámara le indicamos
-		//   El ángulo del campo de visión vértical en grados sexagesimales
-		//   La razón de aspecto ancho/alto
-		//   Los planos de recorte cercano y lejano
-		this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-		// También se indica dónde se coloca
-		this.camera.position.set (25, 20, 25);
-		// Y hacia dónde mira
-		//var look = new THREE.Vector3 (0,0,0);
-		//this.camera.lookAt(look);
-		this.add (this.camera);
-
-		this.cameraControl = new FirstPersonControls(this.camera, this.renderer.domElement)
-		this.cameraControl.movementSpeed = 20
-		this.cameraControl.lookSpeed = 0.4
-		this.cameraControl.noFly = true
-		this.cameraControl.lookVertical = true
-
-		this.cameraControl.constrainVertical = true
-		this.cameraControl.minVerticalAngle = (Math.PI / 180) * 5
-		this.cameraControl.maxVerticalAngle = (Math.PI / 180) * 5
-		this.cameraControl.minPolarAngle = (Math.PI / 180) * 5;
-		this.cameraControl.maxPolarAngle = (Math.PI / 180) * 5;
-
-		// Para el control de cámara usamos una clase que ya tiene implementado los movimientos de órbita
-		/*this.cameraControl = new TrackballControls (this.camera, this.renderer.domElement);
-
-		// Se configuran las velocidades de los movimientos
-		this.cameraControl.rotateSpeed = 5;
-		this.cameraControl.zoomSpeed = -2;
-		this.cameraControl.panSpeed = 0.5;
-		// Debe orbitar con respecto al punto de mira de la cámara
-		this.cameraControl.target = look;*/
 	}
 
 

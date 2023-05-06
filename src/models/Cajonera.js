@@ -1,6 +1,7 @@
 
-import * as THREE from "../../libs/three.module.js";
-import {CSG} from "../../libs/CSG-v2.js";
+import * as THREE from "../../libs/three.module.js"
+import * as TWEEN from '../../libs/tween.esm.js'
+import {CSG} from "../../libs/CSG-v2.js"
 
 class Cajonera extends THREE.Object3D
 {
@@ -16,7 +17,7 @@ class Cajonera extends THREE.Object3D
 		cajonSueloY: 0.125,
 		cajonTraseraZ:1,
 		cajonLateralX: 1,
-		cajonLateralY: 1,
+		cajonLateralY: 1, // 0 a 1 de la altura final del cajón
 
 		cajonAsaX: 1,
 		cajonAsaY: 1,
@@ -49,9 +50,10 @@ class Cajonera extends THREE.Object3D
 		this.cajonSueloX = this.cajoneraX - 2*this.cajonLateralX
 		this.cajonSueloZ = this.cajoneraZ + this.cajoneraBorde - (this.cajonFrontalZ + this.cajonTraseraZ)
 		this.cajonFrontalY = this.cajoneraY / this.numCajones - this.cajoneraBorde + this.cajoneraBorde/this.numCajones
+		this.cajonLateralY *= this.cajonFrontalY
 
 		// Otros
-		this.cajonAperturaZ = this.cajoneraZ + this.cajoneraBorde - this.cajonTraseraZ
+		this.cajonAperturaZ = this.cajoneraZ + this.cajoneraBorde
 		this.cajones = []
 
 		// Materiales
@@ -94,18 +96,25 @@ class Cajonera extends THREE.Object3D
 		}
 
 		this.add(csg.toMesh())
-	}
 
-	// TODO: Animacion
-	abrirCajon(numCajon)
-	{
-		this.cajones[numCajon].translateZ(this.cajonAperturaZ)
-	}
+		//
+		// Animación
+		//
 
-	// TODO: Animacion
-	cerrarCajon(numCajon)
-	{
-		this.cajones[numCajon].translateZ(-this.cajonAperturaZ)
+		this._crearAnimacion()
+
+		//
+		// Interacción
+		//
+
+		let metodoInteraccion = this._interactuar.bind(this)
+
+		for (let i = 0; i < this.cajones.length; i++)
+		{
+			this.cajones[i].getObjectByName("Frontal").userData.interaction = {
+				interact: (event) => metodoInteraccion(event, i)
+			}
+		}
 	}
 
 	// TODO: Para la interacción, probablemente necesitemos que sea su propia clase con una
@@ -143,41 +152,75 @@ class Cajonera extends THREE.Object3D
 		let geoParedFrontal = new THREE.BoxGeometry(this.cajoneraX, this.cajonFrontalY, this.cajonFrontalZ)
 		geoParedFrontal.translate(0, this.cajonFrontalY/2 - this.cajonSueloY/2, this.cajonFrontalZ/2 + this.cajonSueloZ/2)
 
-		cajon.add(new THREE.Mesh(geoParedFrontal, this.cajonFrontalMaterial))
+		let meshFrontal = new THREE.Mesh(geoParedFrontal, this.cajonFrontalMaterial)
+		meshFrontal.name = "Frontal"
 
-		// Añadir el asa TODO
+		cajon.add(meshFrontal)
+
+		// TODO: Añadir el asa (Colgarlo del mesh frontal para la interacción)
 
 		return cajon
 	}
 
-	createAsa() {
+	_crearAnimacion()
+	{
+		this.estadoAnimaciones = []
+		this.animaciones = []
 
-		let asa = new THREE.Object3D();
+		let cajonPosCerrado = this.cajoneraBorde - this.cajonFrontalZ
 
-		let asaFrontalGeometry = new THREE.BoxGeometry(this.cajonAsaX,this.cajonAsaY,this.cajonAsaZ);
-		asaFrontalGeometry.translate(0,this.cajonAsaY/2 + this.altoCara/2,this.fondoSuelo/2 + 3*this.cajonAsaZ  + this.cajonFrontalZ );
+		for (let i = 0; i < this.cajones.length; i++)
+		{
+			let frameCerrado = {p: cajonPosCerrado}
+			let frameAbierto = {p: this.cajonAperturaZ}
 
-		let asaFrontal = new THREE.Mesh(asaFrontalGeometry,this.cajonSueloMaterial);
+			this.estadoAnimaciones.push({
+				animando: false,
+				cajonAbierto: false
+			})
 
-		asa.add(asaFrontal)
+			this.animaciones.push({
+				abrirCajon: new TWEEN.Tween(frameCerrado)
+					.to(frameAbierto, 1200)
+					.easing(TWEEN.Easing.Cubic.Out)
+					.onStart(() => {
+						this.estadoAnimaciones[i].animando = true
+					})
+					.onUpdate(() => {
+						this.cajones[i].position.z = frameCerrado.p
+					})
+					.onComplete(() => {
+						frameCerrado.p = cajonPosCerrado
+						this.estadoAnimaciones[i].animando = false
+						this.estadoAnimaciones[i].cajonAbierto = true
+					}),
+				cerrarCajon: new TWEEN.Tween(frameAbierto)
+					.to(frameCerrado, 1200)
+					.easing(TWEEN.Easing.Cubic.Out)
+					.onStart(() => {
+						this.estadoAnimaciones[i].animando = true
+					})
+					.onUpdate(() => {
+						this.cajones[i].position.z = frameAbierto.p
+					})
+					.onComplete(() => {
+						frameAbierto.p = this.cajonAperturaZ
+						this.estadoAnimaciones[i].animando = false
+						this.estadoAnimaciones[i].cajonAbierto = false
+					})
+			})
+		}
+	}
 
-		let asaIzqGeometry = new THREE.BoxGeometry(this.cajonAsaX/4,this.cajonAsaY,3*this.cajonAsaZ);
-		asaIzqGeometry.translate(((-this.cajonAsaX/4)/2) - this.cajonAsaX/2,this.cajonAsaY/2 + this.altoCara/2,(3*this.cajonAsaZ)/2 + this.fondoSuelo/2  + this.cajonFrontalZ);
+	_interactuar(event, numCajon)
+	{
+		if (this.estadoAnimaciones[numCajon].animando)
+			return
 
-		let asaIzq = new THREE.Mesh(asaIzqGeometry,this.cajonSueloMaterial);
-
-		asa.add(asaFrontal)
-
-		let asaDchaGeometry = new THREE.BoxGeometry(this.cajonAsaX/4,this.cajonAsaY,3*this.cajonAsaZ);
-		asaDchaGeometry.translate(((this.cajonAsaX/4)/2) + this.cajonAsaX/2,this.cajonAsaY/2 + this.altoCara/2,(3*this.cajonAsaZ)/2 + this.fondoSuelo/2 + this.cajonFrontalZ);
-
-		let asaDcha = new THREE.Mesh(asaDchaGeometry,this.cajonSueloMaterial);
-
-		asa.add(asaFrontal)
-		asa.add(asaIzq)
-		asa.add(asaDcha)
-
-		return asa;
+		if (this.estadoAnimaciones[numCajon].cajonAbierto)
+			this.animaciones[numCajon].cerrarCajon.start()
+		else
+			this.animaciones[numCajon].abrirCajon.start()
 	}
 }
 

@@ -103,14 +103,13 @@ class SalaPrincipal extends Sala
 			separacionRejillas: 3,
 			separacionSuperiorRejillas: 5
 		})
-		//taq.position.set(taq.taquillaX/2 + taq.taquillaBorde, 0, taq.taquillaZ/2 + taq.taquillaBorde)
-		taq.position.set(0, 100, 0)
+		taq.position.set(taq.taquillaX/2 + taq.taquillaBorde, 0, taq.taquillaZ/2 + taq.taquillaBorde)
 		this.add(taq)
 
 		let caj = new Cajonera({
 			cajoneraX: 20, // x interna
 			cajoneraY: 25, // y interna
-			cajoneraZ: 40, // z interna
+			cajoneraZ: 20, // z interna
 			cajoneraBorde: 1.5, // Borde en todos los lados (también es la separación entre cajones)
 
 			numCajones: 6,
@@ -126,8 +125,12 @@ class SalaPrincipal extends Sala
 			cajonAsaZ: 1,
 		})
 
-		caj.position.set(0, 50, 0)
+		caj.position.set(caj.cajoneraX/2 + caj.cajoneraBorde + taq.taquillaX*2, 0, caj.cajoneraZ/2 + caj.cajoneraBorde)
 		this.add(caj)
+
+		// Agregarlos a los interactuables
+		GameState.systems.interaction.allInteractables.push(taq)
+		GameState.systems.interaction.allInteractables.push(caj)
 	}
 
 	colocarPuzles()

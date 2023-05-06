@@ -46,12 +46,19 @@ class ControladorCamaraPrincipal extends ControladorCamara
 
 	onMouseMove(event)
 	{
-		// TODO: Cuando se hace el desbloqueo, hay que ignorar esto o la cámara se moverá
+		// Cuando se bloquea la cámara, se ignora el movimiento del ratón
+		if (GameState.tmp.cameraLock)
+			return
+
 		this.controlador._onMouseMove(event)
 	}
 
 	onKeyDown(event)
 	{
+		// Cuando se bloquea la cámara, se ignora el movimiento del jugador
+		if (GameState.tmp.cameraLock)
+			return
+
 		switch (event.code)
 		{
 			case 'ArrowUp':
@@ -86,6 +93,10 @@ class ControladorCamaraPrincipal extends ControladorCamara
 
 	onKeyUp(event)
 	{
+		// Cuando se bloquea la cámara, se ignora el movimiento del jugador
+		if (GameState.tmp.cameraLock)
+			return
+
 		switch (event.code)
 		{
 			case 'ArrowUp':

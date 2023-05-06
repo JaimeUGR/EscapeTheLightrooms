@@ -130,6 +130,30 @@ class GestorCamaras
 
 	onKeyDown(event)
 	{
+		switch (event.code)
+		{
+			case "ControlLeft":
+				if (GameState.tmp.cameraLock)
+				{
+					// TODO: TEMPORAL, NO FUNCIONARA CON OTROS CONTROLADORES
+					// Desbloqueamos la cámara
+					this.activeController.enable()
+				}
+				else
+				{
+					// Bloqueamos la cámara
+					this.activeController.disable()
+				}
+
+				GameState.tmp.cameraLock = !GameState.tmp.cameraLock
+				return
+				break;
+			case "KeyX":
+				GameState.tmp.colsEnabled = !GameState.tmp.colsEnabled
+				return
+				break;
+		}
+
 		this.activeController.onKeyDown(event)
 	}
 

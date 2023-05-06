@@ -1,6 +1,6 @@
 
 import {Rect} from "./Rect.js"
-import {Vector2} from "../../libs/three.module.js";
+import {Vector2} from "../../libs/three.module.js"
 
 class QuadTree
 {
@@ -85,11 +85,9 @@ class QuadTree
 				// Optimización: si mi hijo está contenido completamente añado todos sus objetos
 				if (rect.containsRectangle(this.quadAreas[i]))
 					this.quads[i].items(resultItems)
-
-				// If child overlaps with search area then checks need
-				// to be made
-			else if (this.quadAreas[i].overlapsRectangle(rect))
-				this.quads[i].searchArea(rect, allItems, resultItems);
+				// Si el hijo está parcialmente contenido
+				else if (this.quadAreas[i].overlapsRectangle(rect))
+					this.quads[i].searchArea(rect, allItems, resultItems);
 			}
 		}
 	}

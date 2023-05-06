@@ -13,10 +13,17 @@ class GameState
 			movementVector: new Vector3(0, 0, 0)
 		}
 
+		this.tmp = {
+			cameraLock: false,
+			colsEnabled: true,
+			gameStarted: false
+		}
+
 		this.systems = {
 			input: null,
 			collision: null,
-			interaction: null
+			interaction: null,
+			cameras: null
 		}
 	}
 }
