@@ -81,10 +81,10 @@ class SistemaColisiones
 		this.debugNode.add(this.debugPlayerBB)
 
 		// Para hacer debug
-		this.aniadeRectColliders("test", [
+		/*this.aniadeRectColliders("test", [
 			new Rect(new THREE.Vector2(10, 0), new THREE.Vector2(50, 20)),
 			new Rect(new THREE.Vector2(15, 20), new THREE.Vector2(10, 30))
-		])
+		])*/
 
 		this.debugTimerStart = 0
 		this.debugTimerEnd = 0

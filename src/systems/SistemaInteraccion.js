@@ -38,20 +38,15 @@ class SistemaInteraccion
 
 		this.rayCaster.setFromCamera(mouse, camera)
 
-		console.log("Busco interactuables")
 		let interactables = this.rayCaster.intersectObjects(this.allInteractables, true)
 
 		if (interactables.length > 0)
 		{
-			console.log("He encontrado interactuable")
-			let interactable = interactables[0].object
-
-			console.log(interactable.userData)
+			let interactionResult = interactables[0]
+			let interactable = interactionResult.object
 
 			if (interactable.userData && interactable.userData.interaction)
 			{
-				console.log(interactable.userData)
-				console.log("Intento interactuar")
 				interactable.userData.interaction.interact(event) // Para saber si es izda o dcha?
 			}
 		}

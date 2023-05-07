@@ -84,7 +84,7 @@ class QuadTree
 			{
 				// Optimización: si mi hijo está contenido completamente añado todos sus objetos
 				if (rect.containsRectangle(this.quadAreas[i]))
-					this.quads[i].items(resultItems)
+					this.quads[i].getItems(resultItems)
 				// Si el hijo está parcialmente contenido
 				else if (this.quadAreas[i].overlapsRectangle(rect))
 					this.quads[i].searchArea(rect, allItems, resultItems);
@@ -92,7 +92,7 @@ class QuadTree
 		}
 	}
 
-	items(resultList)
+	getItems(resultList)
 	{
 		// Añade todos los items recursivamente a la lista dada
 		for (let i = 0; i < this.items.length; i++)
@@ -104,7 +104,7 @@ class QuadTree
 		for (let i = 0; i < 4; i++)
 		{
 			if (this.quads[i] != null)
-				this.quads[i].items(resultList)
+				this.quads[i].getItems(resultList)
 		}
 	}
 }

@@ -4,6 +4,7 @@ import {Pasillo, Sala} from "./Sala.js"
 import {Mesa} from "../models/Mesa.js"
 import {Cajonera} from "../models/Cajonera.js"
 import {Taquilla} from "../models/Taquilla.js"
+import {CuboCentral} from "../models/CuboCentral.js"
 
 import {GameState} from "../GameState.js";
 import {Box2, Box3, Vector2, Vector3} from "../../libs/three.module.js";
@@ -131,6 +132,14 @@ class SalaPrincipal extends Sala
 		// Agregarlos a los interactuables
 		GameState.systems.interaction.allInteractables.push(taq)
 		GameState.systems.interaction.allInteractables.push(caj)
+
+		this.cuboPC = new CuboCentral()
+
+		this.cuboPC.translateY(this.alturaPared/2)
+		this.cuboPC.translateX(this.largoParedX/2)
+		//this.cuboPC.translateZ(this.largoParedZ/2)
+
+		this.add(this.cuboPC)
 	}
 
 	colocarPuzles()

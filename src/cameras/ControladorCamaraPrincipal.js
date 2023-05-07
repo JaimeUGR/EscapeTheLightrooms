@@ -41,6 +41,13 @@ class ControladorCamaraPrincipal extends ControladorCamara
 
 	disable()
 	{
+		this.moveForward = false
+		this.moveBackward = false
+		this.moveLeft = false
+		this.moveRight = false
+		this.moveUp = false
+		this.moveDown = false
+
 		this.controlador.unlock()
 	}
 
@@ -93,10 +100,6 @@ class ControladorCamaraPrincipal extends ControladorCamara
 
 	onKeyUp(event)
 	{
-		// Cuando se bloquea la cámara, se ignora el movimiento del jugador
-		if (GameState.tmp.cameraLock)
-			return
-
 		switch (event.code)
 		{
 			case 'ArrowUp':
