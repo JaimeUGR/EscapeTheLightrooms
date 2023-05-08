@@ -13,6 +13,21 @@ class GameState
 			movementVector: new Vector3(0, 0, 0)
 		}
 
+		this.items = {
+			destornillador: null
+		}
+
+		// Flags del juego
+		this.flags = {
+			tieneDestornillador: false,
+			tieneManecillaHora: false,
+			tieneManecillaMinuto: false,
+			tieneMangoPalanca: false,
+			tienePaloPalanca: false,
+			tieneTarjeta: false
+		}
+
+		// Temporal
 		this.tmp = {
 			cameraLock: false,
 			colsEnabled: true,

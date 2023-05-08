@@ -137,9 +137,11 @@ class SalaPrincipal extends Sala
 
 		this.cuboPC.translateY(this.alturaPared/2)
 		this.cuboPC.translateX(this.largoParedX/2)
-		//this.cuboPC.translateZ(this.largoParedZ/2)
+		this.cuboPC.translateZ(this.largoParedZ/2)
 
 		this.add(this.cuboPC)
+
+		GameState.systems.interaction.allInteractables.push(this.cuboPC)
 	}
 
 	colocarPuzles()
