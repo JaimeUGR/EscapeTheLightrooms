@@ -30,7 +30,9 @@ class CuboCentral extends THREE.Object3D
 			alturaTornillo: 0.1,
 		},
 		infoPanIzd: {
-
+			anchoLector: 8,
+			altoLector: 1,
+			profLector: 0.5
 		},
 		infoPanTras: {
 
@@ -68,6 +70,8 @@ class CuboCentral extends THREE.Object3D
 		this.materialPalanca = new THREE.MeshBasicMaterial({color: 0x334455})
 
 		this.materialTornillo = new THREE.MeshBasicMaterial({color: 0x222222})
+
+		this.materialLectorTarjetas = new THREE.MeshBasicMaterial({color: 0x222222})
 
 		this.materialFondoPrisma = new THREE.MeshBasicMaterial({color: 0x222222})
 		this.materialLatPrismaVerde = new THREE.MeshBasicMaterial({color: 0x55ff55})
@@ -377,7 +381,7 @@ class CuboCentral extends THREE.Object3D
 		//
 		// Animación
 		//
-		this._crearAnimacionPanelDerecha(meshPanelBase)
+		this._crearAnimacionPanelTornillos(meshPanelBase)
 
 		//
 		// Interacción
@@ -392,7 +396,7 @@ class CuboCentral extends THREE.Object3D
 		return meshPanelBase
 	}
 
-	_crearAnimacionPanelDerecha(meshPanel)
+	_crearAnimacionPanelTornillos(meshPanel)
 	{
 		this.elementosPD.animacion = {
 			animacion: null,
@@ -432,7 +436,7 @@ class CuboCentral extends THREE.Object3D
 
 				if (this.elementosPD.tornillosRestantes <= 0)
 				{
-					console.log("Inicio la animación de quitar el panel")
+					console.log("Panel Tornillos Resuelto")
 					this._quitarPanel(0)
 				}
 				else
@@ -446,15 +450,70 @@ class CuboCentral extends THREE.Object3D
 
 	crearPanelTarjeta(meshPanelBase)
 	{
+		let geoLectorTarjeta = new THREE.BoxGeometry(this.infoPanIzd.anchoLector,
+			this.infoPanIzd.altoLector, this.infoPanIzd.profLector)
+
+		let meshLectorTarjeta = new THREE.Mesh(geoLectorTarjeta, this.materialLectorTarjetas)
+		meshLectorTarjeta.position.z = this.infoPanIzd.profLector/2
+
+		meshPanelBase.add(meshLectorTarjeta)
+
+		let O3DTarjeta = new THREE.Object3D()
+		O3DTarjeta.translateY(this.infoPanIzd.altoLector/2)
+
+		meshLectorTarjeta.add(O3DTarjeta)
+
 		//
 		// Animación
 		//
 
+		this._crearAnimacionPanelTarjeta(meshPanelBase, O3DTarjeta)
+
 		//
 		// Interacción
 		//
+		let metodoInteraccion = this._pasarTarjeta.bind(this)
+
+		meshPanelBase.userData.interaction = {
+			interact: metodoInteraccion
+		}
+
+		meshLectorTarjeta.userData.interaction = {
+			interact: metodoInteraccion
+		}
 
 		return meshPanelBase
+	}
+
+	_crearAnimacionPanelTarjeta(meshPanelBase, O3DTarjeta)
+	{
+		this.animaciones.pasarTarjeta = {
+			animacion: null,
+			O3DTarjeta: O3DTarjeta
+		}
+
+		let tarjeta = GameState.items.tarjeta
+
+		O3DTarjeta.position.y += tarjeta.altoTarjeta/2 - tarjeta.altoBarraLectura
+
+		let frameInicio = {p: -this.infoPanIzd.anchoLector/2}
+		let frameFin = {p: this.infoPanIzd.anchoLector/2}
+
+		this.animaciones.pasarTarjeta.animacion = new TWEEN.Tween(frameInicio).to(frameFin, 1000)
+			.easing(TWEEN.Easing.Cubic.In)
+			.onStart(() => {
+				// Añadir la tarjeta como hija
+				O3DTarjeta.add(tarjeta)
+			})
+			.onUpdate(() => {
+				O3DTarjeta.position.x = frameInicio.p
+			})
+			.onComplete(() => {
+				console.log("Panel Tarjeta Resuelto")
+
+				// Ordenar quitar el panel
+				this._quitarPanel(1)
+			})
 	}
 
 	crearPanelCodigo(meshPanelBase)
@@ -600,6 +659,9 @@ class CuboCentral extends THREE.Object3D
 
 	_desatornillar(event, numTornillo)
 	{
+		if (GameState.flags.tieneDestornillador === false)
+			return
+
 		// TODO
 		if (this._animating)
 			return
@@ -608,6 +670,20 @@ class CuboCentral extends THREE.Object3D
 
 		this.elementosPD.animacion.tornillo = this.elementosPD.tornillos[numTornillo]
 		this.elementosPD.animacion.desatornillar.start()
+	}
+
+	_pasarTarjeta(event)
+	{
+		if (GameState.flags.tieneTarjeta === false)
+			return
+
+		if (this._animating)
+			return
+
+		this._animating = true
+
+		// TODO: Bloquear el input
+		this.animaciones.pasarTarjeta.animacion.start()
 	}
 
 	// PRE: Si se llama varias veces dará resultados inesperados

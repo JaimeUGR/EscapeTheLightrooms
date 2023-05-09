@@ -57,11 +57,11 @@ class Cajonera extends THREE.Object3D
 		this.cajones = []
 
 		// Materiales
-		this.cajoneraMaterial = new THREE.MeshNormalMaterial({color: 0xf1f1f1, opacity: 0.5, transparent: true})//new THREE.MeshBasicMaterial({color: 0x349f21})
-		this.cajonFrontalMaterial = new THREE.MeshNormalMaterial({color: 0xf1f1f1, opacity: 0.5, transparent: true})//new THREE.MeshBasicMaterial({color: 0x825a65})
-		this.cajonParedesMaterial = new THREE.MeshNormalMaterial({color: 0xf1f1f1, opacity: 0.5, transparent: true})//new THREE.MeshBasicMaterial({color: 0x71989a})
-		this.cajonSueloMaterial = new THREE.MeshNormalMaterial({color: 0xf1f1f1, opacity: 0.5, transparent: true})//new THREE.MeshBasicMaterial({color: 0xaf94fa})
-		this.cajonAsaMaterial = new THREE.MeshNormalMaterial({color: 0xf1f1f1, opacity: 0.5, transparent: true})//new THREE.MeshBasicMaterial({color: 0xaf94fa})
+		this.cajoneraMaterial = new THREE.MeshNormalMaterial({opacity: 0.5, transparent: true})
+		this.cajonFrontalMaterial = new THREE.MeshNormalMaterial({opacity: 0.5, transparent: true})
+		this.cajonParedesMaterial = new THREE.MeshNormalMaterial({opacity: 0.5, transparent: true})
+		this.cajonSueloMaterial = new THREE.MeshNormalMaterial({opacity: 0.5, transparent: true})
+		this.cajonAsaMaterial = new THREE.MeshNormalMaterial({opacity: 0.5, transparent: true})
 
 		//
 		//

@@ -1,6 +1,10 @@
 
 import {Vector2, Vector3} from "../libs/three.module.js"
-import {Rect} from "./structures/Rect.js";
+import {Rect} from "./structures/Rect.js"
+
+import {Destornillador} from "./models/items/Destornillador.js"
+import {Tarjeta} from "./models/items/Tarjeta.js"
+import {Prisma} from "./models/items/Prisma.js"
 
 
 class GameState
@@ -14,18 +18,20 @@ class GameState
 		}
 
 		this.items = {
-			destornillador: null
+			destornillador: null,
+			tarjeta: new Tarjeta()
 		}
 
 		// Flags del juego
+		// TODO: TMP a true
 		this.flags = {
-			tieneDestornillador: false,
-			tieneManecillaHora: false,
-			tieneManecillaMinuto: false,
-			tieneMangoPalanca: false,
-			tienePaloPalanca: false,
-			tieneTarjeta: false,
-			tienePrisma: false
+			tieneDestornillador: true,
+			tieneManecillaHora: true,
+			tieneManecillaMinuto: true,
+			tieneMangoPalanca: true,
+			tienePaloPalanca: true,
+			tieneTarjeta: true,
+			tienePrisma: true
 		}
 
 		this.salas = {
