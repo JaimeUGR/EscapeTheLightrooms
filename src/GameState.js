@@ -24,7 +24,12 @@ class GameState
 			tieneManecillaMinuto: false,
 			tieneMangoPalanca: false,
 			tienePaloPalanca: false,
-			tieneTarjeta: false
+			tieneTarjeta: false,
+			tienePrisma: false
+		}
+
+		this.salas = {
+			salaPrincipal: null
 		}
 
 		// Temporal

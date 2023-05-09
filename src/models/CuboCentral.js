@@ -11,16 +11,16 @@ class CuboCentral extends THREE.Object3D
 {
 	constructor(dimensiones = {
 		// Parte interna
-		ladoCubo: 15,
-		bordeCubo: 1, // Borde por todos los lados. Además, es el grueso del panel
+		ladoCubo: 11,
+		bordeCubo: 0.5, // Borde por todos los lados. Además, es el grueso del panel
 
-		separacionPanelPalanca: 2, // Hueco entre el panel y la palanca
-		anchoPalanca: 6,
-		altoPalanca: 2,
-		profPalanca: 1,
+		separacionPanelPalanca: 1, // Hueco entre el panel y la palanca
+		anchoPalanca: 5,
+		altoPalanca: 1.5,
+		profPalanca: 0.5,
 		separacionTirPalanca: 1, // Separación desde la derecha
 		anchoTirPalanca: 1,
-		altoTirPalanca: 1.5,
+		altoTirPalanca: 1,
 
 		infoPanSup: {
 			ladoPrisma: 5,
@@ -265,6 +265,7 @@ class CuboCentral extends THREE.Object3D
 		// Animación
 		//
 		this._crearAnimacionQuitarPanel()
+		this._crearAnimacionTirarPalanca()
 
 		this.add(this.meshCuboExterno)
 		this.add(this.meshCuboInterno)
@@ -535,6 +536,68 @@ class CuboCentral extends THREE.Object3D
 		this.animaciones.quitarPanel.animacion = animacionSacar
 	}
 
+	_crearAnimacionTirarPalanca()
+	{
+		this.animaciones.palancas = {
+			palanca: null,
+			pasillo: null,
+			animacion: null
+		}
+
+		let frameInicio = {r: 0}
+		let frameFin = {r: -Math.PI/2}
+
+		let animacionTirar = new TWEEN.Tween(frameInicio).to(frameFin, 750)
+			.easing(TWEEN.Easing.Cubic.In)
+			.onUpdate(() => {
+				this.animaciones.palancas.palanca.rotation.y = frameInicio.r
+			})
+			.onComplete(() => {
+				frameInicio.r = 0
+
+				// TODO: Desbloquear el input
+
+				// Iniciar la animación de abrir la puerta
+				this.animaciones.palancas.pasillo.desbloquear()
+			})
+
+		let animacionSoltar = new TWEEN.Tween(frameFin).to(frameInicio, 1500)
+			.easing(TWEEN.Easing.Cubic.In)
+			.onUpdate(() => {
+				this.animaciones.palancas.palanca.rotation.y = frameFin.r
+			})
+			.onComplete(() => {
+				frameFin.r = -Math.PI/2
+
+				// Ya no se podrá interactuar con esta palanca
+				this.animaciones.palancas.palanca.userData = {}
+
+				this._animating = false
+			})
+
+		animacionTirar.chain(animacionSoltar)
+
+		this.animaciones.palancas.animacion = animacionTirar
+
+		//
+		// Interacción de las palantas
+		//
+
+		let metodoInteraccion = this._tirarPalanca.bind(this)
+
+		this.palancaDerecha.userData.interaction = {
+			interact: (event) => { metodoInteraccion(this.palancaDerecha, GameState.salas.salaPrincipal.pasilloIzquierda) }
+		}
+
+		this.palancaIzquierda.userData.interaction = {
+			interact: (event) => { metodoInteraccion(this.palancaIzquierda, GameState.salas.salaPrincipal.pasilloDerecha) }
+		}
+
+		this.palancaTrasera.userData.interaction = {
+			interact: (event) => { metodoInteraccion(this.palancaTrasera, GameState.salas.salaPrincipal.pasilloSuperior) }
+		}
+	}
+
 	_desatornillar(event, numTornillo)
 	{
 		// TODO
@@ -550,9 +613,6 @@ class CuboCentral extends THREE.Object3D
 	// PRE: Si se llama varias veces dará resultados inesperados
 	_quitarPanel(numPanel) // 0 derecha, 1 izda, 2 sup
 	{
-		if (!this._animating)
-			return
-
 		// TODO: Bloquear el input
 
 		let meshPadre = null
@@ -561,19 +621,31 @@ class CuboCentral extends THREE.Object3D
 		{
 			case 0:
 				meshPadre = this.panelDerechoO3D
-				break;
+				break
 			case 1:
 				meshPadre = this.panelIzquierdoO3D
-				break;
+				break
 			case 2:
 				meshPadre = this.panelTraseroO3D
-				break;
+				break
 			default:
 				return
 		}
 
 		this.animaciones.quitarPanel.panel = meshPadre.getObjectByName("Panel")
 		this.animaciones.quitarPanel.animacion.start()
+	}
+
+	_tirarPalanca(meshPalanca, pasillo)
+	{
+		if (this._animating)
+			return
+
+		this._animating = true
+
+		this.animaciones.palancas.palanca = meshPalanca
+		this.animaciones.palancas.pasillo = pasillo
+		this.animaciones.palancas.animacion.start()
 	}
 }
 

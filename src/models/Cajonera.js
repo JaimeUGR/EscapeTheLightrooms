@@ -97,6 +97,12 @@ class Cajonera extends THREE.Object3D
 
 		this.add(csg.toMesh())
 
+		// Añadir el O3D para poner objetos encima de la cajonera
+		this.cajoneraO3D = new THREE.Object3D()
+		this.cajoneraO3D.translateY(this.cajoneraY + 2*this.cajoneraBorde)
+
+		this.add(this.cajoneraO3D)
+
 		//
 		// Animación
 		//

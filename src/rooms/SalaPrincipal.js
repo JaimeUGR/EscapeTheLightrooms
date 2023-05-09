@@ -23,6 +23,8 @@ class SalaPrincipal extends Sala
 
 		this.crearPasillos()
 
+		GameState.salas.salaPrincipal = this
+
 		// Colocar los materiales
 		this.colocarMateriales()
 
@@ -61,12 +63,6 @@ class SalaPrincipal extends Sala
 		this.add(pIzda)
 		this.add(pDcha)
 		this.add(pSup)
-
-		// TODO TEMPORAL
-		this.pasilloSuperior.desbloquear()
-
-		// TODO TEMPORAL
-		// Añadir un método para meter los colliders del pasillo, actualizando esta matriz de paso
 	}
 
 	updateColliders()
@@ -135,13 +131,37 @@ class SalaPrincipal extends Sala
 
 		this.cuboPC = new CuboCentral()
 
-		this.cuboPC.translateY(this.alturaPared/2)
-		this.cuboPC.translateX(this.largoParedX/2)
-		this.cuboPC.translateZ(this.largoParedZ/2)
+		this.cuboPC.translateY(this.cuboPC.ladoCubo/2 + this.cuboPC.bordeCubo)
 
-		this.add(this.cuboPC)
+		// TODO: Esta rotación es la que se cambiará para hacer la cámara
+		this.cuboPC.rotateY(Math.PI)
 
 		GameState.systems.interaction.allInteractables.push(this.cuboPC)
+
+		//
+		// Mesa y CuboPC
+		//
+		let mesaPrincipal = new Mesa({
+			// Tablero
+			tableroX: 40,
+			tableroY: 0.5,
+			tableroZ: 24,
+
+			// Patas
+			pataX: 3,
+			pataY: 15,
+			pataZ: 3,
+
+			separacionPatasX: 18, // Separación desde la esquina de la pata (la que se vería) hasta el centro
+			separacionPatasZ: 10 // Separación desde la esquina de la pata (la que se vería) hasta el centro
+		})
+
+		mesaPrincipal.translateX(this.largoParedX - mesaPrincipal.tableroX/2)
+		mesaPrincipal.translateZ(this.largoParedZ - mesaPrincipal.tableroZ/2)
+
+		mesaPrincipal.tableroO3D.add(this.cuboPC)
+
+		this.add(mesaPrincipal)
 	}
 
 	colocarPuzles()

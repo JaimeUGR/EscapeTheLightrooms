@@ -1,64 +1,65 @@
 
-import * as THREE from "../../libs/three.module.js";
+import * as THREE from "../../libs/three.module.js"
 
 class Mesa extends THREE.Object3D
 {
 	constructor(dimensiones = {
-		 anchoSup: 1,
-		 altoSup: 1,
-		 fondoSup: 1,
+		// Tablero
+		tableroX: 80,
+		tableroY: 1,
+		tableroZ: 40,
 
-		 anchoInf: 1,
-		 altoInf: 1,
-		 fondoInf: 1,
+		// Patas
+		pataX: 4,
+		pataY: 20,
+		pataZ: 5,
 
-		separacion: 1
+		separacionPatasX: 38, // Separación desde la esquina de la pata (la que se vería) hasta el centro
+		separacionPatasZ: 18 // Separación desde la esquina de la pata (la que se vería) hasta el centro
 	})
 	{
 		super()
 
-		this.anchoSup = dimensiones.anchoSup
-		this.altoSup = dimensiones.altoSup
-		this.fondoSup = dimensiones.fondoSup
-		this.anchoInf = dimensiones.anchoInf
-		this.altoInf = dimensiones.altoInf
-		this.fondoInf = dimensiones.fondoInf
+		this.tableroX = dimensiones.tableroX
+		this.tableroY = dimensiones.tableroY
+		this.tableroZ = dimensiones.tableroZ
 
-		this.separacion = dimensiones.separacion
+		this.pataX = dimensiones.pataX
+		this.pataY = dimensiones.pataY
+		this.pataZ = dimensiones.pataZ
 
+		this.separacionPatasX = dimensiones.separacionPatasX
+		this.separacionPatasZ = dimensiones.separacionPatasZ
 
-		// Material temporal. Luego será la textura de las paredes.
-		let mesaMaterial = new THREE.MeshNormalMaterial({color: 0Xf1f1f1,opacity: 0.5,transparent: true})
+		this.materialTablero = new THREE.MeshNormalMaterial({opacity: 0.5,transparent: true})
+		this.materialPatas = new THREE.MeshNormalMaterial({opacity: 0.5,transparent: true})
 
-		// Crear la geometría de la mesa
-		let mesaGeometry = new THREE.BoxGeometry( this.anchoSup, this.altoSup, this.fondoSup )
-		let tablero = new THREE.Mesh( mesaGeometry, mesaMaterial )
-		mesaGeometry.translate( this.anchoSup/2, this.altoSup/2 + this.altoInf, this.fondoSup/2)
+		// Crear el tablero
+		let geoTablero = new THREE.BoxGeometry(this.tableroX, this.tableroY, this.tableroZ)
+		geoTablero.translate(0, this.tableroY/2 + this.pataY, 0)
 
-		let pataGeometry1 = new THREE.BoxGeometry( this.anchoInf, this.altoInf, this.fondoInf )
+		this.add(new THREE.Mesh(geoTablero, this.materialTablero))
 
-		pataGeometry1.translate(this.anchoInf/2,this.altoInf/2,this.fondoInf/2)
+		let geoPata = new THREE.BoxGeometry(this.pataX, this.pataY, this.pataZ)
+		geoPata.translate(-this.separacionPatasX + this.pataX/2, this.pataY/2, this.separacionPatasZ - this.pataZ/2)
 
-		let pata1 = new THREE.Mesh( pataGeometry1, mesaMaterial )
+		this.add(new THREE.Mesh(geoPata.clone(), this.materialPatas))
 
-		let pataGeometry2 = pataGeometry1.clone()
-			pataGeometry2.translate( this.separacion, 0, 0)
-		let pata2 = new THREE.Mesh( pataGeometry2, mesaMaterial )
+		geoPata.translate(2*this.separacionPatasX - this.pataX, 0, 0)
+		this.add(new THREE.Mesh(geoPata.clone(), this.materialPatas))
 
-		let pataGeometry3 = pataGeometry2.clone()
-			pataGeometry3.translate( 0, 0, this.separacion )
-		let pata3 = new THREE.Mesh( pataGeometry3, mesaMaterial )
+		geoPata.translate(this.pataX - 2*this.separacionPatasX, 0, this.pataZ - 2*this.separacionPatasZ)
+		this.add(new THREE.Mesh(geoPata.clone(), this.materialPatas))
 
-		let pataGeometry4 =pataGeometry3.clone()
-			pataGeometry4.translate( -this.separacion, 0, 0 )
-		let pata4 = new THREE.Mesh( pataGeometry4, mesaMaterial )
+		geoPata.translate(2*this.separacionPatasX - this.pataX, 0, 0)
+		this.add(new THREE.Mesh(geoPata.clone(), this.materialPatas))
 
 
-		this.add(tablero)
-		this.add(pata1)
-		this.add(pata2)
-		this.add(pata3)
-		this.add(pata4)
+		// Para poder poner objetos encima
+		this.tableroO3D = new THREE.Object3D()
+		this.tableroO3D.position.set(0, this.tableroY + this.pataY, 0)
+
+		this.add(this.tableroO3D)
 	}
 }
 
