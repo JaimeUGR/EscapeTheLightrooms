@@ -139,6 +139,15 @@ class ControladorCamaraPrincipal extends ControladorCamara
 		this.velocity.y -= this.velocity.y * 10.0 * deltaTime
 		this.velocity.z -= this.velocity.z * 10.0 * deltaTime
 
+		/*if (Math.abs(this.velocity.x) < 0.00001)
+			this.velocity.x = 0
+
+		if (Math.abs(this.velocity.y) < 0.00001)
+			this.velocity.y = 0
+
+		if (Math.abs(this.velocity.z) < 0.00001)
+			this.velocity.z = 0*/
+
 		this.direction.z = Number(this.moveForward) - Number(this.moveBackward)
 		this.direction.y = Number(this.moveDown) - Number(this.moveUp)
 		this.direction.x = Number(this.moveRight) - Number(this.moveLeft)

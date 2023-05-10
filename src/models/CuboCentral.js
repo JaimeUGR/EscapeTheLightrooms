@@ -35,7 +35,14 @@ class CuboCentral extends THREE.Object3D
 			profLector: 0.5
 		},
 		infoPanTras: {
-
+			anchoTeclado: 5,
+			altoTeclado: 6,
+			profTeclado: 0.2,
+			bordeTeclado: 0.5,
+			altoPantalla: 1,
+			profPantalla: 0.1,
+			profBoton: 0.25,
+			numBotones: 12
 		},
 	})
 	{
@@ -72,6 +79,26 @@ class CuboCentral extends THREE.Object3D
 		this.materialTornillo = new THREE.MeshBasicMaterial({color: 0x222222})
 
 		this.materialLectorTarjetas = new THREE.MeshBasicMaterial({color: 0x222222})
+
+		this.materialKeypad = new THREE.MeshBasicMaterial({color: 0x343434})
+		// TODO: Este material será una textura que se cambiará por los * cada vez que se pulse
+		this.materialKeypadPant = new THREE.MeshBasicMaterial({color: 0x111111})
+
+		// Diferente por cada tecla
+		this.materialKeypadTeclas = [
+			new THREE.MeshBasicMaterial({color: 0x55ff55}),
+			new THREE.MeshBasicMaterial({color: 0x55ff55}),
+			new THREE.MeshBasicMaterial({color: 0x55ff55}),
+			new THREE.MeshBasicMaterial({color: 0x55ff55}),
+			new THREE.MeshBasicMaterial({color: 0x55ff55}),
+			new THREE.MeshBasicMaterial({color: 0x55ff55}),
+			new THREE.MeshBasicMaterial({color: 0x55ff55}),
+			new THREE.MeshBasicMaterial({color: 0x55ff55}),
+			new THREE.MeshBasicMaterial({color: 0x55ff55}),
+			new THREE.MeshBasicMaterial({color: 0x55ff55}),
+			new THREE.MeshBasicMaterial({color: 0x55ff55}),
+			new THREE.MeshBasicMaterial({color: 0x55ff55})
+		]
 
 		this.materialFondoPrisma = new THREE.MeshBasicMaterial({color: 0x222222})
 		this.materialLatPrismaVerde = new THREE.MeshBasicMaterial({color: 0x55ff55})
@@ -518,15 +545,165 @@ class CuboCentral extends THREE.Object3D
 
 	crearPanelCodigo(meshPanelBase)
 	{
+		let dims = this.infoPanTras
+
+		let geoKeypad = new THREE.BoxGeometry(dims.anchoTeclado + 2*dims.bordeTeclado,
+			dims.altoTeclado + 2*dims.bordeTeclado, dims.profTeclado)
+		geoKeypad.translate(0, 0, dims.profTeclado/2)
+
+		meshPanelBase.add(new THREE.Mesh(geoKeypad, this.materialKeypad))
+
+		// Añadir la pantalla del keypad
+
+		// Calcular la dimensión de los botones
+		// Los botones se separan la mitad del borde entre ellos
+		let anchoBoton = (dims.anchoTeclado - dims.bordeTeclado)/3
+		let altoBoton = (dims.altoTeclado - (dims.altoPantalla + dims.bordeTeclado + 3*dims.bordeTeclado/2))/4
+
+		let geoBoton = new THREE.BoxGeometry(anchoBoton, altoBoton, dims.profBoton)
+		geoBoton.translate(0, 0, dims.profBoton/2)
+
+		// TODO: El material luego habrá que ponerlo a su correspondiente
+		let botonMesh = new THREE.Mesh(geoBoton, null)
+		botonMesh.position.z += dims.profTeclado
+		botonMesh.position.x += anchoBoton/2 - dims.anchoTeclado/2
+		botonMesh.position.y += altoBoton/2 - dims.altoTeclado/2
+
+		//	7	8	9		// 9 10 11
+		//	4	5	6		// 6 7 8
+		//	1	2	3		// 3 4 5
+		// 	OK	0	C		// 0 1 2
+
+		this.elementosPT.botones = []
+		let nombreBotones = ["OK", "0", "C", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
+
+		const botonPosXInicial = botonMesh.position.x
+
+		for (let i = 1; i <= dims.numBotones; i++)
+		{
+			botonMesh.name = nombreBotones[i-1]
+			botonMesh.material = this.materialKeypadTeclas[i-1]
+			botonMesh.material.needsUpdate = true
+
+			meshPanelBase.add(botonMesh)
+			this.elementosPT.botones.push(botonMesh)
+
+			// Preparar el siguiente
+			botonMesh = botonMesh.clone()
+			botonMesh.material = null
+			botonMesh.position.x += anchoBoton + dims.bordeTeclado/2
+
+			if (i%3 === 0)
+			{
+				botonMesh.position.x = botonPosXInicial
+				botonMesh.position.y += altoBoton + dims.bordeTeclado/2
+			}
+		}
+
+		// Crear el panel
+		let geoPantalla = new THREE.BoxGeometry(dims.anchoTeclado, dims.altoPantalla, dims.profPantalla)
+		geoPantalla.translate(0, dims.altoTeclado/2 - dims.altoPantalla/2, dims.profTeclado)
+
+		let meshPantalla = new THREE.Mesh(geoPantalla, this.materialKeypadPant)
+
+		meshPanelBase.add(meshPantalla)
+
 		//
 		// Animación
 		//
+		this._crearAnimacionPanelCodigo(meshPanelBase)
 
 		//
 		// Interacción
 		//
 
+		let metodoInteraccion = this._pulsarTeclaKeypad.bind(this)
+
+		for (let i = 0; i < dims.numBotones; i++)
+		{
+			let boton = this.elementosPT.botones[i]
+
+			boton.userData.interaction = {
+				interact: (event) => metodoInteraccion(event, i)
+			}
+		}
+
 		return meshPanelBase
+	}
+
+	_crearAnimacionPanelCodigo(meshPanelBase)
+	{
+		this.animaciones.keypad = {
+			boton: null,
+			codigoActual: "",
+			animacion: null
+		}
+
+		let frameEmpiezaPulsar = {sZ: 1} // Oscurecer el color
+		let framePulsado = {sZ: 0.5} // Restaurar el color
+
+		let animacionPulsar = new TWEEN.Tween(frameEmpiezaPulsar).to(framePulsado, 250)
+			.onStart(() => {
+				// Oscurecer el material
+				this.animaciones.keypad.boton.material.color.set(0x88ff88) // TODO: El original será blanco y este gris
+			})
+			.onUpdate(() => {
+				this.animaciones.keypad.boton.scale.z = frameEmpiezaPulsar.sZ
+			})
+			.onComplete(() => {
+				frameEmpiezaPulsar.sZ = 1
+
+				// Comprobaciones sobre el botón pulsado
+				switch (this.animaciones.keypad.boton.name)
+				{
+					case "OK":
+						if (this.animaciones.keypad.codigoActual === GameState.tmp.keypadCode)
+						{
+							this._quitarPanel(2)
+						}
+						else
+						{
+							// Limpiar la pantalla y actualizar la textura haciendo una animación
+							this.animaciones.keypad.codigoActual = ""
+							console.log("Codigo erroneo")
+						}
+						break;
+					case "C":
+						// Limpiar la pantalla y actualizar la textura haciendo una animación
+						this.animaciones.keypad.codigoActual = ""
+						console.log("Limpio pantalla")
+						break;
+					default:
+						this.animaciones.keypad.codigoActual += this.animaciones.keypad.boton.name
+
+						if (this.animaciones.keypad.codigoActual.length > GameState.tmp.keypadCode.length)
+						{
+							// Limpiar la pantalla y actualizar la textura haciendo una animación
+							this.animaciones.keypad.codigoActual = ""
+							console.log("Codigo erroneo")
+						}
+
+						console.log("Actualizo la pantalla")
+
+						break;
+				}
+			})
+
+		let animacionDespulsar = new TWEEN.Tween(framePulsado).to(frameEmpiezaPulsar, 150)
+			.onStart(() => {
+				//console.log(this.animaciones.keypad.boton.material)
+				this.animaciones.keypad.boton.material.color.set(0x55ff55)
+			})
+			.onUpdate(() => {
+				this.animaciones.keypad.boton.scale.z = framePulsado.sZ
+			})
+			.onComplete(() => {
+				framePulsado.sZ = 0.5
+				this._animating = false
+			})
+
+		animacionPulsar.chain(animacionDespulsar)
+		this.animaciones.keypad.animacion = animacionPulsar
 	}
 
 	crearPanelOrdenador(geoPanel)
@@ -684,6 +861,18 @@ class CuboCentral extends THREE.Object3D
 
 		// TODO: Bloquear el input
 		this.animaciones.pasarTarjeta.animacion.start()
+	}
+
+	_pulsarTeclaKeypad(event, numBoton)
+	{
+		if (this._animating)
+			return
+
+		this._animating = true
+
+		// TODO: Bloquear el input
+		this.animaciones.keypad.boton = this.elementosPT.botones[numBoton]
+		this.animaciones.keypad.animacion.start()
 	}
 
 	// PRE: Si se llama varias veces dará resultados inesperados

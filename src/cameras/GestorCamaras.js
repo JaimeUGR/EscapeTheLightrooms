@@ -149,11 +149,20 @@ class GestorCamaras
 
 				GameState.tmp.cameraLock = !GameState.tmp.cameraLock
 				return
-				break;
+				break
 			case "KeyX":
 				GameState.tmp.colsEnabled = !GameState.tmp.colsEnabled
 				return
-				break;
+				break
+			case "KeyZ":
+				console.log("Posición actual: ")
+				console.log(GameState.player.position)
+				console.log(this.controladoresCamaras[0])
+
+				let iniPos = GameState.player.initialPosition
+				GameState.player.position.set(iniPos.x, iniPos.y, iniPos.z)
+				return
+				break
 		}
 
 		this.activeController.onKeyDown(event)

@@ -134,7 +134,8 @@ class SalaPrincipal extends Sala
 		this.cuboPC.translateY(this.cuboPC.ladoCubo/2 + this.cuboPC.bordeCubo)
 
 		// TODO: Esta rotación es la que se cambiará para hacer la cámara
-		this.cuboPC.rotateY(Math.PI)
+		// TODO: TMP QUITARLA
+		//this.cuboPC.rotateY(Math.PI)
 
 		GameState.systems.interaction.allInteractables.push(this.cuboPC)
 

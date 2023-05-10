@@ -40,7 +40,7 @@ import {SistemaInteraccion} from "./systems/SistemaInteraccion.js";
  */
 
 let FPSLimit = true
-let myDeltaTime = 1/30.0
+let myDeltaTime = 1/25.0
 let myDelta = 0
 
 class EscapeTheLightrooms extends THREE.Scene
@@ -257,6 +257,7 @@ class EscapeTheLightrooms extends THREE.Scene
 		// La añadimos a la escena
 		this.add (ambientLight);
 
+		return
 		// Se crea una luz focal que va a ser la luz principal de la escena
 		// La luz focal, además tiene una posición, y un punto de mira
 		// Si no se le da punto de mira, apuntará al (0,0,0) en coordenadas del mundo

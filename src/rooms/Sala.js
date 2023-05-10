@@ -42,10 +42,42 @@ class Sala extends THREE.Object3D
 		this.largoParedZ = largoParedZ
 		this.alturaPared = alturaPared
 
-		// Material temporal. Luego será la textura de las paredes.
-		let materialSuelo = new THREE.MeshBasicMaterial({color: 0x852a3b})
-		let materialPared = new THREE.MeshBasicMaterial({color: 0x154352})
-		let materialTecho = new THREE.MeshBasicMaterial({color: 0x35a78b})
+		//
+		let texturaSuelo = GameState.txLoader.load('../../resources/textures/rooms/Madera.jpg')
+
+		texturaSuelo.wrapS = THREE.RepeatWrapping
+		texturaSuelo.wrapT = THREE.RepeatWrapping
+		texturaSuelo.repeat.set(this.largoParedX/15, this.largoParedZ/15)
+
+		// TODO: Lambert
+		let materialSuelo = new THREE.MeshBasicMaterial({
+			map: texturaSuelo,
+			color: 0xffffff
+		})
+
+		let texturaPared = GameState.txLoader.load('../../resources/textures/rooms/Papel.png')
+
+		texturaPared.wrapS = THREE.RepeatWrapping
+		texturaPared.wrapT = THREE.MirroredRepeatWrapping
+		texturaPared.repeat.set(this.largoParedX / 25, 2)
+
+		// TODO: Lambert
+		let materialPared = new THREE.MeshBasicMaterial({
+			map: texturaPared,
+			color: 0xffffff
+		})
+
+		//
+		let texturaTecho = GameState.txLoader.load('../../resources/textures/rooms/AluminioTecho.jpg')
+
+		texturaTecho.wrapS = THREE.RepeatWrapping
+		texturaTecho.wrapT = THREE.RepeatWrapping
+		texturaTecho.repeat.set(this.largoParedX / 32, this.largoParedZ / 32)
+
+		let materialTecho = new THREE.MeshBasicMaterial({
+			map: texturaTecho,
+			color: 0xffffff
+		})
 
 		// Construir la puerta
 		let geoPuerta = new THREE.BoxGeometry(Sala_PuertaAncho, Sala_PuertaAlto, Sala_GrosorPared)
