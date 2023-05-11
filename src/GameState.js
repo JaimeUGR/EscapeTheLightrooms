@@ -6,7 +6,6 @@ import {Destornillador} from "./models/items/Destornillador.js"
 import {Tarjeta} from "./models/items/Tarjeta.js"
 import {Prisma} from "./models/items/Prisma.js"
 
-
 class GameState
 {
 	static Initialize()
@@ -20,7 +19,8 @@ class GameState
 
 		this.items = {
 			destornillador: null,
-			tarjeta: new Tarjeta()
+			tarjeta: new Tarjeta(),
+			prisma: new Prisma()
 		}
 
 		// Flags del juego

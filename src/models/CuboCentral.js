@@ -22,9 +22,6 @@ class CuboCentral extends THREE.Object3D
 		anchoTirPalanca: 1,
 		altoTirPalanca: 1,
 
-		infoPanSup: {
-			ladoPrisma: 5,
-		},
 		infoPanDer: {
 			radioTornillo: 0.25,
 			alturaTornillo: 0.1,
@@ -62,13 +59,14 @@ class CuboCentral extends THREE.Object3D
 		this.separacionPanelPalanca = dimensiones.separacionPanelPalanca
 		this.separacionGiroPalanca = dimensiones.profPalanca/2
 
-		this.infoPanSup = dimensiones.infoPanSup
+		this.infoPanSup = {
+			ladoPrisma: GameState.items.prisma.ladoPrisma,
+			alturaPrisma: GameState.items.prisma.altoPrisma
+		}
+
 		this.infoPanDer = dimensiones.infoPanDer
 		this.infoPanIzd = dimensiones.infoPanIzd
 		this.infoPanTras = dimensiones.infoPanTras
-
-		// TODO: TMP
-		this.ladoPrisma = dimensiones.infoPanSup.ladoPrisma
 
 		this.material = new THREE.MeshNormalMaterial({color: 0xf1f1f1, opacity: 0.5, transparent: true})
 		this.materialBordesCubo = new THREE.MeshNormalMaterial({color: 0xf1f1f1, opacity: 0.5, transparent: true})
@@ -283,7 +281,7 @@ class CuboCentral extends THREE.Object3D
 		meshPanelRecorte.position.y = this.ladoCubo/2
 
 		// Recortar el fondo prisma negro de la caja interna
-		let geoPrismaRecorte = new TriangularPrismGeometry(this.ladoPrisma, this.bordeCubo)
+		let geoPrismaRecorte = new TriangularPrismGeometry(this.infoPanSup.ladoPrisma, this.bordeCubo)
 		geoPrismaRecorte.translate(0, this.ladoCubo/2 - this.bordeCubo/2, 0)
 
 		csgRecorteCuboExterno.subtract([meshPanelRecorte])
@@ -312,14 +310,14 @@ class CuboCentral extends THREE.Object3D
 		let csg = new CSG().union([meshPanelBase])
 
 		// Crear el prisma y los rectángulos laterales
-		let geoPrisma = new TriangularPrismGeometry(this.ladoPrisma, this.bordeCubo)
+		let geoPrisma = new TriangularPrismGeometry(this.infoPanSup.ladoPrisma, this.bordeCubo)
 		geoPrisma.rotateX(Math.PI/2)
 		geoPrisma.translate(0, 0, -this.bordeCubo/2)
 
 		csg.subtract([new THREE.Mesh(geoPrisma, null)])
 
 		// Crear los rectángulos de recorte
-		let geoRectRecorteRojo = new BoxGeometry(this.ladoPrisma, this.bordeCubo, this.bordeCubo)
+		let geoRectRecorteRojo = new BoxGeometry(this.infoPanSup.ladoPrisma, this.bordeCubo, this.bordeCubo)
 		geoRectRecorteRojo.translate(0, 0, -this.bordeCubo/2)
 
 		let geoRectRecorteVerde = geoRectRecorteRojo.clone()
@@ -327,8 +325,8 @@ class CuboCentral extends THREE.Object3D
 
 		geoRectRecorteRojo.translate(0, -(geoPrisma.triangleHeight/2 + this.bordeCubo/2), 0)
 
-		geoRectRecorteAzul.translate(this.ladoPrisma/2, this.bordeCubo/2, 0)
-		geoRectRecorteVerde.translate(-this.ladoPrisma/2, this.bordeCubo/2, 0)
+		geoRectRecorteAzul.translate(this.infoPanSup.ladoPrisma/2, this.bordeCubo/2, 0)
+		geoRectRecorteVerde.translate(-this.infoPanSup.ladoPrisma/2, this.bordeCubo/2, 0)
 
 		// Rotar los rectángulos
 		geoRectRecorteAzul.rotateZ(-Math.PI/3)
@@ -338,24 +336,25 @@ class CuboCentral extends THREE.Object3D
 		geoRectRecorteAzul.translate(0, geoPrisma.triangleHeight/2, 0)
 		geoRectRecorteVerde.translate(0, geoPrisma.triangleHeight/2, 0)
 
-		this.prismaLatRojo = new THREE.Mesh(geoRectRecorteRojo, this.materialLatPrismaRojo)
-		this.prismaLatVerde = new THREE.Mesh(geoRectRecorteVerde, this.materialLatPrismaVerde)
-		this.prismaLatAzul = new THREE.Mesh(geoRectRecorteAzul, this.materialLatPrismaAzul)
+		this.elementosPS.prismaLatRojo = new THREE.Mesh(geoRectRecorteRojo, this.materialLatPrismaRojo)
+		this.elementosPS.prismaLatVerde = new THREE.Mesh(geoRectRecorteVerde, this.materialLatPrismaVerde)
+		this.elementosPS.prismaLatAzul = new THREE.Mesh(geoRectRecorteAzul, this.materialLatPrismaAzul)
 
-		csg.subtract([this.prismaLatRojo, this.prismaLatVerde, this.prismaLatAzul])
+		csg.subtract([this.elementosPS.prismaLatRojo,
+			this.elementosPS.prismaLatVerde, this.elementosPS.prismaLatAzul])
 
 		let meshPanelSuperior = csg.toMesh()
 
-		meshPanelSuperior.add(this.prismaLatRojo)
-		meshPanelSuperior.add(this.prismaLatVerde)
-		meshPanelSuperior.add(this.prismaLatAzul)
+		meshPanelSuperior.add(this.elementosPS.prismaLatRojo)
+		meshPanelSuperior.add(this.elementosPS.prismaLatVerde)
+		meshPanelSuperior.add(this.elementosPS.prismaLatAzul)
 
 		// Añadir el fondo negro del prisma
 		geoPrisma = geoPrisma.clone()
 		geoPrisma.translate(0, 0, -this.bordeCubo)
 
-		this.prismaFondo = new THREE.Mesh(geoPrisma, this.materialFondoPrisma)
-		meshPanelSuperior.add(this.prismaFondo)
+		this.elementosPS.prismaFondo = new THREE.Mesh(geoPrisma, this.materialFondoPrisma)
+		meshPanelSuperior.add(this.elementosPS.prismaFondo)
 
 		//
 		// Animación
@@ -366,6 +365,11 @@ class CuboCentral extends THREE.Object3D
 		//
 
 		return meshPanelSuperior
+	}
+
+	_crearAnimacionPanelPrisma()
+	{
+
 	}
 
 	crearPanelTornillos(meshPanelBase)
@@ -403,7 +407,6 @@ class CuboCentral extends THREE.Object3D
 			meshPanelBase.add(tornillos[i])
 
 		this.elementosPD.tornillos = tornillos
-		this.elementosPD.tornillosRestantes = tornillos.length
 
 		//
 		// Animación
@@ -425,9 +428,10 @@ class CuboCentral extends THREE.Object3D
 
 	_crearAnimacionPanelTornillos(meshPanel)
 	{
-		this.elementosPD.animacion = {
+		this.animaciones.tornillos = {
 			animacion: null,
-			tornillo: null
+			tornillo: null,
+			tornillosRestantes: this.elementosPD.tornillos.length
 		}
 
 		let frameInicio = {
@@ -441,16 +445,16 @@ class CuboCentral extends THREE.Object3D
 			p: this.infoPanDer.alturaTornillo*2 // TODO: Esta cantidad debería ser el fondo del tornillo
 		}
 
-		this.elementosPD.animacion.desatornillar = new TWEEN.Tween(frameInicio).to(frameFin, 1000)
+		this.animaciones.tornillos.animacion = new TWEEN.Tween(frameInicio).to(frameFin, 1000)
 			.onStart(() => {
 				this._animating = true
-				frameInicio.zInicio = this.elementosPD.animacion.tornillo.position.z
+				frameInicio.zInicio = this.animaciones.tornillos.tornillo.position.z
 
 				// TODO: Añadir el destornillador como hijo de este mesh
 			})
 			.onUpdate(() => {
-				this.elementosPD.animacion.tornillo.rotation.z = frameInicio.r
-				this.elementosPD.animacion.tornillo.position.z = frameInicio.zInicio + frameInicio.p
+				this.animaciones.tornillos.tornillo.rotation.z = frameInicio.r
+				this.animaciones.tornillos.tornillo.position.z = frameInicio.zInicio + frameInicio.p
 			})
 			.onComplete(() => {
 				frameInicio.r = 0
@@ -458,10 +462,10 @@ class CuboCentral extends THREE.Object3D
 
 				// TODO: Sacar el destornillador como hijo de este mesh
 
-				meshPanel.remove(this.elementosPD.animacion.tornillo)
-				this.elementosPD.tornillosRestantes--
+				meshPanel.remove(this.animaciones.tornillos.tornillo)
+				this.animaciones.tornillos.tornillosRestantes--
 
-				if (this.elementosPD.tornillosRestantes <= 0)
+				if (this.animaciones.tornillos.tornillosRestantes <= 0)
 				{
 					console.log("Panel Tornillos Resuelto")
 					this._quitarPanel(0)
@@ -494,7 +498,7 @@ class CuboCentral extends THREE.Object3D
 		// Animación
 		//
 
-		this._crearAnimacionPanelTarjeta(meshPanelBase, O3DTarjeta)
+		this._crearAnimacionPanelTarjeta(O3DTarjeta)
 
 		//
 		// Interacción
@@ -512,7 +516,7 @@ class CuboCentral extends THREE.Object3D
 		return meshPanelBase
 	}
 
-	_crearAnimacionPanelTarjeta(meshPanelBase, O3DTarjeta)
+	_crearAnimacionPanelTarjeta(O3DTarjeta)
 	{
 		this.animaciones.pasarTarjeta = {
 			animacion: null,
@@ -611,7 +615,7 @@ class CuboCentral extends THREE.Object3D
 		//
 		// Animación
 		//
-		this._crearAnimacionPanelCodigo(meshPanelBase)
+		this._crearAnimacionPanelCodigo()
 
 		//
 		// Interacción
@@ -631,7 +635,7 @@ class CuboCentral extends THREE.Object3D
 		return meshPanelBase
 	}
 
-	_crearAnimacionPanelCodigo(meshPanelBase)
+	_crearAnimacionPanelCodigo()
 	{
 		this.animaciones.keypad = {
 			boton: null,
@@ -845,8 +849,8 @@ class CuboCentral extends THREE.Object3D
 
 		// TODO: Bloquear el input
 
-		this.elementosPD.animacion.tornillo = this.elementosPD.tornillos[numTornillo]
-		this.elementosPD.animacion.desatornillar.start()
+		this.animaciones.tornillos.tornillo = this.elementosPD.tornillos[numTornillo]
+		this.animaciones.tornillos.animacion.start()
 	}
 
 	_pasarTarjeta(event)
