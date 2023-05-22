@@ -68,7 +68,7 @@ class SistemaColisiones
 		//
 		this.debugObjectMap = new Map()
 		this.debugNode = new THREE.Object3D()
-		this.debugNode.translateY(50)
+		this.debugNode.translateY(-50)
 		this.debugPlayerBB = null
 
 		let geoPlano = new THREE.PlaneGeometry(GameState.player.rect.size.x, GameState.player.rect.size.y)

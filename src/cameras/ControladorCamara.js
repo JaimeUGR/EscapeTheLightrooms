@@ -4,6 +4,7 @@ class ControladorCamara
 	constructor(camara)
 	{
 		this.camara = camara
+		this.isSceneCamera = true
 		this.enabled = false
 	}
 

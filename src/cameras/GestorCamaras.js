@@ -57,7 +57,8 @@ class GestorCamaras
 		this.controladoresCamaras.push(controladorCamara)
 
 		// Añadir la cámara a la escena
-		this.game.add(controladorCamara.camara)
+		if (controladorCamara.isSceneCamera)
+			this.game.add(controladorCamara.camara)
 
 		// Generar el id
 		let id = this.controladoresCamaras.length - 1
@@ -133,6 +134,10 @@ class GestorCamaras
 		switch (event.code)
 		{
 			case "ControlLeft":
+				// TODO: FIX TEMPORAL a lo de abajo
+				if (this.activeCameraID !== ID_CAMARA_PRINCIPAL)
+					return
+
 				if (GameState.tmp.cameraLock)
 				{
 					// TODO: TEMPORAL, NO FUNCIONARA CON OTROS CONTROLADORES

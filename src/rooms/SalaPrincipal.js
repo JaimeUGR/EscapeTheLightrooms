@@ -7,7 +7,6 @@ import {Taquilla} from "../models/Taquilla.js"
 import {CuboCentral} from "../models/CuboCentral.js"
 
 import {GameState} from "../GameState.js";
-import {Box2, Box3, Vector2, Vector3} from "../../libs/three.module.js";
 import {Rect} from "../structures/Rect.js"
 
 class SalaPrincipal extends Sala
@@ -86,6 +85,37 @@ class SalaPrincipal extends Sala
 
 	colocarModelos()
 	{
+		// Cajonera robot
+		{
+			let cajonera = new Cajonera({
+				cajoneraX: 25, // x interna
+				cajoneraY: 15, // y interna
+				cajoneraZ: 8, // z interna
+				cajoneraBorde: 1, // Borde en todos los lados (también es la separación entre cajones)
+
+				numCajones: 3,
+
+				cajonFrontalZ: 0.5,
+				cajonSueloY: 0.01,
+				cajonTraseraZ: 0.5,
+				cajonLateralX: 0.5,
+				cajonLateralY: 0.75,
+
+				cajonAsaX: 1,
+				cajonAsaY: 1,
+				cajonAsaZ: 1,
+			})
+
+			cajonera.position.set(cajonera.cajoneraX/2 + cajonera.cajoneraBorde + this.largoParedX - this.largoParedX/4 - Sala.AnchoPuerta()/4,
+				0,
+				cajonera.cajoneraZ/2 + cajonera.cajoneraBorde)
+
+			this.add(cajonera)
+			GameState.systems.interaction.allInteractables.push(cajonera)
+		}
+
+		//
+
 		let taq = new Taquilla({
 			taquillaX: 15, // x interna
 			taquillaY: 25, // y interna
@@ -100,49 +130,17 @@ class SalaPrincipal extends Sala
 			separacionRejillas: 3,
 			separacionSuperiorRejillas: 5
 		})
+
+
 		taq.position.set(taq.taquillaX/2 + taq.taquillaBorde, 0, taq.taquillaZ/2 + taq.taquillaBorde)
 		this.add(taq)
 
-		let caj = new Cajonera({
-			cajoneraX: 20, // x interna
-			cajoneraY: 25, // y interna
-			cajoneraZ: 20, // z interna
-			cajoneraBorde: 1.5, // Borde en todos los lados (también es la separación entre cajones)
-
-			numCajones: 6,
-
-			cajonFrontalZ: 0.5,
-			cajonSueloY: 0.01,
-			cajonTraseraZ: 1,
-			cajonLateralX: 2,
-			cajonLateralY: 0.5,
-
-			cajonAsaX: 1,
-			cajonAsaY: 1,
-			cajonAsaZ: 1,
-		})
-
-		caj.position.set(caj.cajoneraX/2 + caj.cajoneraBorde + taq.taquillaX*2, 0, caj.cajoneraZ/2 + caj.cajoneraBorde)
-		this.add(caj)
-
-		// Agregarlos a los interactuables
 		GameState.systems.interaction.allInteractables.push(taq)
-		GameState.systems.interaction.allInteractables.push(caj)
-
-		this.cuboPC = new CuboCentral()
-
-		this.cuboPC.translateY(this.cuboPC.ladoCubo/2 + this.cuboPC.bordeCubo)
-
-		// TODO: Esta rotación es la que se cambiará para hacer la cámara
-		// TODO: TMP QUITARLA
-		//this.cuboPC.rotateY(Math.PI)
-
-		GameState.systems.interaction.allInteractables.push(this.cuboPC)
 
 		//
 		// Mesa y CuboPC
 		//
-		let mesaPrincipal = new Mesa({
+		this.mesaPrincipal = new Mesa({
 			// Tablero
 			tableroX: 40,
 			tableroY: 0.5,
@@ -157,17 +155,31 @@ class SalaPrincipal extends Sala
 			separacionPatasZ: 10 // Separación desde la esquina de la pata (la que se vería) hasta el centro
 		})
 
-		mesaPrincipal.translateX(this.largoParedX - mesaPrincipal.tableroX/2)
-		mesaPrincipal.translateZ(this.largoParedZ - mesaPrincipal.tableroZ/2)
+		this.mesaPrincipal.translateX(this.largoParedX - this.mesaPrincipal.tableroX/2)
+		this.mesaPrincipal.translateZ(this.largoParedZ - this.mesaPrincipal.tableroZ/2)
 
-		mesaPrincipal.tableroO3D.add(this.cuboPC)
-
-		this.add(mesaPrincipal)
+		this.add(this.mesaPrincipal)
 	}
 
 	colocarPuzles()
 	{
+		//
+		// Cubo Central
+		//
+		this.cuboPC = new CuboCentral()
 
+		this.cuboPC.translateY(this.cuboPC.ladoCubo/2 + this.cuboPC.bordeCubo)
+
+		// TODO: Esta rotación es la que se cambiará para hacer la cámara
+		// TODO: TMP QUITARLA
+		this.cuboPC.rotateY(Math.PI)
+		this.mesaPrincipal.tableroO3D.add(this.cuboPC)
+
+		GameState.systems.interaction.allInteractables.push(this.cuboPC)
+
+		//
+		// Lasérs
+		//
 	}
 }
 

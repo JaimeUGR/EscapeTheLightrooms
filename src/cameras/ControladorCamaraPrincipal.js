@@ -29,13 +29,6 @@ class ControladorCamaraPrincipal extends ControladorCamara
 
 	enable()
 	{
-		// NOTA: Esta activación desactivación se habrá hecho pulsando el control
-		/*this._puedeBloquear = true
-		this.pantallaElemento = document.getElementById( 'pantalla' );
-
-		this.pantallaElemento.addEventListener('click', this._iniciarBloqueo().bind(this))
-		this.cameraControl.addEventListener('lock', this._bloquear.bind(this))
-		this.cameraControl.addEventListener('unlock', this._desbloquear().bind(this));*/
 		this.controlador.lock()
 	}
 

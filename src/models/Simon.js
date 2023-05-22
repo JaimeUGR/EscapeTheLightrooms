@@ -1,41 +1,36 @@
 
-import * as THREE from "../../libs/three.module.js";
-import {TrapezoidGeometry} from "../geometry/TrapezoidGeometry.js";
+import * as THREE from "../../libs/three.module.js"
+import {TrapezoidGeometry} from "../geometry/TrapezoidGeometry.js"
 
 class Simon extends THREE.Object3D
 {
 	constructor(dimensiones = {
+		panelX: 16,
+		panelY: 24,
+		panelZ: 1,
 
-		panelX: 20,
-		panelY: 30,
-		panelZ: 5,
+		alturaBotonJuego : 0.75,
 
-		alturaBotonJuego :1,
-
-		borde: 1.5,
+		borde: 1,
 		radioIndicador: 2,
-		alturaIndicador: 1,
-		altoBotonInicial: 1,
-		profundidadBotonInicial: 3,
-		anchoBotonSuperior: 0.8,
-		profBotonSuperior: 0.8
-
-
+		alturaIndicador: 0.5,
+		altoBotonInicial: 0.75,
+		profundidadBotonInicial: 2,
+		anchoBotonSuperior: 0.5,
+		profBotonSuperior: 0.5
 	})
 	{
-		super();
+		super()
 
 		this.panelX = dimensiones.panelX
 		this.panelY = dimensiones.panelY
 		this.panelZ = dimensiones.panelZ
-
 
 		this.alturaBotonJuego = dimensiones.alturaBotonJuego
 
 		this.borde = dimensiones.borde
 		this.radioIndicador = dimensiones.radioIndicador
 		this.alturaIndicador = dimensiones.alturaIndicador
-
 
 		this.altoBotonInicial = dimensiones.altoBotonInicial
 		this.profundidadBotonInicial = dimensiones.profundidadBotonInicial
@@ -44,7 +39,7 @@ class Simon extends THREE.Object3D
 
 		this.botonAnchoInferior = (this.panelX - 3*this.borde)/2
 		this.botonAnchoSuperior = this.botonAnchoInferior * dimensiones.anchoBotonSuperior
-		this.botonProfInferior = this.botonAnchoInferior
+		this.botonProfInferior = (this.panelY - (5*this.borde + this.profundidadBotonInicial + 2*this.radioIndicador))/2
 		this.botonProfSuperior = this.botonProfInferior * dimensiones.profBotonSuperior
 
 		this.separacionCentral = (this.panelY - (5*this.borde + this.profundidadBotonInicial + 2*this.radioIndicador + 2*this.botonProfInferior))/2
@@ -55,17 +50,17 @@ class Simon extends THREE.Object3D
 		this.botones = []
 		this.indicadores = [] // 0 1 2
 
-		let simonMaterial = new THREE.MeshNormalMaterial({color: 0Xf1f1f1,opacity: 0.5,transparent: true})
+		let simonMaterial = new THREE.MeshNormalMaterial({color: 0Xf1f1f1, opacity: 0.5, transparent: true})
 
 		// Crear panel de soporte
 		let geoPanel = new THREE.BoxGeometry(this.panelX,this.panelY,this.panelZ)
 		geoPanel.translate(0,this.panelY/2,-this.panelZ/2)
-		this.add(new THREE.Mesh(geoPanel,simonMaterial))
+		this.add(new THREE.Mesh(geoPanel, simonMaterial))
 
 		//Crear boton inicial
 		let geoBotonInicial = new TrapezoidGeometry(this.anchoBotonInicial, this.profundidadBotonInicial, this.anchoBotonInicial, this.profundidadBotonInicial, this.altoBotonInicial)
 		geoBotonInicial.rotateX(Math.PI/2)
-		geoBotonInicial.translate(0,this.borde + this.profundidadBotonInicial/2,this.altoBotonInicial/2)
+		geoBotonInicial.translate(0, this.borde + this.profundidadBotonInicial/2, this.altoBotonInicial/2)
 
 		this.botonInicialMesh = new THREE.Mesh(geoBotonInicial, new THREE.MeshBasicMaterial({color: 0x556655}))
 
@@ -83,7 +78,7 @@ class Simon extends THREE.Object3D
 		geoBotonJuego.rotateX(Math.PI/2)
 		geoBotonJuego.translate(0,0,this.alturaBotonJuego/2)
 
-		let botonJuego = new THREE.Mesh(geoBotonJuego, this.materialesBotonesJuego[0] )
+		let botonJuego = new THREE.Mesh(geoBotonJuego, this.materialesBotonesJuego[0])
 		botonJuego.position.set(this.botonAnchoInferior/2 + this.borde - this.panelX/2,
 			2*this.borde + this.profundidadBotonInicial + this.separacionCentral + this.botonProfInferior/2, 0)
 
@@ -128,4 +123,6 @@ class Simon extends THREE.Object3D
 		for (let i = 0; i < this.indicadores.length; i++)
 			this.add(this.indicadores[i])
 	}
-}export {Simon}
+}
+
+export {Simon}

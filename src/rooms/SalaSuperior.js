@@ -1,5 +1,7 @@
 
-import {Sala} from "./Sala.js";
+import {Sala} from "./Sala.js"
+import {PuzleSimon} from "../puzles/PuzleSimon.js"
+import {GameState} from "../GameState.js"
 
 class SalaSuperior extends Sala
 {
@@ -42,7 +44,16 @@ class SalaSuperior extends Sala
 
 	colocarPuzles()
 	{
+		let puzleSimon = new PuzleSimon(null) // TODO: Añadir la callback para abrir el contenedor del prisma
+		puzleSimon.rotateY(-Math.PI/2)
+		puzleSimon.position.set(this.largoParedX - puzleSimon.simon.panelZ,
+			this.alturaPared/2 - puzleSimon.simon.panelY, this.largoParedZ/4)
 
+		this.add(puzleSimon)
+
+		GameState.systems.interaction.allInteractables.push(puzleSimon)
+
+		this.puzleSimon = puzleSimon
 	}
 }
 

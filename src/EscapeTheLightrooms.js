@@ -114,6 +114,7 @@ class EscapeTheLightrooms extends THREE.Scene
 		})
 
 		this.interactionSystem = new SistemaInteraccion()
+		this.gestorCamaras = new GestorCamaras(this)
 
 		// Debug
 		this.add(this.collisionSystem.debugNode)
@@ -121,6 +122,7 @@ class EscapeTheLightrooms extends THREE.Scene
 		// Colocar los sistemas
 		GameState.systems.collision = this.collisionSystem
 		GameState.systems.interaction = this.interactionSystem
+		GameState.systems.cameras = this.gestorCamaras
 	}
 
 	// Crear las salas, unirlas y colocarlas
@@ -128,7 +130,7 @@ class EscapeTheLightrooms extends THREE.Scene
 	crearSalas()
 	{
 		// Crear las salas
-		this.salaPrincipal = new SalaPrincipal(150, 110, 40, {
+		this.salaPrincipal = new SalaPrincipal(150, 110, 55, {
 			up: true,
 			down: true,
 			left: true,
@@ -199,8 +201,6 @@ class EscapeTheLightrooms extends THREE.Scene
 
 	createCamera()
 	{
-		this.gestorCamaras = new GestorCamaras(this)
-
 		// TODO: TEMPORAL
 		this.pantallaPausa = document.getElementById("pantalla")
 		//this.pantallaPausa.addEventListener('click', this.cambiarCamara.bind(this))

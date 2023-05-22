@@ -4,8 +4,9 @@ import * as TWEEN from '../../libs/tween.esm.js'
 import {CSG} from "../../libs/CSG-v2.js"
 import {TrapezoidGeometry} from "../geometry/TrapezoidGeometry.js"
 import {TriangularPrismGeometry} from "../geometry/PrismGeometry.js"
-import {BoxGeometry} from "../../libs/three.module.js"
+import {BoxGeometry, PerspectiveCamera} from "../../libs/three.module.js"
 import {GameState} from "../GameState.js"
+import {ControladorCamaraCuboCentral} from "../cameras/ControladorCamaraCuboCentral.js"
 
 class CuboCentral extends THREE.Object3D
 {
@@ -111,6 +112,17 @@ class CuboCentral extends THREE.Object3D
 
 		this.animaciones = {}
 		this._animating = false
+
+		//
+		this.O3Cubo = new THREE.Object3D()
+
+		// Método de animación de acercamiento
+		this.animaciones.camara = {
+			metodoActivar: this._acercarCamara.bind(this),
+			idControlador: -1,
+			activa: false // Si está a true significa que estamos en la cámara del cubo
+		}
+
 
 		//
 		// Cubo Interno (el que tendrá las palancas)
@@ -290,19 +302,41 @@ class CuboCentral extends THREE.Object3D
 		this.meshCuboExterno = csgRecorteCuboExterno.toMesh()
 		this.meshCuboInterno = csgRecorteCuboInterno.toMesh()
 
+		this.O3Cubo.add(this.meshCuboExterno)
+		this.O3Cubo.add(this.meshCuboInterno)
+		this.O3Cubo.add(this.panelSuperiorO3D)
+		this.O3Cubo.add(this.panelDerechoO3D)
+		this.O3Cubo.add(this.panelTraseroO3D)
+		this.O3Cubo.add(this.panelIzquierdoO3D)
+		this.O3Cubo.add(this.panelFrontal)
+
+		this.add(this.O3Cubo)
+
 		//
 		// Animación
 		//
 		this._crearAnimacionQuitarPanel()
 		this._crearAnimacionTirarPalanca()
 
-		this.add(this.meshCuboExterno)
-		this.add(this.meshCuboInterno)
-		this.add(this.panelSuperiorO3D)
-		this.add(this.panelDerechoO3D)
-		this.add(this.panelTraseroO3D)
-		this.add(this.panelIzquierdoO3D)
-		this.add(this.panelFrontal)
+		//
+		// Cámara
+		//
+
+		this.animaciones.camara.idControlador = GameState.systems.cameras.aniadeControlador(new ControladorCamaraCuboCentral(
+			new PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000),
+			this))
+		this.animaciones.camara.activa = false
+
+		// Registrar el evento de interacción a todo el árbol (excepto a los que ya lo tienen definido)
+		this.traverse((anyNode) => {
+			if (anyNode.userData === undefined)
+				anyNode.userData = {}
+
+			if (anyNode.userData.interaction === undefined)
+				anyNode.userData.interaction = {
+					interact: this.animaciones.camara.metodoActivar
+				}
+		})
 	}
 
 	crearPanelPrisma(meshPanelBase)
@@ -359,17 +393,14 @@ class CuboCentral extends THREE.Object3D
 		//
 		// Animación
 		//
-
-		//
-		// Interacción
-		//
+		this._crearAnimacionPanelPrisma()
 
 		return meshPanelSuperior
 	}
 
 	_crearAnimacionPanelPrisma()
 	{
-
+		// TODO: Que no se nos olvide añadir el código de la cámara al método de interacción
 	}
 
 	crearPanelTornillos(meshPanelBase)
@@ -628,7 +659,9 @@ class CuboCentral extends THREE.Object3D
 			let boton = this.elementosPT.botones[i]
 
 			boton.userData.interaction = {
-				interact: (event) => metodoInteraccion(event, i)
+				interact: (event) => {
+					metodoInteraccion(event, i)
+				}
 			}
 		}
 
@@ -809,8 +842,11 @@ class CuboCentral extends THREE.Object3D
 			.onComplete(() => {
 				frameFin.r = -Math.PI/2
 
-				// Ya no se podrá interactuar con esta palanca
-				this.animaciones.palancas.palanca.userData = {}
+				// Sobreescribir la interacción para que no se pueda interactuar pero sí
+				// acercar
+				this.animaciones.palancas.palanca.userData.interaction = {
+					interact: this.animaciones.camara.metodoActivar
+				}
 
 				this._animating = false
 			})
@@ -840,6 +876,13 @@ class CuboCentral extends THREE.Object3D
 
 	_desatornillar(event, numTornillo)
 	{
+		// Comprobar interacción cámara
+		if (!this.animaciones.camara.activa)
+		{
+			this._acercarCamara()
+			return
+		}
+
 		if (GameState.flags.tieneDestornillador === false)
 			return
 
@@ -855,6 +898,13 @@ class CuboCentral extends THREE.Object3D
 
 	_pasarTarjeta(event)
 	{
+		// Comprobar interacción cámara
+		if (!this.animaciones.camara.activa)
+		{
+			this._acercarCamara()
+			return
+		}
+
 		if (GameState.flags.tieneTarjeta === false)
 			return
 
@@ -869,6 +919,13 @@ class CuboCentral extends THREE.Object3D
 
 	_pulsarTeclaKeypad(event, numBoton)
 	{
+		// Comprobar interacción cámara
+		if (!this.animaciones.camara.activa)
+		{
+			this._acercarCamara()
+			return
+		}
+
 		if (this._animating)
 			return
 
@@ -907,6 +964,13 @@ class CuboCentral extends THREE.Object3D
 
 	_tirarPalanca(meshPalanca, pasillo)
 	{
+		// Comprobar interacción cámara
+		if (!this.animaciones.camara.activa)
+		{
+			this._acercarCamara()
+			return
+		}
+
 		if (this._animating)
 			return
 
@@ -915,6 +979,14 @@ class CuboCentral extends THREE.Object3D
 		this.animaciones.palancas.palanca = meshPalanca
 		this.animaciones.palancas.pasillo = pasillo
 		this.animaciones.palancas.animacion.start()
+	}
+
+	_acercarCamara()
+	{
+		if (this.animaciones.camara.activa)
+			return
+
+		GameState.systems.cameras.cambiarControladorCamara(this.animaciones.camara.idControlador)
 	}
 }
 

@@ -7,9 +7,9 @@ import {Vector2} from "../../libs/three.module.js"
 import {GameState} from "../GameState.js"
 import {SistemaColisiones} from "../systems/SistemaColisiones.js"
 
-const Sala_PuertaAncho = 20
-const Sala_PuertaAlto = 30
-const Sala_GrosorPared = 3
+const Sala_PuertaAncho = 24
+const Sala_PuertaAlto = 38
+const Sala_GrosorPared = 2
 
 class Sala extends THREE.Object3D
 {
