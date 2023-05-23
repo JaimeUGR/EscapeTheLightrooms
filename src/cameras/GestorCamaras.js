@@ -168,6 +168,36 @@ class GestorCamaras
 				GameState.player.position.set(iniPos.x, iniPos.y, iniPos.z)
 				return
 				break
+			case "KeyV":
+				console.log("Cambiando visibilidad del techo")
+
+				let sp = this.game.salaPrincipal
+				let si = this.game.salaIzquierda
+				let sd = this.game.salaDerecha
+				let ss = this.game.salaSuperior
+
+				if (sp.materialTecho.visible === true)
+				{
+					sp.materialTecho.visible = false
+					si.materialTecho.visible = false
+					sd.materialTecho.visible = false
+					ss.materialTecho.visible = false
+				}
+				else
+				{
+					sp.materialTecho.visible = true
+					si.materialTecho.visible = true
+					sd.materialTecho.visible = true
+					ss.materialTecho.visible = true
+				}
+
+				sp.needsUpdate = true
+				si.needsUpdate = true
+				sd.needsUpdate = true
+				ss.needsUpdate = true
+
+				return
+				break
 		}
 
 		this.activeController.onKeyDown(event)

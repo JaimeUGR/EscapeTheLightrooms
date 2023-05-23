@@ -50,7 +50,7 @@ class Sala extends THREE.Object3D
 		texturaSuelo.repeat.set(this.largoParedX/15, this.largoParedZ/15)
 
 		// TODO: Lambert
-		let materialSuelo = new THREE.MeshBasicMaterial({
+		this.materialSuelo = new THREE.MeshBasicMaterial({
 			map: texturaSuelo,
 			color: 0xffffff
 		})
@@ -62,7 +62,9 @@ class Sala extends THREE.Object3D
 		texturaPared.repeat.set(this.largoParedX / 25, 2)
 
 		// TODO: Lambert
-		let materialPared = new THREE.MeshBasicMaterial({
+		// TODO: Si este material no es sencillo, hay que hacer dos materiales cada uno con la textura
+		// TODO: con el wrap adaptado a su largo
+		this.materialPared = new THREE.MeshBasicMaterial({
 			map: texturaPared,
 			color: 0xffffff
 		})
@@ -74,7 +76,7 @@ class Sala extends THREE.Object3D
 		texturaTecho.wrapT = THREE.RepeatWrapping
 		texturaTecho.repeat.set(this.largoParedX / 32, this.largoParedZ / 32)
 
-		let materialTecho = new THREE.MeshBasicMaterial({
+		this.materialTecho = new THREE.MeshBasicMaterial({
 			map: texturaTecho,
 			color: 0xffffff
 		})
@@ -82,7 +84,7 @@ class Sala extends THREE.Object3D
 		// Construir la puerta
 		let geoPuerta = new THREE.BoxGeometry(Sala_PuertaAncho, Sala_PuertaAlto, Sala_GrosorPared)
 		geoPuerta.translate(0, Sala_PuertaAlto/2, 0)
-		let puerta = new THREE.Mesh(geoPuerta, materialPared)
+		let puerta = new THREE.Mesh(geoPuerta, this.materialPared)
 
 		// Construir las paredes
 		let paredAbajoGeo = new THREE.BoxGeometry(largoParedX, alturaPared, Sala_GrosorPared)
@@ -97,16 +99,16 @@ class Sala extends THREE.Object3D
 
 		// Se debería añadir un marquito a la puerta, por la zona interna de la sala
 		if (puertas.down)
-			paredAbajoGeo = this.recortarPuerta(paredAbajoGeo, materialPared, puerta)
+			paredAbajoGeo = this.recortarPuerta(paredAbajoGeo, this.materialPared, puerta)
 
 		if (puertas.up)
-			paredArribaGeo = this.recortarPuerta(paredArribaGeo, materialPared, puerta)
+			paredArribaGeo = this.recortarPuerta(paredArribaGeo, this.materialPared, puerta)
 
 		if (puertas.left)
-			paredIzdaGeo = this.recortarPuerta(paredIzdaGeo, materialPared, puerta)
+			paredIzdaGeo = this.recortarPuerta(paredIzdaGeo, this.materialPared, puerta)
 
 		if (puertas.right)
-			paredDchaGeo = this.recortarPuerta(paredDchaGeo, materialPared, puerta)
+			paredDchaGeo = this.recortarPuerta(paredDchaGeo, this.materialPared, puerta)
 
 		// Colocar las paredes en su posición final
 		paredIzdaGeo.rotateY(Math.PI/2)
@@ -118,10 +120,10 @@ class Sala extends THREE.Object3D
 		paredDchaGeo.translate(-Sala_GrosorPared/2, 0, largoParedZ/2)
 
 		// Añadir las paredes
-		this.paredAbajo = new THREE.Mesh(paredAbajoGeo, materialPared)
-		this.paredArriba = new THREE.Mesh(paredArribaGeo, materialPared)
-		this.paredIzda = new THREE.Mesh(paredIzdaGeo, materialPared)
-		this.paredDcha = new THREE.Mesh(paredDchaGeo, materialPared)
+		this.paredAbajo = new THREE.Mesh(paredAbajoGeo, this.materialPared)
+		this.paredArriba = new THREE.Mesh(paredArribaGeo, this.materialPared)
+		this.paredIzda = new THREE.Mesh(paredIzdaGeo, this.materialPared)
+		this.paredDcha = new THREE.Mesh(paredDchaGeo, this.materialPared)
 
 		// Calcular los colliders como box
 		this.baseColliders = []
@@ -238,13 +240,13 @@ class Sala extends THREE.Object3D
 		let sueloGeo = new THREE.BoxGeometry(largoParedX, 1, largoParedZ)
 		sueloGeo.translate(largoParedX/2, -0.5, largoParedZ/2)
 
-		this.add(new THREE.Mesh(sueloGeo, materialSuelo))
+		this.add(new THREE.Mesh(sueloGeo, this.materialSuelo))
 
 		// Añadir el techo
 		let techoGeo = sueloGeo.clone()
 		techoGeo.translate(0, alturaPared + 1, 0)
 
-		this.add(new THREE.Mesh(techoGeo, materialTecho))
+		this.add(new THREE.Mesh(techoGeo, this.materialTecho))
 	}
 
 	recortarPuerta(paredGeo, material, puerta)

@@ -69,6 +69,7 @@ class Taquilla extends THREE.Object3D
 
 		// Colocar la estantería base
 		let estante = new THREE.Object3D()
+		estante.translateZ(-(this.taquillaBorde + this.taquillaZ/2))
 		estante.translateY(this.taquillaBorde)
 
 		this.estantes.push(estante)
@@ -129,7 +130,7 @@ class Taquilla extends THREE.Object3D
 	crearEstante()
 	{
 		let geoEstante = new THREE.BoxGeometry(this.taquillaX, this.estanteY, this.taquillaZ)
-		geoEstante.translate(0, -this.estanteY/2, this.taquillaBorde/2)
+		geoEstante.translate(0, -this.estanteY/2, 0)
 
 		return new THREE.Mesh(geoEstante, this.taquillaMaterial)
 	}
@@ -170,7 +171,8 @@ class Taquilla extends THREE.Object3D
 		let frameAbierta = {r: -Math.PI/2}
 
 		this._animacionAbrir = new TWEEN.Tween(frameCerrada)
-			.to(frameAbierta, 1500)
+			.to(frameAbierta, 1200)
+			.easing(TWEEN.Easing.Quartic.Out)
 			.onStart(() => {
 				this._animating = true
 			})
@@ -184,7 +186,8 @@ class Taquilla extends THREE.Object3D
 			})
 
 		this._animacionCerrar = new TWEEN.Tween(frameAbierta)
-			.to(frameCerrada, 1500)
+			.to(frameCerrada, 1000)
+			.easing(TWEEN.Easing.Quartic.Out)
 			.onStart(() => {
 				this._animating = true
 			})

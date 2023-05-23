@@ -1,7 +1,7 @@
 
 import {Pasillo, Sala} from "./Sala.js"
 
-import {Mesa} from "../models/Mesa.js"
+import {Mesa, MesaCristal} from "../models/Mesa.js"
 import {Cajonera} from "../models/Cajonera.js"
 import {Taquilla} from "../models/Taquilla.js"
 import {CuboCentral} from "../models/CuboCentral.js"
@@ -114,28 +114,57 @@ class SalaPrincipal extends Sala
 			GameState.systems.interaction.allInteractables.push(cajonera)
 		}
 
-		//
+		// Mesa cristal
+		{
+			let mesaCristal = new MesaCristal({
+				// Tablero
+				tableroX: 30,
+				tableroY: 0.5,
+				tableroZ: 18,
 
-		let taq = new Taquilla({
-			taquillaX: 15, // x interna
-			taquillaY: 25, // y interna
-			taquillaZ: 15, // z interna
-			taquillaBorde: 2,
-			puertaZ: 1, // <= borde
-			numEstantes: 4,
-			estanteY: 2,
-			separacionInferiorEstantes: 5,
-			rejillaX: 10, // <= x interna
-			rejillaY: 2,
-			separacionRejillas: 3,
-			separacionSuperiorRejillas: 5
-		})
+				// Patas
+				pataX: 3,
+				pataY: 10,
+				pataZ: 3,
+
+				separacionPatasX: 15, // Separación desde la esquina de la pata (la que se vería) hasta el centro
+				separacionPatasZ: 9, // Separación desde la esquina de la pata (la que se vería) hasta el centro
+
+				cristalX: 30 - 6,
+				cristalZ: 18 - 6,
+				cristalY: 1
+			})
+
+			mesaCristal.position.set(
+				this.largoParedX/4 - Sala.AnchoPuerta()/4
+				, 0, mesaCristal.tableroZ/2)
+
+			this.add(mesaCristal)
+		}
+
+		// Taquilla mesa
+		{
+			let taq = new Taquilla({
+				taquillaX: 12, // x interna
+				taquillaY: 35, // y interna
+				taquillaZ: 10, // z interna
+				taquillaBorde: 0.75,
+				puertaZ: 0.5, // <= borde
+				numEstantes: 5,
+				estanteY: 1,
+				separacionInferiorEstantes: 2,
+				rejillaX: 8, // <= x interna
+				rejillaY: 1.5,
+				separacionRejillas: 1.5,
+				separacionSuperiorRejillas: 4
+			})
 
 
-		taq.position.set(taq.taquillaX/2 + taq.taquillaBorde, 0, taq.taquillaZ/2 + taq.taquillaBorde)
-		this.add(taq)
+			taq.position.set(taq.taquillaX/2 + taq.taquillaBorde, 0, taq.taquillaZ/2 + taq.taquillaBorde)
+			this.add(taq)
 
-		GameState.systems.interaction.allInteractables.push(taq)
+			GameState.systems.interaction.allInteractables.push(taq)
+		}
 
 		//
 		// Mesa y CuboPC
