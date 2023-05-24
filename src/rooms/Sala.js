@@ -34,6 +34,10 @@ class Sala extends THREE.Object3D
 		up: false,
 		left: false,
 		right: false
+	}, pathTexturas = {
+		suelo: "../../resources/textures/rooms/Madera.jpg",
+		pared: "../../resources/textures/rooms/Papel.png",
+		techo: "../../resources/textures/rooms/AluminioTecho.jpg"
 	})
 	{
 		super()
@@ -42,41 +46,50 @@ class Sala extends THREE.Object3D
 		this.largoParedZ = largoParedZ
 		this.alturaPared = alturaPared
 
+		this.pathTexturas = pathTexturas
+
 		//
-		let texturaSuelo = GameState.txLoader.load('../../resources/textures/rooms/Madera.jpg')
+		let texturaSuelo = GameState.txLoader.load(this.pathTexturas.suelo)
 
 		texturaSuelo.wrapS = THREE.RepeatWrapping
 		texturaSuelo.wrapT = THREE.RepeatWrapping
 		texturaSuelo.repeat.set(this.largoParedX/15, this.largoParedZ/15)
 
-		// TODO: Lambert
-		this.materialSuelo = new THREE.MeshBasicMaterial({
+		this.materialSuelo = new THREE.MeshLambertMaterial({
 			map: texturaSuelo,
 			color: 0xffffff
 		})
 
-		let texturaPared = GameState.txLoader.load('../../resources/textures/rooms/Papel.png')
+		let texturaParedX = GameState.txLoader.load(this.pathTexturas.pared)
+		let texturaParedZ = GameState.txLoader.load(this.pathTexturas.pared)
 
-		texturaPared.wrapS = THREE.RepeatWrapping
-		texturaPared.wrapT = THREE.MirroredRepeatWrapping
-		texturaPared.repeat.set(this.largoParedX / 25, 2)
+		texturaParedX.wrapS = THREE.RepeatWrapping
+		texturaParedZ.wrapS = THREE.RepeatWrapping
 
-		// TODO: Lambert
-		// TODO: Si este material no es sencillo, hay que hacer dos materiales cada uno con la textura
-		// TODO: con el wrap adaptado a su largo
-		this.materialPared = new THREE.MeshBasicMaterial({
-			map: texturaPared,
+		texturaParedX.wrapT = THREE.MirroredRepeatWrapping
+		texturaParedZ.wrapT = THREE.MirroredRepeatWrapping
+
+		texturaParedX.repeat.set(this.largoParedX / 25, 2)
+		texturaParedZ.repeat.set(this.largoParedZ / 25, 2)
+
+		this.materialParedX = new THREE.MeshLambertMaterial({
+			map: texturaParedX,
+			color: 0xffffff
+		})
+
+		this.materialParedZ = new THREE.MeshLambertMaterial({
+			map: texturaParedZ,
 			color: 0xffffff
 		})
 
 		//
-		let texturaTecho = GameState.txLoader.load('../../resources/textures/rooms/AluminioTecho.jpg')
+		let texturaTecho = GameState.txLoader.load(this.pathTexturas.techo)
 
 		texturaTecho.wrapS = THREE.RepeatWrapping
 		texturaTecho.wrapT = THREE.RepeatWrapping
 		texturaTecho.repeat.set(this.largoParedX / 32, this.largoParedZ / 32)
 
-		this.materialTecho = new THREE.MeshBasicMaterial({
+		this.materialTecho = new THREE.MeshLambertMaterial({
 			map: texturaTecho,
 			color: 0xffffff
 		})
@@ -84,7 +97,7 @@ class Sala extends THREE.Object3D
 		// Construir la puerta
 		let geoPuerta = new THREE.BoxGeometry(Sala_PuertaAncho, Sala_PuertaAlto, Sala_GrosorPared)
 		geoPuerta.translate(0, Sala_PuertaAlto/2, 0)
-		let puerta = new THREE.Mesh(geoPuerta, this.materialPared)
+		let puerta = new THREE.Mesh(geoPuerta, null)
 
 		// Construir las paredes
 		let paredAbajoGeo = new THREE.BoxGeometry(largoParedX, alturaPared, Sala_GrosorPared)
@@ -99,16 +112,16 @@ class Sala extends THREE.Object3D
 
 		// Se debería añadir un marquito a la puerta, por la zona interna de la sala
 		if (puertas.down)
-			paredAbajoGeo = this.recortarPuerta(paredAbajoGeo, this.materialPared, puerta)
+			paredAbajoGeo = this.recortarPuerta(paredAbajoGeo, this.materialParedX, puerta)
 
 		if (puertas.up)
-			paredArribaGeo = this.recortarPuerta(paredArribaGeo, this.materialPared, puerta)
+			paredArribaGeo = this.recortarPuerta(paredArribaGeo, this.materialParedX, puerta)
 
 		if (puertas.left)
-			paredIzdaGeo = this.recortarPuerta(paredIzdaGeo, this.materialPared, puerta)
+			paredIzdaGeo = this.recortarPuerta(paredIzdaGeo, this.materialParedZ, puerta)
 
 		if (puertas.right)
-			paredDchaGeo = this.recortarPuerta(paredDchaGeo, this.materialPared, puerta)
+			paredDchaGeo = this.recortarPuerta(paredDchaGeo, this.materialParedZ, puerta)
 
 		// Colocar las paredes en su posición final
 		paredIzdaGeo.rotateY(Math.PI/2)
@@ -120,10 +133,10 @@ class Sala extends THREE.Object3D
 		paredDchaGeo.translate(-Sala_GrosorPared/2, 0, largoParedZ/2)
 
 		// Añadir las paredes
-		this.paredAbajo = new THREE.Mesh(paredAbajoGeo, this.materialPared)
-		this.paredArriba = new THREE.Mesh(paredArribaGeo, this.materialPared)
-		this.paredIzda = new THREE.Mesh(paredIzdaGeo, this.materialPared)
-		this.paredDcha = new THREE.Mesh(paredDchaGeo, this.materialPared)
+		this.paredAbajo = new THREE.Mesh(paredAbajoGeo, this.materialParedX)
+		this.paredArriba = new THREE.Mesh(paredArribaGeo, this.materialParedX)
+		this.paredIzda = new THREE.Mesh(paredIzdaGeo, this.materialParedZ)
+		this.paredDcha = new THREE.Mesh(paredDchaGeo, this.materialParedZ)
 
 		// Calcular los colliders como box
 		this.baseColliders = []
@@ -285,10 +298,10 @@ class Pasillo extends THREE.Object3D
 		this.baseColliders = []
 		this.baseCierreCollider = null
 
-		let materialSuelo = new THREE.MeshBasicMaterial({color: 0x852a3b})
-		let materialCierre = new THREE.MeshBasicMaterial({color: 0x455382})
-		let materialPared = new THREE.MeshBasicMaterial({color: 0x257355})
-		let materialTecho = new THREE.MeshBasicMaterial({color: 0x35a78b})
+		let materialSuelo = new THREE.MeshLambertMaterial({color: 0x852a3b})
+		let materialCierre = new THREE.MeshLambertMaterial({color: 0x455382})
+		let materialPared = new THREE.MeshLambertMaterial({color: 0x257355})
+		let materialTecho = new THREE.MeshLambertMaterial({color: 0x35a78b})
 
 		// Puerta
 		let geoPuerta = new THREE.BoxGeometry(Sala_PuertaAncho, Sala_PuertaAlto, Sala_GrosorPared)

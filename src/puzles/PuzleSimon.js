@@ -2,6 +2,7 @@
 import * as THREE from "../../libs/three.module.js"
 import * as TWEEN from '../../libs/tween.esm.js'
 import {Simon} from "../models/Simon.js"
+import {GameState} from "../GameState.js"
 
 const NUM_NIVELES = 3
 
@@ -25,9 +26,26 @@ class PuzleSimon extends THREE.Object3D
 		this.estaJugando = false
 		this.nivel  = 0
 
-		this.luzBotones = new THREE.SpotLight( 0xffffff, 0.5 )
-		this.luzBotones.position.set(0, 0, this.simon.alturaBotonJuego + 20)
+		this.luzBotones = new THREE.SpotLight( 0xffffff, 1, 15, Math.PI/4, 0.1, 0.02)
+		this.luzBotones.position.set(0, 0, this.simon.alturaBotonJuego + 4)
 		this.luzBotones.name = "Luz"
+
+		//this.simon.add(this.luzBotones)
+		//this.luzBotones.target = this.simon.botones[0]
+
+		//this.simon.botones[0].add(this.luzBotones)
+
+		let targetLuz = new THREE.Object3D()
+		targetLuz.name = "TargetLuz"
+		targetLuz.position.set(0, 0, -(this.simon.alturaBotonJuego + 4))
+
+		this.luzBotones.add(targetLuz)
+		this.luzBotones.target = targetLuz
+
+		let lightHelper = new THREE.SpotLightHelper(this.luzBotones, 0xffffff)
+		GameState.scene.add(lightHelper)
+
+		//this.simon.botones[0].add(this.luzBotones)
 
 		// Creación de las animaciones y adición de interacciones
 		this._crearAnimacionInicio()
@@ -49,6 +67,7 @@ class PuzleSimon extends THREE.Object3D
 
 	reset()
 	{
+		this.estaJugando = false
 		this.nivel = 0
 
 		// Resetear indicadores
@@ -56,7 +75,7 @@ class PuzleSimon extends THREE.Object3D
 			this.simon.indicadores[i].material.color.set(0x111111)
 
 		// Generar secuencia
-		setTimeout(() => this.generarSecuencia(), 500)
+		setTimeout(() => this.generarSecuencia(), 800)
 	}
 
 	generarSecuencia()
@@ -68,11 +87,9 @@ class PuzleSimon extends THREE.Object3D
 		for(let i = 0; i < 3 + this.nivel; i++ )
 			this.secuenciaBotones.push(Math.floor(Math.random() * 4)) // TODO: Revisar porque puede generar un numero que no es
 
-		console.log(this.secuenciaBotones)
-
 		this.simon.indicadores[this.nivel].material.color.set(0xFFFF00)
 
-		setTimeout(() => this._iluminarSecuencia(), 1000)
+		setTimeout(() => this._iluminarSecuencia(), 500)
 	}
 
 	_crearAnimacionIluminacionBoton()
@@ -86,9 +103,9 @@ class PuzleSimon extends THREE.Object3D
 		let frameInicio = {t: 0}
 		let frameFinal  = {t: 1}
 
-		let animacionIluminarse = new TWEEN.Tween(frameInicio).to(frameFinal, 1000)
+		let animacionIluminarse = new TWEEN.Tween(frameInicio).to(frameFinal, 250)
 			.onStart(() =>{
-				this.luzBotones.color.setHex(this.animaciones.iluminacionBoton.boton.material.color)
+				this.luzBotones.color = this.animaciones.iluminacionBoton.boton.material.color.clone()
 				this.animaciones.iluminacionBoton.boton.add(this.luzBotones)
 			})
 			.onUpdate(() => {
@@ -96,23 +113,20 @@ class PuzleSimon extends THREE.Object3D
 			})
 			.onComplete(() =>
 			{
-				// Animación para que el botón recupere su forma incial
 				this.animaciones.iluminacionBoton.boton.remove(this.luzBotones)
+
 				this.animaciones.iluminacionBoton.indiceSecuencia++
 				frameInicio.t = 0
 
-				if(this.animaciones.iluminacionBoton.indiceSecuencia < this.secuenciaBotones.length){
-
-					this.animaciones.iluminacionBoton.animacion.end()
+				if(this.animaciones.iluminacionBoton.indiceSecuencia < this.secuenciaBotones.length)
+				{
 					this.animaciones.iluminacionBoton.boton = this.simon.botones[this.secuenciaBotones[this.animaciones.iluminacionBoton.indiceSecuencia]]
-					this.animaciones.iluminacionBoton.animacion.start()
-
+					setTimeout(() => this.animaciones.iluminacionBoton.animacion.start(), 325)
 				}
 				else
 				{
 					this._animating = false
-
-					setTimeout(() => this.estaJugando = true, 1000)
+					setTimeout(() => this.estaJugando = true, 200)
 				}
 			})
 
@@ -129,6 +143,7 @@ class PuzleSimon extends THREE.Object3D
 		this.animaciones.iluminacionBoton.indiceSecuencia = 0
 
 		this.animaciones.iluminacionBoton.boton = this.simon.botones[this.secuenciaBotones[0]]
+		this.animaciones.iluminacionBoton.animacion.repeat(this.secuenciaBotones.length)
 		this.animaciones.iluminacionBoton.animacion.start()
 	}
 
@@ -143,15 +158,15 @@ class PuzleSimon extends THREE.Object3D
 		let frameInicio = {z: 1}
 		let frameFinal = {z: 0.5}
 
-		let animacionEmpezarPulsar = new TWEEN.Tween(frameInicio).to(frameFinal, 100)
+		let animacionEmpezarPulsar = new TWEEN.Tween(frameInicio).to(frameFinal, 350)
 			.onStart(() =>
 			{
-				console.log("Me ilumino")
-				//this.luzBotones.color.setHex(this.animaciones.pulsacionBoton.boton.material.color)
-				//this.animaciones.pulsacionBoton.boton.add(this.luzBotones)
+				this.luzBotones.color = this.animaciones.pulsacionBoton.boton.material.color
+				this.animaciones.pulsacionBoton.boton.add(this.luzBotones)
 			})
 			.onUpdate(() =>
 			{
+				// TODO: Hay que modificar la escala de un botón hijo
 				this.animaciones.pulsacionBoton.boton.scale.set(1, 1, frameInicio.z )
 			})
 			.onComplete(() =>
@@ -164,8 +179,7 @@ class PuzleSimon extends THREE.Object3D
 		let animacionTerminarPulsar =  new TWEEN.Tween(frameFinal).to(frameInicio, 100)
 			.onStart(() =>
 			{
-				console.log("Me apago")
-				//this.animaciones.pulsacionBoton.boton.remove(this.luzBotones)
+				this.animaciones.pulsacionBoton.boton.remove(this.luzBotones)
 			})
 			.onUpdate(() =>
 			{
@@ -210,6 +224,8 @@ class PuzleSimon extends THREE.Object3D
 			this.simon.indicadores[this.nivel].material.color.set(0x123456)
 			this.nivel++
 
+			this.estaJugando = false
+
 			if(this.nivel === NUM_NIVELES)
 			{
 				this.completarJuego()
@@ -218,16 +234,13 @@ class PuzleSimon extends THREE.Object3D
 
 			setTimeout(() => {
 				this.generarSecuencia()
-			}, 750)
+			}, 1000)
 
 			return
 		}
 
 		// Secuencia Errónea
-		setTimeout(() => {
-			console.log("Reiniciando")
-			this.reset()
-		}, 250)
+		this.reset()
 	}
 
 

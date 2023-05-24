@@ -12,7 +12,11 @@ class SalaSuperior extends Sala
 		right: false
 	})
 	{
-		super(largoParedX, largoParedZ, alturaPared, puertas)
+		super(largoParedX, largoParedZ, alturaPared, puertas, {
+			suelo: "../../resources/textures/rooms/Madera.jpg",
+			pared: "../../resources/textures/rooms/PapelRojo.png",
+			techo: "../../resources/textures/rooms/AluminioTecho.jpg"
+		})
 
 		// Colocar los materiales
 		this.colocarMateriales()

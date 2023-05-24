@@ -8,8 +8,10 @@ import {Prisma} from "./models/items/Prisma.js"
 
 class GameState
 {
-	static Initialize()
+	static Initialize(scene)
 	{
+		this.scene = scene
+
 		this.player = {
 			initialPosition: new Vector3(0, 25, 5),
 			position: new Vector3(0, 25, 5),

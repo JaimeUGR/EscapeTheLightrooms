@@ -105,7 +105,7 @@ class EscapeTheLightrooms extends THREE.Scene
 
 	inicializarGameState()
 	{
-		GameState.Initialize()
+		GameState.Initialize(this)
 
 		this.collisionSystem = new SistemaColisiones({
 			startPos: new Vector2(-500, -100),
@@ -253,17 +253,19 @@ class EscapeTheLightrooms extends THREE.Scene
 		// La luz ambiental solo tiene un color y una intensidad
 		// Se declara como   var   y va a ser una variable local a este método
 		//    se hace así puesto que no va a ser accedida desde otros métodos
-		var ambientLight = new THREE.AmbientLight(0xccddee, 0.35);
+		var ambientLight = new THREE.AmbientLight(0xccddee, 0.45);
 		// La añadimos a la escena
 		this.add (ambientLight);
 
-		return
-		// Se crea una luz focal que va a ser la luz principal de la escena
-		// La luz focal, además tiene una posición, y un punto de mira
-		// Si no se le da punto de mira, apuntará al (0,0,0) en coordenadas del mundo
-		// En este caso se declara como   this.atributo   para que sea un atributo accesible desde otros métodos.
-		this.spotLight = new THREE.SpotLight( 0xffffff, this.guiControls.lightIntensity );
-		this.spotLight.position.set( 60, 60, 40 );
+		this.spotLight = new THREE.PointLight( 0xffffff, this.guiControls.lightIntensity, 110, 0.5);
+
+		let targetTmp = new THREE.Object3D()
+		targetTmp.position.set(0, 0, 110/2)
+
+		this.spotLight.position.set( 0, 50, 110/2 );
+		this.spotLight.target = targetTmp
+
+		this.add(targetTmp)
 		this.add (this.spotLight);
 	}
 
@@ -347,6 +349,8 @@ class EscapeTheLightrooms extends THREE.Scene
 		{
 			this.renderer.render (this, this.getCamera());
 		}
+
+		//this.spotLight.position.x += 0.01
 
 		// Se actualiza la posición de la cámara según su controlador
 		this.gestorCamaras.update(currentDelta);
