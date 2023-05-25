@@ -5,8 +5,9 @@ import {Mesa, MesaCristal} from "../models/Mesa.js"
 import {Cajonera} from "../models/Cajonera.js"
 import {Taquilla} from "../models/Taquilla.js"
 import {CuboCentral} from "../models/CuboCentral.js"
+import {Robot} from "../models/Robot.js"
 
-import {GameState} from "../GameState.js";
+import {GameState} from "../GameState.js"
 import {Rect} from "../structures/Rect.js"
 
 class SalaPrincipal extends Sala
@@ -111,7 +112,11 @@ class SalaPrincipal extends Sala
 				cajonera.cajoneraZ/2 + cajonera.cajoneraBorde)
 
 			this.add(cajonera)
+			this.collidables.push(cajonera)
+
 			GameState.systems.interaction.allInteractables.push(cajonera)
+
+			this.cajoneraRobot = cajonera
 		}
 
 		// Mesa cristal
@@ -140,6 +145,7 @@ class SalaPrincipal extends Sala
 				, 0, mesaCristal.tableroZ/2)
 
 			this.add(mesaCristal)
+			this.collidables.push(mesaCristal)
 		}
 
 		// Taquilla mesa
@@ -162,6 +168,7 @@ class SalaPrincipal extends Sala
 
 			taq.position.set(taq.taquillaX/2 + taq.taquillaBorde, 0, taq.taquillaZ/2 + taq.taquillaBorde)
 			this.add(taq)
+			this.collidables.push(taq)
 
 			GameState.systems.interaction.allInteractables.push(taq)
 		}
@@ -188,6 +195,15 @@ class SalaPrincipal extends Sala
 		this.mesaPrincipal.translateZ(this.largoParedZ - this.mesaPrincipal.tableroZ/2)
 
 		this.add(this.mesaPrincipal)
+		this.collidables.push(this.mesaPrincipal)
+
+		{
+			this.robot = new Robot(GameState.scene.gui)
+			this.robot.translateY(25)
+			this.robot.translateZ(this.largoParedZ/2)
+			this.robot.translateX(this.largoParedX/2)
+			this.add(this.robot)
+		}
 	}
 
 	colocarPuzles()

@@ -49,15 +49,15 @@ class EscapeTheLightrooms extends THREE.Scene
 	// la visualización de la escena
 	constructor(myCanvas)
 	{
-		super();
+		super()
 
 		this.clock = new THREE.Clock(false)
 
 		// Lo primero, crear el visualizador, pasándole el lienzo sobre el que realizar los renderizados.
-		this.renderer = this.createRenderer(myCanvas);
+		this.renderer = this.createRenderer(myCanvas)
 
 		// Se crea la interfaz gráfica de usuario
-		this.gui = this.createGUI ();
+		this.gui = this.createGUI()
 
 
 		this.inicializarGameState()
@@ -174,7 +174,7 @@ class EscapeTheLightrooms extends THREE.Scene
 		this.add(this.salaDerecha)
 		this.add(this.salaSuperior)
 
-		// NOTE: Importante cuándo llamamos a este método (debe ser después de meter los objetos al grafo)
+		// TODO: NOTE: Importante cuándo llamamos a este método (debe ser después de meter los objetos al grafo)
 		this.salaPrincipal.updateColliders()
 		this.salaIzquierda.updateColliders()
 		this.salaDerecha.updateColliders()
@@ -350,7 +350,8 @@ class EscapeTheLightrooms extends THREE.Scene
 			this.renderer.render (this, this.getCamera());
 		}
 
-		//this.spotLight.position.x += 0.01
+		// TODO: TMP
+		this.salaPrincipal.robot.update()
 
 		// Se actualiza la posición de la cámara según su controlador
 		this.gestorCamaras.update(currentDelta);

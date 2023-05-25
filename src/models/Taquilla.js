@@ -2,6 +2,8 @@
 import * as THREE from "../../libs/three.module.js"
 import * as TWEEN from '../../libs/tween.esm.js'
 import {CSG} from "../../libs/CSG-v2.js"
+import {GameState} from "../GameState.js"
+import {SistemaColisiones} from "../systems/SistemaColisiones.js"
 
 class Taquilla extends THREE.Object3D
 {
@@ -39,6 +41,9 @@ class Taquilla extends THREE.Object3D
 
 		//
 		this.estantes = []
+
+		//
+		this.baseColliders = []
 
 		// TODO Material temporal. Luego será la textura de las paredes.
 		this.taquillaMaterial = new THREE.MeshNormalMaterial({color: 0xf1f1f1, opacity: 0.5, transparent: true})
@@ -113,6 +118,11 @@ class Taquilla extends THREE.Object3D
 		this.add(puertaObject)
 
 		//
+		// Colliders
+		//
+		this._crearColliders()
+
+		//
 		// Animación
 		//
 
@@ -160,6 +170,24 @@ class Taquilla extends THREE.Object3D
 		geoPuerta.translate(this.taquillaX/2, 0, 0)
 
 		return new THREE.Mesh(geoPuerta, this.taquillaMaterial)
+	}
+
+	updateColliders()
+	{
+		let colSys = GameState.systems.collision
+
+		// Añado mis colliders
+		this.updateMatrixWorld(true)
+		colSys.aniadeRectColliders(this.uuid,
+			SistemaColisiones.Box3ArrayToRectArray(this.baseColliders, this.matrixWorld))
+	}
+
+	_crearColliders()
+	{
+		let tmpMin = new THREE.Vector3(-(this.taquillaX/2 + this.taquillaBorde), 0, -(this.taquillaZ/2 + this.taquillaBorde))
+		let tmpMax = new THREE.Vector3(this.taquillaX/2 + this.taquillaBorde, 0, this.taquillaZ/2 + this.taquillaBorde)
+
+		this.baseColliders.push(new THREE.Box3(tmpMin, tmpMax))
 	}
 
 	_crearAnimacion()

@@ -2,6 +2,8 @@
 import * as THREE from "../../libs/three.module.js"
 import * as TWEEN from '../../libs/tween.esm.js'
 import {CSG} from "../../libs/CSG-v2.js"
+import {GameState} from "../GameState.js"
+import {SistemaColisiones} from "../systems/SistemaColisiones.js"
 
 class Cajonera extends THREE.Object3D
 {
@@ -56,6 +58,9 @@ class Cajonera extends THREE.Object3D
 		this.cajonAperturaZ = this.cajoneraZ + this.cajoneraBorde
 		this.cajones = []
 
+		// Colisiones
+		this.baseColliders = []
+
 		// Materiales
 		this.cajoneraMaterial = new THREE.MeshNormalMaterial({opacity: 0.5, transparent: true})
 		this.cajonFrontalMaterial = new THREE.MeshNormalMaterial({opacity: 0.5, transparent: true})
@@ -102,6 +107,11 @@ class Cajonera extends THREE.Object3D
 		this.cajoneraO3D.translateY(this.cajoneraY + 2*this.cajoneraBorde)
 
 		this.add(this.cajoneraO3D)
+
+		//
+		// Colliders
+		//
+		this._crearColliders()
 
 		//
 		// Animación
@@ -166,6 +176,24 @@ class Cajonera extends THREE.Object3D
 		// TODO: Añadir el asa (Colgarlo del mesh frontal para la interacción)
 
 		return cajon
+	}
+
+	updateColliders()
+	{
+		let colSys = GameState.systems.collision
+
+		// Añado mis colliders
+		this.updateMatrixWorld(true)
+		colSys.aniadeRectColliders(this.uuid,
+			SistemaColisiones.Box3ArrayToRectArray(this.baseColliders, this.matrixWorld))
+	}
+
+	_crearColliders()
+	{
+		let tmpMin = new THREE.Vector3(-(this.cajoneraX/2 + this.cajoneraBorde), 0, -(this.cajoneraZ/2 + this.cajoneraBorde))
+		let tmpMax = new THREE.Vector3(this.cajoneraX/2 + this.cajoneraBorde, 0, this.cajoneraZ/2 + this.cajoneraBorde)
+
+		this.baseColliders.push(new THREE.Box3(tmpMin, tmpMax))
 	}
 
 	_crearAnimacion()

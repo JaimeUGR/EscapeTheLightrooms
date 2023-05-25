@@ -1,6 +1,8 @@
 
 import * as THREE from "../../libs/three.module.js"
 import {CSG} from "../../libs/CSG-v2.js"
+import {GameState} from "../GameState.js"
+import {SistemaColisiones} from "../systems/SistemaColisiones.js"
 
 class Mesa extends THREE.Object3D
 {
@@ -32,6 +34,8 @@ class Mesa extends THREE.Object3D
 		this.separacionPatasX = dimensiones.separacionPatasX
 		this.separacionPatasZ = dimensiones.separacionPatasZ
 
+		this.baseColliders = []
+
 		this.materialTablero = new THREE.MeshNormalMaterial({opacity: 0.5,transparent: true})
 		this.materialPatas = new THREE.MeshNormalMaterial({opacity: 0.5,transparent: true})
 
@@ -61,6 +65,29 @@ class Mesa extends THREE.Object3D
 		this.tableroO3D.position.set(0, this.tableroY + this.pataY, 0)
 
 		this.add(this.tableroO3D)
+
+		//
+		// Colliders
+		//
+		this._crearColliders()
+	}
+
+	updateColliders()
+	{
+		let colSys = GameState.systems.collision
+
+		// Añado mis colliders
+		this.updateMatrixWorld(true)
+		colSys.aniadeRectColliders(this.uuid,
+			SistemaColisiones.Box3ArrayToRectArray(this.baseColliders, this.matrixWorld))
+	}
+
+	_crearColliders()
+	{
+		let tmpMin = new THREE.Vector3(-this.tableroX/2, 0, -this.tableroZ/2)
+		let tmpMax = new THREE.Vector3(this.tableroX/2, 0, this.tableroZ/2)
+
+		this.baseColliders.push(new THREE.Box3(tmpMin, tmpMax))
 	}
 }
 
@@ -102,6 +129,8 @@ class MesaCristal extends THREE.Object3D
 		this.cristalY = dimensiones.cristalY * this.tableroY
 		this.cristalZ = dimensiones.cristalZ
 
+		this.baseColliders = []
+
 		this.materialTablero = new THREE.MeshNormalMaterial({opacity: 0.5, transparent: true})
 		this.materialCristal = new THREE.MeshNormalMaterial({opacity: 0.5, transparent: true})
 		this.materialPatas = new THREE.MeshNormalMaterial({opacity: 0.5, transparent: true})
@@ -141,6 +170,29 @@ class MesaCristal extends THREE.Object3D
 		this.tableroO3D.position.set(0, this.tableroY + this.pataY, 0)
 
 		this.add(this.tableroO3D)
+
+		//
+		// Colliders
+		//
+		this._crearColliders()
+	}
+
+	updateColliders()
+	{
+		let colSys = GameState.systems.collision
+
+		// Añado mis colliders
+		this.updateMatrixWorld(true)
+		colSys.aniadeRectColliders(this.uuid,
+			SistemaColisiones.Box3ArrayToRectArray(this.baseColliders, this.matrixWorld))
+	}
+
+	_crearColliders()
+	{
+		let tmpMin = new THREE.Vector3(-this.tableroX/2, 0, -this.tableroZ/2)
+		let tmpMax = new THREE.Vector3(this.tableroX/2, 0, this.tableroZ/2)
+
+		this.baseColliders.push(new THREE.Box3(tmpMin, tmpMax))
 	}
 }
 

@@ -2,7 +2,7 @@
 import * as THREE from '../../libs/three.module.js'
 import * as TWEEN from '../../libs/tween.esm.js'
 import {CSG} from "../../libs/CSG-v2.js"
-import {Rect} from "../structures/Rect.js";
+import {Rect} from "../structures/Rect.js"
 import {Vector2} from "../../libs/three.module.js"
 import {GameState} from "../GameState.js"
 import {SistemaColisiones} from "../systems/SistemaColisiones.js"
@@ -47,6 +47,12 @@ class Sala extends THREE.Object3D
 		this.alturaPared = alturaPared
 
 		this.pathTexturas = pathTexturas
+
+		//
+		// Colisionables en la sala e interactuables
+		//
+		this.collidables = []
+		this.interactables = []
 
 		//
 		let texturaSuelo = GameState.txLoader.load(this.pathTexturas.suelo)
@@ -279,6 +285,11 @@ class Sala extends THREE.Object3D
 	{
 		this.updateMatrixWorld(true)
 		GameState.systems.collision.aniadeRectColliders(this.uuid, SistemaColisiones.Box3ArrayToRectArray(this.baseColliders, this.matrixWorld))
+
+		// Además, actualizamos todos los colliders de los modelos
+		for (let i = 0; i < this.collidables.length; i++)
+			if (this.collidables[i].updateColliders)
+				this.collidables[i].updateColliders()
 	}
 }
 
@@ -286,7 +297,12 @@ const Pasillo_Cierre_Grosor = 5
 
 class Pasillo extends THREE.Object3D
 {
-	constructor(largoPasillo, alturaPasillo, espacioInterno, orientacion = 0)
+	constructor(largoPasillo, alturaPasillo, espacioInterno, orientacion = 0
+	, pathTexturas = {
+		suelo: "../../resources/textures/rooms/Madera.jpg",
+		pared: "../../resources/textures/rooms/PapelMorado.png",
+		techo: "../../resources/textures/rooms/AluminioTecho.jpg"
+	})
 	{
 		super()
 
@@ -298,10 +314,51 @@ class Pasillo extends THREE.Object3D
 		this.baseColliders = []
 		this.baseCierreCollider = null
 
-		let materialSuelo = new THREE.MeshLambertMaterial({color: 0x852a3b})
-		let materialCierre = new THREE.MeshLambertMaterial({color: 0x455382})
-		let materialPared = new THREE.MeshLambertMaterial({color: 0x257355})
-		let materialTecho = new THREE.MeshLambertMaterial({color: 0x35a78b})
+		this.pathTexturas = pathTexturas
+
+		// Texturas
+
+		let texturaSuelo = GameState.txLoader.load(this.pathTexturas.suelo)
+
+		texturaSuelo.wrapS = THREE.RepeatWrapping
+		texturaSuelo.wrapT = THREE.RepeatWrapping
+		texturaSuelo.repeat.set(this.espacioInterno/15, this.largoPasillo/15)
+
+		this.materialSuelo = new THREE.MeshLambertMaterial({color: 0x852a3b, map: texturaSuelo})
+
+		//
+		let texturaParedX = GameState.txLoader.load(this.pathTexturas.pared)
+		let texturaParedZ = GameState.txLoader.load(this.pathTexturas.pared)
+
+		texturaParedX.wrapS = THREE.RepeatWrapping
+		texturaParedZ.wrapS = THREE.RepeatWrapping
+
+		texturaParedX.wrapT = THREE.MirroredRepeatWrapping
+		texturaParedZ.wrapT = THREE.MirroredRepeatWrapping
+
+		texturaParedX.repeat.set(this.espacioInterno / 25, 2)
+		texturaParedZ.repeat.set(this.largoPasillo / 25, 2)
+
+		this.materialParedX = new THREE.MeshLambertMaterial({
+			map: texturaParedX,
+			color: 0xffffff
+		})
+
+		this.materialParedZ = new THREE.MeshLambertMaterial({
+			map: texturaParedZ,
+			color: 0xffffff
+		})
+
+		//
+		let texturaTecho = GameState.txLoader.load(this.pathTexturas.techo)
+
+		texturaTecho.wrapS = THREE.RepeatWrapping
+		texturaTecho.wrapT = THREE.RepeatWrapping
+		texturaTecho.repeat.set(this.largoParedX / 32, this.largoParedZ / 32)
+
+		this.materialTecho = new THREE.MeshLambertMaterial({color: 0x35a78b})
+
+		this.materialCierre = new THREE.MeshLambertMaterial({color: 0x455382})
 
 		// Puerta
 		let geoPuerta = new THREE.BoxGeometry(Sala_PuertaAncho, Sala_PuertaAlto, Sala_GrosorPared)
@@ -311,16 +368,16 @@ class Pasillo extends THREE.Object3D
 		let geoParedFrontal = new THREE.BoxGeometry(espacioInterno, alturaPasillo, Sala_GrosorPared)
 		geoParedFrontal.translate(0, alturaPasillo/2, 0)
 		geoParedFrontal = new CSG()
-			.union([new THREE.Mesh(geoParedFrontal, materialPared)])
+			.union([new THREE.Mesh(geoParedFrontal, this.materialParedX)])
 			.subtract([new THREE.Mesh(geoPuerta, null)])
 			.toGeometry()
 
 		geoParedFrontal.translate(0, 0, Sala_GrosorPared/2 + largoPasillo/2)
-		this.paredFrontal = new THREE.Mesh(geoParedFrontal.clone(), materialPared)
+		this.paredFrontal = new THREE.Mesh(geoParedFrontal.clone(), this.materialParedX)
 		this.add(this.paredFrontal)
 
 		geoParedFrontal.translate(0, 0, -(largoPasillo + Sala_GrosorPared))
-		this.paredTrasera = new THREE.Mesh(geoParedFrontal, materialPared)
+		this.paredTrasera = new THREE.Mesh(geoParedFrontal, this.materialParedX)
 		this.add(this.paredTrasera)
 
 		// Pared Derecha
@@ -330,22 +387,22 @@ class Pasillo extends THREE.Object3D
 		// Pared Izquierda
 		let geoParedIzda = new THREE.BoxGeometry(Sala_GrosorPared, alturaPasillo, largoPasillo/2 - Pasillo_Cierre_Grosor/2)
 		geoParedIzda.translate(Sala_GrosorPared/2 + espacioInterno/2, alturaPasillo/2, -(Pasillo_Cierre_Grosor/4 + largoPasillo/4))
-		this.paredIzdaSup = new THREE.Mesh(geoParedIzda.clone(), materialPared)
+		this.paredIzdaSup = new THREE.Mesh(geoParedIzda.clone(), this.materialParedZ)
 		this.add(this.paredIzdaSup)
 
 		geoParedIzda.translate(0, 0, largoPasillo/2 + Pasillo_Cierre_Grosor/2)
 
-		this.paredDcha = new THREE.Mesh(geoParedDcha, materialPared)
+		this.paredDcha = new THREE.Mesh(geoParedDcha, this.materialParedZ)
 		this.add(this.paredDcha)
 
-		this.paredIzdaInf = new THREE.Mesh(geoParedIzda, materialPared)
+		this.paredIzdaInf = new THREE.Mesh(geoParedIzda, this.materialParedZ)
 		this.add(this.paredIzdaInf)
 
 		// Cierre
 		let geoCierre = new THREE.BoxGeometry(Sala_GrosorPared + espacioInterno, alturaPasillo, Pasillo_Cierre_Grosor)
 		geoCierre.translate(Sala_GrosorPared/2, alturaPasillo/2, 0)
 
-		this.cierre = new THREE.Mesh(geoCierre, materialCierre)
+		this.cierre = new THREE.Mesh(geoCierre, this.materialCierre)
 		this.add(this.cierre)
 
 		//
@@ -359,13 +416,13 @@ class Pasillo extends THREE.Object3D
 		let sueloGeo = new THREE.BoxGeometry(espacioInterno, 1, largoPasillo)
 		sueloGeo.translate(0, -0.5, 0)
 
-		this.add(new THREE.Mesh(sueloGeo, materialSuelo))
+		this.add(new THREE.Mesh(sueloGeo, this.materialSuelo))
 
 		// Añadir el techo
 		let techoGeo = sueloGeo.clone()
 		techoGeo.translate(0, alturaPasillo + 1, 0)
 
-		this.add(new THREE.Mesh(techoGeo, materialTecho))
+		this.add(new THREE.Mesh(techoGeo, this.materialTecho))
 
 		this.rotateY(orientacion)
 
@@ -423,7 +480,7 @@ class Pasillo extends THREE.Object3D
 		let frameAbierta = {pos: this.espacioInterno}
 
 		this._animacionApertura = new TWEEN.Tween(frameCerrada)
-			.to(frameAbierta, 5000)
+			.to(frameAbierta, 6000)
 			.onUpdate(() => {
 				this.cierre.position.set(frameCerrada.pos, 0, 0)
 
