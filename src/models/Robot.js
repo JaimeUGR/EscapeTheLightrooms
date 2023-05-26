@@ -1,24 +1,25 @@
 
 import * as THREE from '../../libs/three.module.js'
+import * as TWEEN from '../../libs/tween.esm.js'
 import {CSG} from '../../libs/CSG-v2.js'
 
 class Robot extends THREE.Object3D
 {
 	constructor(gui, dimensiones = {
 		cabeza: {
-			cabezaX: 1,
-			cabezaY: 1,
-			cabezaZ: 1,
+			cabezaX: 4,
+			cabezaY: 4,
+			cabezaZ: 4,
 
-			radioCuello: 0.25,
-			alturaCuello: 1
+			radioCuello: 1.15,
+			alturaCuello: 1.25
 		},
 		tronco: {
-			troncoX: 10,
-			troncoZ: 9,
+			troncoX: 7,
+			troncoZ: 5,
 
-			troncoSupY: 10,
-			troncoInfY: 4,
+			troncoSupY: 5,
+			troncoInfY: 3,
 
 			radioPila: 1,
 			alturaPila: 2.5, // Menos que tronco Z
@@ -27,35 +28,38 @@ class Robot extends THREE.Object3D
 			separacionYZonaPila: 0.5, // NO TOCAR
 		},
 		brazos: {
-			hombroX: 6,
-			hombroY: 3,
-			hombroZ: 6,
+			hombroX: 2.5,
+			hombroY: 2,
+			hombroZ: 3,
 
-			brazoX: 3,
-			brazoZ: 3,
+			brazoX: 1.5,
+			brazoZ: 1.5,
 
-			brazoSupY: 8,
-			brazoInfY: 6,
+			brazoSupY: 4,
+			brazoInfY: 3,
 
 			// NOTA: Todas deben ser mayor que brazoXZ
-			unionX: 5,
-			unionY: 4,
-			unionZ: 5,
+			unionX: 2,
+			unionY: 2,
+			unionZ: 2,
 
 			alturaBrazos: 0.8, // 0 a 1 en el tronco Y
 		},
 		piernas: {
-			piernaX: 2,
-			piernaZ: 2,
-			piernaSupY: 6,
-			piernaInfY: 6,
+			piernaX: 1.5,
+			piernaZ: 1.5,
+			piernaSupY: 2,
+			piernaInfY: 2,
+
+			pieY: 0.8,
+			pieZ: 2.5, // Extensión que incluye la piernaZ
 
 			separacionPiernas: 1, // 0 a 1, desde la mitad del tronco inferior
 
 			// NOTA: Todas deben ser mayor que piernaXZ
-			unionX: 2.5,
-			unionY: 2.5,
-			unionZ: 2.5
+			unionX: 2,
+			unionY: 2,
+			unionZ: 2
 		}
 	})
 	{
@@ -102,12 +106,14 @@ class Robot extends THREE.Object3D
 			brazoDer_rYSup: 0,
 			brazoDer_rZSup: 0,
 			brazoDer_rXInf: 0,
+			brazoDer_rZInf: 0,
 
 			brazoIzd_rXCodo: 0,
 			brazoIzd_escSup: 1,
 			brazoIzd_rYSup: 0,
 			brazoIzd_rZSup: 0,
 			brazoIzd_rXInf: 0,
+			brazoIzd_rZInf: 0,
 
 			troncoInf_rY: 0,
 
@@ -125,6 +131,9 @@ class Robot extends THREE.Object3D
 			piernaIzd_rXInf: 0,
 			piernaIzd_rZInf: 0,
 
+			guiControlsEnabled: false,
+			animacionContinuaActivada: true,
+
 			reset: () => {
 				this.movilidad.cabeza_rX = 0
 				this.movilidad.cabeza_rY = 0
@@ -136,13 +145,15 @@ class Robot extends THREE.Object3D
 				this.movilidad.brazoDer_escSup = 1
 				this.movilidad.brazoDer_rYSup = 0
 				this.movilidad.brazoDer_rZSup = 0
-				this.movilidad.brazoDer_rXIn = 0
+				this.movilidad.brazoDer_rXInf = 0
+				this.movilidad.brazoDer_rZInf = 0
 
 				this.movilidad.brazoIzd_rXCodo = 0
 				this.movilidad.brazoIzd_escSup = 1
 				this.movilidad.brazoIzd_rYSup = 0
 				this.movilidad.brazoIzd_rZSup = 0
 				this.movilidad.brazoIzd_rXInf = 0
+				this.movilidad.brazoIzd_rZInf = 0
 
 				this.movilidad.troncoInf_rY = 0
 
@@ -161,6 +172,9 @@ class Robot extends THREE.Object3D
 				this.movilidad.piernaIzd_rZInf = 0
 			}
 		}
+
+		// Animación
+		this.animaciones = {}
 
 		this.material = new THREE.MeshNormalMaterial({opacity: 0.5, transparent: true})
 
@@ -193,18 +207,32 @@ class Robot extends THREE.Object3D
 			meshUnion.name = "MU"
 			meshUnion.position.y = -meshPiernaSup.scale.y * this.dimPiernas.piernaSupY
 
+			let O3PiernaInf = new THREE.Object3D()
+			O3PiernaInf.name = "O3PI"
+			// Libertad -> Rotación XZ
+			// meshPiernaInf.rotation.x = 0
+			// meshPiernaInf.rotation.z = 0
+
 			let geoPiernaInf = new THREE.BoxGeometry(this.dimPiernas.piernaX, this.dimPiernas.piernaInfY, this.dimPiernas.piernaZ)
 			geoPiernaInf.translate(0, -this.dimPiernas.piernaInfY/2, 0)
 
 			let meshPiernaInf = new THREE.Mesh(geoPiernaInf, this.material)
 			meshPiernaInf.name = "MPI"
 			// Libertad -> Escalado pierna inferior
-			// Libertad -> Rotación XZ
 			// meshPiernaInf.scale.y = 1
-			// meshPiernaInf.rotation.x = 0
-			// meshPiernaInf.rotation.z = 0
 
-			meshUnion.add(meshPiernaInf)
+
+			let geoPie = new THREE.BoxGeometry(this.dimPiernas.piernaX, this.dimPiernas.pieY, this.dimPiernas.pieZ)
+			geoPie.translate(0, -this.dimPiernas.pieY/2, this.dimPiernas.pieZ/2 - this.dimPiernas.piernaZ/2)
+
+			// TODO: Trasladar el escalado del pie inferior
+			let meshPie = new THREE.Mesh(geoPie, this.material)
+			meshPie.name = "MP"
+
+			O3PiernaInf.add(meshPie)
+			O3PiernaInf.add(meshPiernaInf)
+
+			meshUnion.add(O3PiernaInf)
 
 			O3Pierna.add(meshPiernaSup)
 			O3Pierna.add(meshUnion)
@@ -218,7 +246,7 @@ class Robot extends THREE.Object3D
 
 			// Pierna derecha
 			let separacionPiernas = (this.dimTronco.troncoZ/2 - this.dimPiernas.piernaZ/2)*this.dimPiernas.separacionPiernas
-			O3Pierna.position.x += separacionPiernas
+			O3Pierna.position.x += -separacionPiernas
 
 			this.piernaDerecha = O3Pierna
 			this.troncoInferior.add(this.piernaDerecha)
@@ -227,7 +255,9 @@ class Robot extends THREE.Object3D
 			this.elementos.piernaDerecha.O3P = this.piernaDerecha
 			this.elementos.piernaDerecha.MPS = this.piernaDerecha.getObjectByName("MPS")
 			this.elementos.piernaDerecha.MU = this.piernaDerecha.getObjectByName("MU")
+			this.elementos.piernaDerecha.O3PI = this.piernaDerecha.getObjectByName("O3PI")
 			this.elementos.piernaDerecha.MPI = this.piernaDerecha.getObjectByName("MPI")
+			this.elementos.piernaDerecha.MP = this.piernaDerecha.getObjectByName("MP")
 
 			// Pierna Izquierda
 			this.piernaIzquierda = O3Pierna.clone(true)
@@ -238,7 +268,9 @@ class Robot extends THREE.Object3D
 			this.elementos.piernaIzquierda.O3P = this.piernaIzquierda
 			this.elementos.piernaIzquierda.MPS = this.piernaIzquierda.getObjectByName("MPS")
 			this.elementos.piernaIzquierda.MU = this.piernaIzquierda.getObjectByName("MU")
+			this.elementos.piernaIzquierda.O3PI = this.piernaIzquierda.getObjectByName("O3PI")
 			this.elementos.piernaIzquierda.MPI = this.piernaIzquierda.getObjectByName("MPI")
+			this.elementos.piernaIzquierda.MP = this.piernaIzquierda.getObjectByName("MP")
 		}
 
 		//
@@ -303,14 +335,12 @@ class Robot extends THREE.Object3D
 			meshBrazoSup.name = "MBS"
 			// Libertad -> Escalado brazo sup
 			// meshBrazoSup.scale.y = 1
-			meshBrazoSup.position.y = this.dimBrazos.brazoSupY/2
 
 			let O3BrazoSup = new THREE.Object3D()
 			O3BrazoSup.name = "O3BS"
 			// Libertad -> Rotación en YZ del brazo sup
 			// O3BrazoSup.rotation.y = 0
 			// O3BrazoSup.rotation.z = 0
-			O3BrazoSup.position.y += -this.dimBrazos.brazoSupY/2
 
 			O3BrazoSup.add(meshBrazoSup)
 
@@ -318,7 +348,7 @@ class Robot extends THREE.Object3D
 			let meshUnion = new THREE.Mesh(geoUnion, this.material)
 			meshUnion.name = "MU"
 			// TODO: Libertad -> Traslación hacia abajo por el escalado
-			meshUnion.position.y = -this.dimBrazos.brazoSupY*meshBrazoSup.scale.y + this.dimBrazos.brazoSupY/2
+			meshUnion.position.y = -this.dimBrazos.brazoSupY*meshBrazoSup.scale.y
 
 			O3BrazoSup.add(meshUnion)
 
@@ -332,7 +362,6 @@ class Robot extends THREE.Object3D
 
 			// TODO: GEOMANO
 
-
 			meshUnion.add(meshBrazoInf)
 			O3Brazo.add(O3BrazoSup)
 
@@ -341,7 +370,7 @@ class Robot extends THREE.Object3D
 			O3Brazo.position.y = alturaBrazo
 
 			// Brazo Derecho
-			O3Brazo.position.x += this.dimTronco.troncoX/2 + this.dimBrazos.hombroX/2
+			O3Brazo.position.x = -(this.dimTronco.troncoX/2 + this.dimBrazos.hombroX/2)
 
 			this.brazoDerecho = O3Brazo
 			this.troncoSuperior.add(this.brazoDerecho)
@@ -407,15 +436,224 @@ class Robot extends THREE.Object3D
 		this.elementos.troncoSuperior = this.troncoSuperior
 		this.elementos.troncoInferior = this.troncoInferior
 
+		// Subirlo los troncos por encima de los ejes
+		let alturaTroncoInferior = this.dimTronco.troncoInfY + this.dimPiernas.piernaSupY
+			+ this.dimPiernas.piernaInfY + this.dimPiernas.pieY
+
+		this.troncoSuperior.translateY(alturaTroncoInferior)
+		this.troncoInferior.translateY(alturaTroncoInferior)
+
+		// Para que todos los elementos estén bien posicionados
+		this._movementUpdate()
+
+		//
+		// Animación
+		//
+		this._crearAnimacionContinua()
+
+		this.animacionContinuaActivada = true
+		this.enAnimacionContinua = false
+		this.esperaAnimacion = 30000 // EN MS
+
+		// DEBUG
 		this.axis = new THREE.AxesHelper (10);
 		this.add (this.axis)
 
 		this.createGUI(gui)
 	}
 
+	_crearAnimacionContinua()
+	{
+		let frameCabezaArriba = {rX: 0}
+		let frameCabezaAbajo = {rX: Math.PI/6}
+
+		let frameLevantarBrazo = {rX: 0}
+		let frameBrazoLevantado = {rX: -Math.PI/2}
+
+		let frameBrazoSupNoEscalado = {sY: 1}
+		let frameBrazoSupEscalado = {sY: 1.75}
+
+		let frameBrazoInfNoRotado = {rZ: 0}
+		let frameBrazoInfRotado = {rZ: Math.PI/2}
+
+		let frameBrazoDerechoArriba = {rZInf: Math.PI/2, rXSup: -Math.PI/2, sYSup: 1.75}
+		let frameBrazoDerechoAbajo = {rZInf: 0, rXSup: 0, sYSup: 1}
+
+		let frameBrazoIzquierdoAbajo = {rXBrazo: 0, rXPierna: 0}
+		let frameBrazoIzquierdoArriba = {rXBrazo: -3*Math.PI/4, rXPierna: -Math.PI/3}
+
+		let frameNoDecepcionado = {rXBrazo: -3*Math.PI/4, rXPierna: -Math.PI/3, rXCabeza: 0}
+		let frameDecepcionado = {rXBrazo: 0, rXPierna: 0, rXCabeza: Math.PI/6}
+
+		let animacionBajarCabeza = new TWEEN.Tween(frameCabezaArriba).to(frameCabezaAbajo, 1000)
+			.onStart(() => {
+				// POR SEGURIDAD
+				this.movilidad.reset()
+				this._movementUpdate()
+			})
+			.onUpdate(() => {
+				this.elementos.cabeza.rotation.x = frameCabezaArriba.rX
+			})
+			.onComplete(() => {
+				frameCabezaArriba.rX = 0
+			})
+
+		let animacionLevantarBrazo = new TWEEN.Tween(frameLevantarBrazo).to(frameBrazoLevantado, 1000)
+			.onUpdate(() => {
+				this.elementos.brazoDerecho.O3B.rotation.x = frameLevantarBrazo.rX
+			})
+			.onComplete(() => {
+				frameLevantarBrazo.rX = 0
+			})
+
+		let animacionEscalarBrazoSup = new TWEEN.Tween(frameBrazoSupNoEscalado).to(frameBrazoSupEscalado, 800)
+			.onUpdate(() => {
+				this.elementos.brazoDerecho.MBS.scale.y = frameBrazoSupNoEscalado.sY
+				this.elementos.brazoDerecho.MU.position.y = -this.dimBrazos.brazoSupY*this.elementos.brazoDerecho.MBS.scale.y
+			})
+			.onComplete(() => {
+				frameBrazoSupNoEscalado.sY = 1
+			})
+
+		let animacionRotarBrazoInf = new TWEEN.Tween(frameBrazoInfNoRotado).to(frameBrazoInfRotado, 500)
+			.onUpdate(() => {
+				this.elementos.brazoDerecho.MBI.rotation.z = frameBrazoInfNoRotado.rZ
+			})
+			.onComplete(() => {
+				frameBrazoInfNoRotado.rZ = 0
+			})
+			.yoyo(true)
+			.repeat(4)
+
+		let animacionSubirCabeza = new TWEEN.Tween(frameCabezaAbajo).to(frameCabezaArriba, 800)
+			.onUpdate(() => {
+				this.elementos.cabeza.rotation.x = frameCabezaAbajo.rX
+			})
+			.onComplete(() => {
+				frameCabezaAbajo.rX = Math.PI/6
+			})
+
+		let animacionBajarBrazoDerecho = new TWEEN.Tween(frameBrazoDerechoArriba).to(frameBrazoDerechoAbajo, 900)
+			.onUpdate(() => {
+				this.elementos.brazoDerecho.O3B.rotation.x = frameBrazoDerechoArriba.rXSup
+
+				this.elementos.brazoDerecho.MBS.scale.y = frameBrazoDerechoArriba.sYSup
+				this.elementos.brazoDerecho.MU.position.y = -this.dimBrazos.brazoSupY*this.elementos.brazoDerecho.MBS.scale.y
+
+				this.elementos.brazoDerecho.MBI.rotation.z = frameBrazoDerechoArriba.rZInf
+			})
+			.onComplete(() => {
+				frameBrazoDerechoArriba.rZInf = Math.PI/2
+				frameBrazoDerechoArriba.rXSup = -Math.PI/2
+				frameBrazoDerechoArriba.sYSup = 1.75
+			})
+
+		let animacionMenearBrazoIzquierdo = new TWEEN.Tween(frameBrazoIzquierdoAbajo).to(frameBrazoIzquierdoArriba, 400)
+			.onUpdate(() => {
+				this.elementos.brazoIzquierdo.O3B.rotation.x = frameBrazoIzquierdoAbajo.rXBrazo
+				this.elementos.piernaDerecha.O3P.rotation.x = frameBrazoIzquierdoAbajo.rXPierna
+			})
+			.onComplete(() => {
+				frameBrazoIzquierdoAbajo.rXBrazo = 0
+				frameBrazoIzquierdoAbajo.rXPierna = 0
+			})
+			.yoyo(true)
+			.repeat(4)
+
+		let animacionDecepcionarse = new TWEEN.Tween(frameNoDecepcionado).to(frameDecepcionado, 1250)
+			.onUpdate(() => {
+				this.elementos.brazoIzquierdo.O3B.rotation.x = frameNoDecepcionado.rXBrazo
+				this.elementos.piernaDerecha.O3P.rotation.x = frameNoDecepcionado.rXPierna
+				this.elementos.cabeza.rotation.x = frameNoDecepcionado.rXCabeza
+			})
+			.onComplete(() => {
+				frameNoDecepcionado.rXBrazo = -3*Math.PI/4
+				frameNoDecepcionado.rXPierna = -Math.PI/3
+				frameNoDecepcionado.rXCabeza = 0
+			})
+
+		//
+		let frameDepresionInicia_I = {rY: 0}
+		let frameDepresionInicia_F = {rY: -Math.PI/6}
+		let frameDepresion_I = {rY: -Math.PI/6}
+		let frameDepresion_F = {rY: Math.PI/6}
+		let frameDepresionTermina_I = {rY: Math.PI/6}
+		let frameDepresionTermina_F = {rY: 0}
+		let frameTerminar_I = {rX: Math.PI/6}
+		let frameTerminar_F = {rX: 0}
+
+		let animacionDepresionInicia = new TWEEN.Tween(frameDepresionInicia_I).to(frameDepresionInicia_F, 250)
+			.onUpdate(() => {
+				this.elementos.cabeza.rotation.y = frameDepresionInicia_I.rY
+			})
+			.onComplete(() => {
+				frameDepresionInicia_I.rY = 0
+			})
+
+		let animacionDepresion = new TWEEN.Tween(frameDepresion_I).to(frameDepresion_F, 550)
+			.onUpdate(() => {
+				this.elementos.cabeza.rotation.y = frameDepresion_I.rY
+			})
+			.onComplete(() => {
+				frameDepresion_I.rY = -Math.PI/6
+			})
+			.yoyo(true)
+			.repeat(4)
+
+		let animacionTerminarDepresion = new TWEEN.Tween(frameDepresionTermina_I).to(frameDepresionTermina_F, 250)
+			.onUpdate(() => {
+				this.elementos.cabeza.rotation.y = frameDepresionTermina_I.rY
+			})
+			.onComplete(() => {
+				frameDepresionTermina_I.rY = Math.PI/6
+			})
+
+		let animacionTerminar = new TWEEN.Tween(frameTerminar_I).to(frameTerminar_F, 1000)
+			.onUpdate(() => {
+				this.elementos.cabeza.rotation.x = frameTerminar_I.rX
+			})
+			.onComplete(() => {
+				frameTerminar_I.rX = Math.PI/6
+
+				this._completarAnimacionContinua()
+			})
+
+		// CHAINS
+		animacionBajarCabeza.chain(animacionLevantarBrazo)
+		animacionLevantarBrazo.chain(animacionEscalarBrazoSup)
+		animacionEscalarBrazoSup.chain(animacionRotarBrazoInf)
+		animacionRotarBrazoInf.chain(animacionSubirCabeza)
+		animacionSubirCabeza.chain(animacionBajarBrazoDerecho)
+		animacionBajarBrazoDerecho.chain(animacionMenearBrazoIzquierdo)
+		animacionMenearBrazoIzquierdo.chain(animacionDecepcionarse)
+		animacionDecepcionarse.chain(animacionDepresionInicia)
+		animacionDepresionInicia.chain(animacionDepresion)
+		animacionDepresion.chain(animacionTerminarDepresion)
+		animacionTerminarDepresion.chain(animacionTerminar)
+
+		this.animaciones.animacionContinua = animacionBajarCabeza
+	}
+
+	// TODO: Debe ser llamado una vez para iniciar
+	iniciaAnimacionContinua()
+	{
+		if (this.enAnimacionContinua || !this.animacionContinuaActivada)
+			return
+
+		this.enAnimacionContinua = true
+		this.animaciones.animacionContinua.start()
+	}
+
+	_completarAnimacionContinua()
+	{
+		this.enAnimacionContinua = false
+
+		if (this.animacionContinuaActivada)
+			setTimeout(this.iniciaAnimacionContinua.bind(this), this.esperaAnimacion)
+	}
+
 	createGUI(gui)
 	{
-
 		// Se crea una sección para los controles de la caja
 		const folder = gui.addFolder ("Robot")
 
@@ -430,12 +668,14 @@ class Robot extends THREE.Object3D
 		folder.add(this.movilidad, 'brazoDer_rYSup', -Math.PI, Math.PI, 0.1).name('brazoDer_rYSup: ').listen()
 		folder.add(this.movilidad, 'brazoDer_rZSup', -Math.PI, Math.PI, 0.1).name('brazoDer_rZSup: ').listen()
 		folder.add(this.movilidad, 'brazoDer_rXInf', -Math.PI, Math.PI, 0.1).name('brazoDer_rXInf: ').listen()
+		folder.add(this.movilidad, 'brazoDer_rZInf', -Math.PI, Math.PI, 0.1).name('brazoDer_rZInf: ').listen()
 
 		folder.add(this.movilidad, 'brazoIzd_rXCodo', -Math.PI, Math.PI, 0.1).name('brazoIzd_rXCodo: ').listen()
 		folder.add(this.movilidad, 'brazoIzd_escSup', 0, 4, 0.1).name('brazoIzd_escSup: ').listen()
 		folder.add(this.movilidad, 'brazoIzd_rYSup', -Math.PI, Math.PI, 0.1).name('brazoIzd_rYSup: ').listen()
 		folder.add(this.movilidad, 'brazoIzd_rZSup', -Math.PI, Math.PI, 0.1).name('brazoIzd_rZSup: ').listen()
 		folder.add(this.movilidad, 'brazoIzd_rXInf', -Math.PI, Math.PI, 0.1).name('brazoIzd_rXInf: ').listen()
+		folder.add(this.movilidad, 'brazoIzd_rZInf', -Math.PI, Math.PI, 0.1).name('brazoIzd_rZInf: ').listen()
 
 		folder.add(this.movilidad, 'troncoInf_rY', -Math.PI, Math.PI, 0.1).name('troncoInf_rY: ').listen()
 
@@ -453,10 +693,28 @@ class Robot extends THREE.Object3D
 		folder.add(this.movilidad, 'piernaIzd_rXInf', -Math.PI, Math.PI, 0.1).name('piernaIzd_rXInf: ').listen()
 		folder.add(this.movilidad, 'piernaIzd_rZInf', -Math.PI, Math.PI, 0.1).name('piernaIzd_rZInf: ').listen()
 
+		folder.add(this.movilidad, 'guiControlsEnabled').name('Control Manual: ').listen()
+		folder.add(this.movilidad, 'animacionContinuaActivada').name('Animación Continua Activada: ').onChange((value) => {
+			this.animacionContinuaActivada = this.movilidad.animacionContinuaActivada
+		})
+
 		folder.add (this.movilidad, 'reset').name ('[ Reset ]')
+
+		this.movilidad.iniciarAnimacionContinua = () => this.iniciaAnimacionContinua()
+		folder.add (this.movilidad, 'iniciarAnimacionContinua').name ('[ INICIAR ANIMACION CONTINUA ]')
 	}
 
 	update()
+	{
+		// Ignorar el control manual si no estamos en modo gui o en animación
+		// TODO: Si añadimos más animaciones incluir un estado animating
+		if (!this.movilidad.guiControlsEnabled || this.enAnimacionContinua)
+			return
+
+		this._movementUpdate()
+	}
+
+	_movementUpdate()
 	{
 		this.elementos.cabeza.rotation.x = this.movilidad.cabeza_rX
 		this.elementos.cabeza.rotation.y = this.movilidad.cabeza_rY
@@ -478,11 +736,14 @@ class Robot extends THREE.Object3D
 		this.elementos.brazoDerecho.O3BS.rotation.z = this.movilidad.brazoDer_rZSup
 		this.elementos.brazoIzquierdo.O3BS.rotation.z = this.movilidad.brazoIzd_rZSup
 
-		this.elementos.brazoDerecho.MU.position.y = -this.dimBrazos.brazoSupY*this.elementos.brazoDerecho.MBS.scale.y + this.dimBrazos.brazoSupY/2
-		this.elementos.brazoIzquierdo.MU.position.y = -this.dimBrazos.brazoSupY*this.elementos.brazoIzquierdo.MBS.scale.y + this.dimBrazos.brazoSupY/2
+		this.elementos.brazoDerecho.MU.position.y = -this.dimBrazos.brazoSupY*this.elementos.brazoDerecho.MBS.scale.y
+		this.elementos.brazoIzquierdo.MU.position.y = -this.dimBrazos.brazoSupY*this.elementos.brazoIzquierdo.MBS.scale.y
 
 		this.elementos.brazoDerecho.MBI.rotation.x = this.movilidad.brazoDer_rXInf
 		this.elementos.brazoIzquierdo.MBI.rotation.x = this.movilidad.brazoIzd_rXInf
+
+		this.elementos.brazoDerecho.MBI.rotation.z = this.movilidad.brazoDer_rZInf
+		this.elementos.brazoIzquierdo.MBI.rotation.z = this.movilidad.brazoIzd_rZInf
 
 		// PIERNAS
 		this.elementos.piernaDerecha.O3P.rotation.x = this.movilidad.piernaDer_rXSup
@@ -500,11 +761,14 @@ class Robot extends THREE.Object3D
 		this.elementos.piernaDerecha.MPI.scale.y = this.movilidad.piernaDer_escInf
 		this.elementos.piernaIzquierda.MPI.scale.y = this.movilidad.piernaIzd_escInf
 
-		this.elementos.piernaDerecha.MPI.rotation.x = this.movilidad.piernaDer_rXInf
-		this.elementos.piernaIzquierda.MPI.rotation.x = this.movilidad.piernaIzd_rXInf
+		this.elementos.piernaDerecha.O3PI.rotation.x = this.movilidad.piernaDer_rXInf
+		this.elementos.piernaIzquierda.O3PI.rotation.x = this.movilidad.piernaIzd_rXInf
 
-		this.elementos.piernaDerecha.MPI.rotation.z = this.movilidad.piernaDer_rZInf
-		this.elementos.piernaIzquierda.MPI.rotation.z = this.movilidad.piernaIzd_rZInf
+		this.elementos.piernaDerecha.O3PI.rotation.z = this.movilidad.piernaDer_rZInf
+		this.elementos.piernaIzquierda.O3PI.rotation.z = this.movilidad.piernaIzd_rZInf
+
+		this.elementos.piernaDerecha.MP.position.y = -this.elementos.piernaDerecha.MPI.scale.y*this.dimPiernas.piernaInfY
+		this.elementos.piernaIzquierda.MP.position.y = -this.elementos.piernaIzquierda.MPI.scale.y*this.dimPiernas.piernaInfY
 	}
 }
 
