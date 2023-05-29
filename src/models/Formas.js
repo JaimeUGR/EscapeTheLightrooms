@@ -2,16 +2,11 @@
 import * as THREE from "../../libs/three.module.js"
 import {CSG} from "../../libs/CSG-v2.js"
 
-class Estrella extends THREE.Object3D
+class Estrella extends THREE.ExtrudeGeometry
 {
 	constructor(extrusion)
 	{
-		super()
-
-		this.extrusion = extrusion
 		let shapeEstrella = new THREE.Shape()
-		this.materialSofa = new THREE.MeshNormalMaterial({opacity: 0.5,transparent: true})
-
 		const radio = 0.5; // Radio de la estrella
 
 		for (let i = 0; i < 10; i++)
@@ -29,32 +24,23 @@ class Estrella extends THREE.Object3D
 			}
 		}
 
+		const options =  {bevelEnabled: false, depth: extrusion, steps: 2}
 
-		var options =  {bevelEnabled: false, depth: 2, steps: this.extrusion, curveSegments: 2,
-			bevelThickness: 0.1, bevelSize: 0.2 , bevelSegements :2};
+		super(shapeEstrella,options)
 
-		var geoshapeEstrella= new THREE.ExtrudeGeometry(shapeEstrella,options);
-		geoshapeEstrella.rotateZ(Math.PI)
-	    geoshapeEstrella.translate(0,0, -this.extrusion/2)
+		this.extrusion = extrusion
+		this.numVertices = 10
 
-
-		let shapeEstrellaMesh = new THREE.Mesh(geoshapeEstrella,this.materialSofa )
-
-		this.add(shapeEstrellaMesh)
-
-
+		this.rotateZ(Math.PI)
+	    this.translate(0,0, -this.extrusion/2)
 	}
 }
 
-class Pentagono extends  THREE.Object3D
+class Pentagono extends THREE.ExtrudeGeometry
 {
 	constructor(extrusion)
 	{
-		super()
-		this.extrusion = extrusion
-		this.materialSofa = new THREE.MeshNormalMaterial({opacity: 0.5,transparent: true})
 		let shapePentagono = new THREE.Shape()
-
 
 		shapePentagono.moveTo(0, 0.5);
 		shapePentagono.lineTo(-0.5, 0.1);
@@ -63,59 +49,50 @@ class Pentagono extends  THREE.Object3D
 		shapePentagono.lineTo(0.5, 0.1);
 		shapePentagono.lineTo(0, 0.5);
 
+		const options =  {bevelEnabled: false, depth: extrusion, steps: 2}
 
-		var options =  {bevelEnabled: true, depth: 2, steps: this.extrusion, curveSegments: 2,
-			bevelThickness: 0.1, bevelSize: 0.2 , bevelSegements :2};
+		super(shapePentagono,options)
 
-		var geoshapePentagono= new THREE.ExtrudeGeometry(shapePentagono,options);
-		geoshapePentagono.translate(0, 0, -this.extrusion/2)
+		this.altura = extrusion
+		this.numVertices = 5
 
-
-		let shapePentagonoMesh = new THREE.Mesh(geoshapePentagono,this.materialSofa )
-
-		this.add(shapePentagonoMesh)
-
+		this.translate(0,0, -this.altura/2)
 	}
 }
 
-class Prisma extends THREE.Object3D
+class Prisma extends THREE.ExtrudeGeometry
 {
-	constructor(extrusion, numVertices) {
-		super()
-		this.extrusion = extrusion
+	constructor(extrusion, numVertices)
+	{
 		let shapeFormaRandom = new THREE.Shape()
-		this.materialSofa = new THREE.MeshNormalMaterial({opacity: 0.5,transparent: true})
-
-		this.numVertices = numVertices;
 		const radius = 0.5; // Radio de la figura
 
 		// Calcular los ángulos de los vértices
-		const angleIncrement = (Math.PI * 2) / this.numVertices;
-		let currentAngle = Math.PI/2;
+		const angleIncrement = (Math.PI * 2) / numVertices
+		let currentAngle = Math.PI/2
 
 		// Crear los vértices de la figura
-		for (let i = 0; i < this.numVertices; i++) {
-			const x = Math.cos(currentAngle) * radius;
-			const y = Math.sin(currentAngle) * radius;
+		for (let i = 0; i < numVertices; i++)
+		{
+			const x = Math.cos(currentAngle) * radius
+			const y = Math.sin(currentAngle) * radius
 
-			if (i === 0) {
-				shapeFormaRandom.moveTo(x, y);
-			} else {
-				shapeFormaRandom.lineTo(x, y);
-			}
+			if (i === 0)
+				shapeFormaRandom.moveTo(x, y)
+			else
+				shapeFormaRandom.lineTo(x, y)
 
-			currentAngle += angleIncrement;
+			currentAngle += angleIncrement
 		}
 
-		var options =  {bevelEnabled: false, depth: this.extrusion, steps: 2, curveSegments: 2,
-			bevelThickness: 0.1, bevelSize: 0.2 , bevelSegements :2};
+		const options =  {bevelEnabled: false, depth: extrusion, steps: 2}
 
-		var geoshapeFormaRandom= new THREE.ExtrudeGeometry(shapeFormaRandom,options);
-		geoshapeFormaRandom.translate(0,0,-this.extrusion/2)
+		super(shapeFormaRandom, options)
 
-		let shapeFormaRandomMesh = new THREE.Mesh(geoshapeFormaRandom, this.materialSofa)
+		this.altura = extrusion
+		this.numVertices = numVertices
 
-		this.add(shapeFormaRandomMesh)
+		this.translate(0,0, -this.altura/2)
 	}
 }
 

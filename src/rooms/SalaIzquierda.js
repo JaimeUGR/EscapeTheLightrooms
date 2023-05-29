@@ -1,5 +1,6 @@
 
-import {Sala} from "./Sala.js";
+import {Sala} from "./Sala.js"
+import {PuzleFormas} from "../puzles/PuzleFormas.js"
 
 class SalaIzquierda extends Sala
 {
@@ -46,7 +47,39 @@ class SalaIzquierda extends Sala
 
 	colocarPuzles()
 	{
+		// Puzle de las formas
+		let puzleFormas = new PuzleFormas({
+			radioContenedor: 4, // Radio del contenedor de la forma
+			alturaContenedor: 1,
+			radioForma: 0.55, // De 0 a 1. 1 significa mismo radio que el contenedor
+			alturaForma: 0.5,
 
+			dimensionesRail: {},
+			separacionComplejosRail: 6,
+
+			operadoresX: 5,
+			operadoresY: 5,
+			operadoresZ: 2,
+
+			dimensionesPalancas: {},
+
+			// La palanca está colocada justo en el centro del raíl (en Z positiva)
+			offsetZPalancas: 35,
+			offsetYPalancas: -this.alturaPared/2
+
+			// X TOTAL -> 2*railGrosor + interiorX ...
+		})
+
+		puzleFormas.rotateY(Math.PI)
+
+		// Truco temporal debido a la rotación prematura
+		puzleFormas.translateX(-this.largoParedX/2)
+		puzleFormas.translateZ(-this.largoParedZ)
+		puzleFormas.translateY(this.alturaPared/2)
+
+		this.add(puzleFormas)
+
+		this.puzleFormas = puzleFormas
 	}
 }
 

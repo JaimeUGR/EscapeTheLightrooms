@@ -211,12 +211,12 @@ class SalaPrincipal extends Sala
 
 		// TODO: TMP
 		{
-			let lampara = new Lampara()
+			/*let lampara = new Lampara()
 
 			lampara.translateX(this.largoParedX/2)
 			lampara.translateZ(this.largoParedZ/2)
 
-			this.add(lampara)
+			this.add(lampara)*/
 		}
 	}
 

@@ -40,6 +40,7 @@ import {SistemaInteraccion} from "./systems/SistemaInteraccion.js";
  */
 
 let FPSLimit = true
+let isWindowFocused = true
 let myDeltaTime = 1/25.0
 let myDelta = 0
 
@@ -96,9 +97,18 @@ class EscapeTheLightrooms extends THREE.Scene
 
 		this.add(new THREE.Mesh(cajaGeo, new THREE.MeshBasicMaterial({color: 0xf7fa2a})))*/
 
-		// TODO: TEMPORAL
+		//
 		//this.gestorCamaras.cambiarControladorCamara(0)
 		//
+
+		// TODO: Temporal para el focus
+		document.addEventListener('focus', () => {
+			isWindowFocused = true
+		})
+
+		document.addEventListener('blur', () => {
+			isWindowFocused = false
+		})
 
 		this.clock.start()
 	}
@@ -137,7 +147,7 @@ class EscapeTheLightrooms extends THREE.Scene
 			right: true
 		})
 
-		this.salaIzquierda = new SalaIzquierda(150, 100, 40, {
+		this.salaIzquierda = new SalaIzquierda(200, 120, 50, {
 			right: true
 		})
 
@@ -350,14 +360,17 @@ class EscapeTheLightrooms extends THREE.Scene
 			this.renderer.render (this, this.getCamera());
 		}
 
-		// TODO: TMP
-		this.salaPrincipal.robot.update()
+		if (isWindowFocused)
+		{
+			// TODO: TMP
+			this.salaPrincipal.robot.update()
 
-		// Se actualiza la posición de la cámara según su controlador
-		this.gestorCamaras.update(currentDelta);
+			// Se actualiza la posición de la cámara según su controlador
+			this.gestorCamaras.update(currentDelta);
 
-		// Actualizar modelos
-		TWEEN.update()
+			// Actualizar modelos
+			TWEEN.update()
+		}
 
 		// Este método debe ser llamado cada vez que queramos visualizar la escena de nuevo.
 		// Literalmente le decimos al navegador: "La próxima vez que haya que refrescar la pantalla, llama al método que te indico".

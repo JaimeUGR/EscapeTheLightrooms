@@ -5,17 +5,14 @@ const SEGMENTOS_SOPORTE = 10;
 class Palanca extends THREE.Object3D
 {
 	constructor(dimensiones = {
-		radioSoporte: 1,
-		alturaSoporte: 1,
+		radioSoporte: 3,
+		alturaSoporte: 3,
 
 		radioPalo: 1,
-		alturaPalo: 1,
+		alturaPalo: 10,
 
-		radioMango: 1,
-		alturaMango: 1
-
-
-
+		radioMango: 1.5,
+		alturaMango: 5
 	})
 	{
 		super()
@@ -53,10 +50,8 @@ class Palanca extends THREE.Object3D
 
 		this.add(palo)
 
-		this.rotateX(-Math.PI/3)
-		
-
-
+		// Posición inicial de la palanca
+		this.rotateX(0)
 	}
 
 
