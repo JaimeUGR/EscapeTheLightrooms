@@ -6,6 +6,7 @@ import {Cajonera} from "../models/Cajonera.js"
 import {Taquilla} from "../models/Taquilla.js"
 import {CuboCentral} from "../models/CuboCentral.js"
 import {Robot} from "../models/Robot.js"
+import {Lampara} from "../models/Lampara.js"
 
 import {GameState} from "../GameState.js"
 import {Rect} from "../structures/Rect.js"
@@ -148,7 +149,7 @@ class SalaPrincipal extends Sala
 			this.collidables.push(mesaCristal)
 		}
 
-		// Taquilla mesa
+		// Taquilla mesa cristal
 		{
 			let taq = new Taquilla({
 				taquillaX: 12, // x interna
@@ -206,6 +207,16 @@ class SalaPrincipal extends Sala
 			this.robot.translateZ(this.largoParedZ/2)
 			this.robot.translateX(this.largoParedX/2)
 			this.add(this.robot)*/
+		}
+
+		// TODO: TMP
+		{
+			let lampara = new Lampara()
+
+			lampara.translateX(this.largoParedX/2)
+			lampara.translateZ(this.largoParedZ/2)
+
+			this.add(lampara)
 		}
 	}
 

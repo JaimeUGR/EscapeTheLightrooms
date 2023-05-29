@@ -1,5 +1,6 @@
 
 import * as THREE from "../../libs/three.module.js"
+
 class TrapezoidGeometry extends THREE.BufferGeometry
 {
 	constructor(widthBottom, depthBottom, widthTop, depthTop, height, indexed = false)
