@@ -28,7 +28,7 @@ class GameState
 		// Flags del juego
 		// TODO: TMP a true
 		this.flags = {
-			tieneDestornillador: true,
+			tieneDestornillador: false,
 			tieneManecillaHora: true,
 			tieneManecillaMinuto: true,
 			tieneMangoPalanca: true,

@@ -8,4 +8,9 @@ function ShuffleArray(array)
 	}
 }
 
-export {ShuffleArray}
+function RandomInt(maximo)
+{
+	return Math.floor(Math.random() * (maximo + 1));
+}
+
+export {ShuffleArray, RandomInt}

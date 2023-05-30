@@ -481,7 +481,7 @@ class CuboCentral extends THREE.Object3D
 				this._animating = true
 				frameInicio.zInicio = this.animaciones.tornillos.tornillo.position.z
 
-				// TODO: Añadir el destornillador como hijo de este mesh
+				this.animaciones.tornillos.tornillo.add(GameState.items.destornillador)
 			})
 			.onUpdate(() => {
 				this.animaciones.tornillos.tornillo.rotation.z = frameInicio.r
@@ -491,7 +491,7 @@ class CuboCentral extends THREE.Object3D
 				frameInicio.r = 0
 				frameInicio.p = 0
 
-				// TODO: Sacar el destornillador como hijo de este mesh
+				this.animaciones.tornillos.tornillo.remove(GameState.items.destornillador)
 
 				meshPanel.remove(this.animaciones.tornillos.tornillo)
 				this.animaciones.tornillos.tornillosRestantes--

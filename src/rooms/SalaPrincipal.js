@@ -8,8 +8,11 @@ import {CuboCentral} from "../models/CuboCentral.js"
 import {Robot} from "../models/Robot.js"
 import {Lampara} from "../models/Lampara.js"
 
+import {Destornillador} from "../models/items/Destornillador.js"
+
 import {GameState} from "../GameState.js"
 import {Rect} from "../structures/Rect.js"
+import {RandomInt} from "../Utils.js"
 
 class SalaPrincipal extends Sala
 {
@@ -37,6 +40,9 @@ class SalaPrincipal extends Sala
 
 		// Añadir los puzles
 		this.colocarPuzles()
+
+		// Añadir los items
+		this.colocarItems()
 	}
 
 	crearPasillos()
@@ -217,6 +223,49 @@ class SalaPrincipal extends Sala
 			lampara.translateZ(this.largoParedZ/2)
 
 			this.add(lampara)*/
+		}
+	}
+
+	colocarItems()
+	{
+		//
+		// Destornillador
+		//
+
+		{
+			let cajonSeleccionado = this.cajoneraRobot.cajones[RandomInt(this.cajoneraRobot.cajones.length - 1)]
+
+			let destornillador = new Destornillador(50, (dest) => {
+				destornillador.rotation.y = Math.PI/2
+				destornillador.position.y += 0.75
+
+				// Preparar la interacción
+
+				let metodoInteraccion = () => {
+					cajonSeleccionado.remove(destornillador)
+
+					destornillador.rotation.y = 0
+					destornillador.position.y = 0
+					destornillador.position.z = 4.4
+
+					destornillador.traverse((anyNode) => {
+						anyNode.userData = {}
+					})
+
+					GameState.flags.tieneDestornillador = true
+				}
+
+				destornillador.traverse((anyNode) => {
+					anyNode.userData.interaction = {
+						interact: metodoInteraccion
+					}
+				})
+
+				cajonSeleccionado.add(dest)
+			})
+
+			GameState.items.destornillador = destornillador
+			GameState.systems.interaction.allInteractables.push(destornillador)
 		}
 	}
 
