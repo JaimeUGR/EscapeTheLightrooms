@@ -8,6 +8,7 @@ import {TriangularPrismGeometry} from "../geometry/PrismGeometry.js"
 import {Palanca} from "../models/Palanca.js"
 
 import {ShuffleArray} from "../Utils.js"
+import {GameState} from "../GameState.js"
 
 class PuzleFormas extends THREE.Object3D
 {
@@ -84,6 +85,11 @@ class PuzleFormas extends THREE.Object3D
 
 			let palanca = new Palanca()
 			rail.add(palanca)
+
+			palanca.setCallbackActivar(rail.rotarFormas.bind(rail))
+
+			// TODO: TMP Añadir un método que meta todas las palancas y cosas interactuables
+			GameState.systems.interaction.allInteractables.push(palanca)
 
 			this.railes.push(rail)
 			this.palancas.push(palanca)
@@ -306,6 +312,8 @@ class Rail extends THREE.Object3D
 		this.indiceFormaSeleccionada = 0
 		this.formas = []
 
+		this.callbackRotacion = null
+
 		this.materialRail = new THREE.MeshBasicMaterial({ color: 0x222222 })
 
 		//
@@ -394,6 +402,11 @@ class Rail extends THREE.Object3D
 		this.animacion.rotacion.animacion.start()
 	}
 
+	setCallbackRotacion(callback)
+	{
+		this.callbackRotacion = callback
+	}
+
 	_crearAnimacion()
 	{
 		this._animating = false
@@ -408,7 +421,7 @@ class Rail extends THREE.Object3D
 		let frameInicio = { p: 0 }
 		let frameFin = { p: 1 }
 
-		this.animacion.rotacion.animacion = new TWEEN.Tween(frameInicio).to(frameFin, 2000)
+		this.animacion.rotacion.animacion = new TWEEN.Tween(frameInicio).to(frameFin, 1500)
 			.onStart(() => {
 				// TODO: Restaurar el color del material del contenedor de la forma seleccionada
 
@@ -435,11 +448,10 @@ class Rail extends THREE.Object3D
 				frameInicio.p = 0
 				frameFin.p = 1
 
-				// TODO: Llamar a una callback asignada con método después de rotar
-				// para notificar al controlador del puzle
+				if (this.callbackRotacion != null)
+					this.callbackRotacion()
 
-				// DEBUG
-				//setTimeout(() => this.animacion.rotacion.animacion.start(), 1000)
+				this._animating = false
 			})
 	}
 }

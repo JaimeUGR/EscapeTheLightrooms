@@ -1,7 +1,9 @@
 
 import * as THREE from "../../libs/three.module.js";
+import * as TWEEN from '../../libs/tween.esm.js'
 
-const SEGMENTOS_SOPORTE = 10;
+const SEGMENTOS_SOPORTE = 10
+
 class Palanca extends THREE.Object3D
 {
 	constructor(dimensiones = {
@@ -12,7 +14,10 @@ class Palanca extends THREE.Object3D
 		alturaPalo: 10,
 
 		radioMango: 1.5,
-		alturaMango: 5
+		alturaMango: 5,
+
+		rotacionDesactivada: -Math.PI/4,
+		rotacionActivada: Math.PI/4,
 	})
 	{
 		super()
@@ -27,6 +32,11 @@ class Palanca extends THREE.Object3D
 
 		this.radioMango = dimensiones.radioMango
 		this.alturaMango = dimensiones.alturaMango
+
+		this.rotacionDesactivada = dimensiones.rotacionDesactivada
+		this.rotacionActivada = dimensiones.rotacionActivada
+
+		this.callbackAnimacion = null
 
 		// Crear soporte
 		let geoSoporte = new THREE.CylinderGeometry(this.radioSoporte,this.radioSoporte,this.alturaSoporte,SEGMENTOS_SOPORTE, 2)
@@ -50,13 +60,83 @@ class Palanca extends THREE.Object3D
 
 		this.add(palo)
 
-		// Posición inicial de la palanca
-		this.rotateX(0)
+		this.palo = palo
+		this.palo.rotation.x = this.rotacionDesactivada
+
+		//
+		// Animación
+		//
+
+		this._crearAnimacion()
+
+		//
+		// Interacción
+		//
+
+		this.palo.traverse((anyNode) => {
+			anyNode.userData.interaction = {
+				interact: this.activar.bind(this)
+			}
+		})
 	}
 
+	_crearAnimacion()
+	{
+		this._animating = false
 
+		this.animaciones = {}
 
+		this.animaciones.tirarPalanca = {
+			animacion: null
+		}
 
+		let frameInicio = { rX: this.rotacionDesactivada }
+		let frameFin = { rX: this.rotacionActivada}
+
+		let animacionSoltar = new TWEEN.Tween(frameFin).to(frameInicio, 750)
+			.easing(TWEEN.Easing.Quadratic.In)
+			.onUpdate(() => {
+				this.palo.rotation.x = frameFin.rX
+			})
+			.onComplete(() => {
+				frameFin.rX = this.rotacionActivada
+				this._animating = false
+			})
+
+		let handlerContinuar = () => {
+			animacionSoltar.start()
+		}
+
+		let animacionTirar = new TWEEN.Tween(frameInicio).to(frameFin, 800)
+			.easing(TWEEN.Easing.Sinusoidal.Out)
+			.onUpdate(() => {
+				this.palo.rotation.x = frameInicio.rX
+			})
+			.onComplete(() => {
+				frameInicio.rX = this.rotacionDesactivada
+
+				if (this.callbackAnimacion != null)
+					this.callbackAnimacion()
+
+				setTimeout(handlerContinuar, 200)
+			})
+
+		this.animaciones.tirarPalanca.animacion = animacionTirar
+	}
+
+	activar()
+	{
+		if (this._animating)
+			return
+
+		this._animating = true
+		this.animaciones.tirarPalanca.animacion.start()
+	}
+
+	setCallbackActivar(callback)
+	{
+		this.callbackAnimacion = callback
+	}
 }
 
 export {Palanca}
