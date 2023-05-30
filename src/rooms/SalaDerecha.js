@@ -1,4 +1,10 @@
-import {Sala} from "./Sala.js";
+
+import {Sala} from "./Sala.js"
+
+import {Reloj} from "../models/Reloj.js"
+
+import {GameState} from "../GameState.js"
+
 
 class SalaDerecha extends Sala
 {
@@ -45,7 +51,22 @@ class SalaDerecha extends Sala
 
 	colocarPuzles()
 	{
+		//
+		// Reloj
+		//
 
+		let reloj = new Reloj()
+
+		reloj.translateX(this.largoParedX/2)
+		reloj.translateY((reloj.cajaY + reloj.trapSup.Y + reloj.trapInf.Y)/2)
+		reloj.translateZ(reloj.cajaZ/2 + reloj.pilarZ)
+
+		this.reloj = reloj
+		this.add(reloj)
+
+		// TODO: Poner el póster con el código detrás
+
+		GameState.systems.interaction.allInteractables.push(reloj)
 	}
 }
 

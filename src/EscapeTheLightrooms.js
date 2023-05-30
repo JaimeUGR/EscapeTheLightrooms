@@ -151,7 +151,7 @@ class EscapeTheLightrooms extends THREE.Scene
 			right: true
 		})
 
-		this.salaDerecha = new SalaDerecha(250, 50, 40, {
+		this.salaDerecha = new SalaDerecha(120, 150, 80, {
 			left: true
 		})
 

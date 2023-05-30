@@ -31,9 +31,7 @@ class GameState
 			tieneDestornillador: false,
 			tieneManecillaHora: true,
 			tieneManecillaMinuto: true,
-			tieneMangoPalanca: true,
-			tienePaloPalanca: true,
-			tieneTarjeta: true,
+			tieneTarjeta: false,
 			tienePrisma: true
 		}
 

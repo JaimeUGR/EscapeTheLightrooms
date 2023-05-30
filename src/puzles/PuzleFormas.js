@@ -87,6 +87,7 @@ class PuzleFormas extends THREE.Object3D
 			rail.add(palanca)
 
 			palanca.setCallbackActivar(rail.rotarFormas.bind(rail))
+			rail.setCallbackRotacion(this.comprobarCompletado.bind(this))
 
 			// TODO: TMP Añadir un método que meta todas las palancas y cosas interactuables
 			GameState.systems.interaction.allInteractables.push(palanca)
@@ -96,6 +97,15 @@ class PuzleFormas extends THREE.Object3D
 
 			this.add(rail)
 			this.add(this.operadores[i])
+		}
+
+		// Comprobación de la autocompletación del juego debido a la aleatoriedad
+		while (this._comprobarFormas())
+		{
+			console.log("El puzle se ha creado resuelto. Rehaciendo el shuffle")
+
+			for (let i = 0; i < this.railes.length; i++)
+				this.railes[i].reordenarFormas()
 		}
 
 		//
@@ -128,6 +138,34 @@ class PuzleFormas extends THREE.Object3D
 		// DEBUG
 		this.axis = new THREE.AxesHelper (10);
 		this.add (this.axis)
+	}
+
+	// NOTE: si cambiamos el número de railes hay que cambiar esto
+
+	comprobarCompletado()
+	{
+		if (!this._comprobarFormas())
+			return
+
+		console.log("Has completado el puzle de las formas!")
+
+		if (GameState.flags.tieneTarjeta)
+			return
+
+		// TODO: Abrir la compuerta de la tarjeta
+		// TODO: esto va al recoger la tarjeta
+		GameState.flags.tieneTarjeta = true
+	}
+
+	// Devuelve true si está completado el puzle
+	_comprobarFormas()
+	{
+		let vForma0 = this.railes[0].getFormaSeleccionada().userData.vertices
+		let vForma1 = this.railes[1].getFormaSeleccionada().userData.vertices
+		let vForma2 = this.railes[2].getFormaSeleccionada().userData.vertices
+		let vFormaObjetivo = this.formaObjetivo.userData.vertices
+
+		return vForma0 + vForma1 - vForma2 === vFormaObjetivo
 	}
 
 	_crearFormas()
@@ -388,6 +426,23 @@ class Rail extends THREE.Object3D
 		}
 	}
 
+	reordenarFormas()
+	{
+		if (this.formas.length === 0)
+			return
+
+		ShuffleArray(this.formas)
+
+		const incrementoPosicionamiento = 1.0 / this.formas.length
+		let posicionamiento = 0.0
+
+		for (let i = 0; i < this.formas.length; i++)
+		{
+			this.formas[i].position.copy(this.spline.getPointAt(posicionamiento))
+			posicionamiento += incrementoPosicionamiento
+		}
+	}
+
 	getFormaSeleccionada()
 	{
 		return this.formas[this.indiceFormaSeleccionada]
@@ -440,7 +495,12 @@ class Rail extends THREE.Object3D
 			})
 			.onComplete(() => {
 				this.animacion.rotacion.offsetActual += frameFin.p
-				this.indiceFormaSeleccionada = (this.indiceFormaSeleccionada + 1) % this.formas.length
+				this.indiceFormaSeleccionada = (this.indiceFormaSeleccionada - 1)
+
+				if (this.indiceFormaSeleccionada < 0)
+					this.indiceFormaSeleccionada = this.formas.length - 1
+				else
+					this.indiceFormaSeleccionada %= this.formas.length
 
 				// TODO: Actualizar el color del material del contenedor de la forma seleccionada para
 				// TODO: que destaque

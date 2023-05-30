@@ -1,197 +1,402 @@
 
-import * as THREE from "../../libs/three.module.js";
+import * as THREE from "../../libs/three.module.js"
+import * as TWEEN from '../../libs/tween.esm.js'
+import {CSG} from "../../libs/CSG-v2.js"
+import {TrapezoidGeometry} from "../geometry/TrapezoidGeometry.js"
+import {GameState} from "../GameState.js"
 
-
-class Reloj extends THREE.Object3D{
-
+class Reloj extends THREE.Object3D
+{
 	constructor(dimensiones = {
+		// Dimensiones de la caja (sin los pilares)
+		cajaX: 12,
+		cajaY: 20,
+		cajaZ: 10,
 
-		radioBase: 1,
-		altoBase: 1,
+		// Dimensiones pilares
+		pilarX: 2,
+		pilarZ: 2,
 
-		radioPalo: 1,
-		altoPalo: 1,
+		// Dimensiones de la parte interna
+		cajaRelojX: 11, // < cajaX. El restante va para los marcos de los lados
+		separacionPuertaReloj: 4, // < cajaZ. El restante es para colocar el reloj separado de la puerta
+		profundidadPuertaReloj: 1, // < cajaZ - profReloj - cajaRelojZ
 
-		radioPendulo: 1,
-		altoPendulo: 1,
+		// Dimensiones del reloj
+		separacionSuperiorReloj: 2, // Separación de la zona superior de la caja
+		radioReloj: 4,
+		profundidadReloj: 1.5,
 
-		radioSuperiorPrismaSuperior: 1,
-		radioInferiorPrismaSuperior: 1,
-		alturaPrismaSuperior: 1,
+		radioPaloPendulo: 0.2,
+		altoPaloPendulo: 6, // < que cajaY + 2*radioReloj o se verá mal
 
-		radioSuperiorPrismaInferior: 1,
-		radioInferiorPrismaInferior: 1,
-		alturaPrismaInferior: 1,
+		radioPendulo: 2,
+		profundidadPendulo: 0.75,
 
-		anchoLateral: 1,
-		altoLateral: 1,
+		tiempoPendulo: 1000, // Tiempo de la animación
+		rotacionPendulo: Math.PI/11, // Máxima y mínima rotación del péndulo al girar
 
-		anchoPilar: 1,
-		grosorPilar: 1,
-
-		anchoCajaReloj: 1,
-		altoCajaReloj: 1,
-		grosorCajaReloj: 1,
-
-		interiorReloj: 1,
-		relojPuerta: 1
-
-	})
-	{
-		super();
-
-		this.radioBase = dimensiones.radioBase
-		this.altoBase = dimensiones.altoBase
-
-		this.radioPalo = dimensiones.radioPalo
-		this.altoPalo = dimensiones.altoPalo
-
-		this.radioPendulo = dimensiones.radioPendulo
-		this.altoPendulo = dimensiones.altoPendulo
-
-		this.radioSuperiorPrismaSuperior = dimensiones.radioSuperiorPrismaSuperior
-		this.radioInferiorPrismaSuperior = dimensiones.radioInferiorPrismaSuperior
-		this.alturaPrismaSuperior = dimensiones.alturaPrismaSuperior
-
-		this.radioSuperiorPrismaInferior = dimensiones.radioSuperiorPrismaInferior
-		this.radioInferiorPrismaInferior = dimensiones.radioInferiorPrismaInferior
-		this.alturaPrismaInferior = dimensiones.alturaPrismaInferior
-
-		this.anchoLateral = dimensiones.anchoLateral
-		this.altoLateral = dimensiones.altoLateral
-
-		this.anchoPilar = dimensiones.anchoPilar
-		this.grosorPilar = dimensiones.grosorPilar
-
-		this.anchoCajaReloj = dimensiones.anchoCajaReloj
-		this.altoCajaReloj = dimensiones.altoCajaReloj
-		this.grosorCajaReloj = dimensiones.grosorCajaReloj
-
-		this.inferiorReloj = dimensiones.interiorReloj
-		this.relojPuerta = dimensiones.relojPuerta
-
-
-		let relojMaterial = new THREE.MeshNormalMaterial({color: 0Xf1f1f1,opacity: 0.5,transparent: true})
-
-
-		// Creación de la base del reloj
-
-
-		let geoBase = new THREE.CylinderGeometry(this.radioBase,this.radioBase,this.altoBase,12)
-		geoBase.rotateX(Math.PI/2)
-		this.baseMesh = new THREE.Mesh(geoBase,relojMaterial)
-		this.baseMesh.position.z = (this.grosorCajaReloj-(this.inferiorReloj + this.relojPuerta))/2 + this.altoBase/2
-		this.baseMesh.position.y = this.altoPalo/2
-
-
-
-		// Creación del péndulo
-		let geoPalo = new THREE.CylinderGeometry(this.radioPalo, this.radioPalo, this.altoPalo + this.radioBase, 12)
-		geoPalo.translate(0,-this.altoPalo/2 + this.radioBase/2,0)
-
-		this.palo = new THREE.Mesh(geoPalo, relojMaterial)
-		this.palo.position.y += -this.radioBase
-
-		let geoPendulo = new THREE.CylinderGeometry(this.radioPendulo,this.radioPendulo,this.altoPendulo,12)
-		geoPendulo.rotateX(Math.PI/2)
-		//geoPendulo.translate(0,-this.radioPendulo,0)
-
-		this.pendulo = new THREE.Mesh(geoPendulo,relojMaterial)
-		this.pendulo.position.y =  -this.altoPalo - this.radioPendulo
-
-		this.palo.add(this.pendulo)
-		this.baseMesh.add(this.palo)
-
-
-		//this.palo.rotateZ(Math.PI/4)
-		this.add(this.baseMesh)
-
-		//	Creacion del prisma superior
-		let geoPrismaSuperior = new THREE.CylinderGeometry(this.radioSuperiorPrismaSuperior,this.radioInferiorPrismaSuperior,this.alturaPrismaSuperior,4)
-		geoPrismaSuperior.rotateY(Math.PI/4)
-		geoPrismaSuperior.translate(0,this.alturaPrismaSuperior/2 + this.altoCajaReloj/2,0)
-		this.add(new THREE.Mesh(geoPrismaSuperior, relojMaterial))
-
-
-		//	Creacion del prisma inferior
-		let geoPrismaInferior = new THREE.CylinderGeometry(this.radioSuperiorPrismaInferior, this.radioInferiorPrismaInferior, this.alturaPrismaInferior, 4)
-		geoPrismaInferior.rotateY(Math.PI/4)
-		geoPrismaInferior.translate(0,-this.alturaPrismaInferior/2 - this.altoCajaReloj/2,0)
-		this.add(new THREE.Mesh(geoPrismaInferior, relojMaterial))
-
-		// Creacion del fondo
-		let geoRelleno = new THREE.BoxGeometry(this.anchoCajaReloj- 2*this.anchoLateral, this.altoCajaReloj, this.grosorCajaReloj-(this.inferiorReloj + this.relojPuerta))
-		geoRelleno.translate(0, 0,-(this.inferiorReloj/2+this.relojPuerta/2))
-
-		this.add(new THREE.Mesh(geoRelleno, relojMaterial))
-
-		//	Creacion partes laterales
-		let geoLateral1 = new THREE.BoxGeometry(this.anchoLateral, this.altoCajaReloj, this.grosorCajaReloj)
-		geoLateral1.translate( this.anchoLateral/2 + (this.anchoCajaReloj-2*this.anchoLateral)/2,0 ,0)
-
-		this.add(new THREE.Mesh(geoLateral1,relojMaterial))
-
-		let geoLateral2 = new THREE.BoxGeometry(this.anchoLateral, this.altoCajaReloj, this.grosorCajaReloj)
-		geoLateral2.translate(-(this.anchoLateral/2 + (this.anchoCajaReloj-2*this.anchoLateral)/2), 0,0)
-
-		this.add(new THREE.Mesh(geoLateral2, relojMaterial))
-
-		// Creacion pilares
-		let geoPilar1 = new THREE.BoxGeometry(this.anchoPilar, this.altoCajaReloj, this.grosorPilar)
-		geoPilar1.translate(this.anchoPilar/2 + this.anchoCajaReloj/2,0,this.grosorPilar/2 + this.grosorCajaReloj/2)
-
-		this.pilarMesh1 = new THREE.Mesh(geoPilar1, relojMaterial)
-
-		let geoPilar2 = geoPilar1.clone()
-		geoPilar2.translate(0,0,-2*(this.grosorPilar/2 + this.grosorCajaReloj/2))
-		this.pilarMesh2 = new THREE.Mesh(geoPilar2, relojMaterial)
-
-		let geoPilar3 = geoPilar2.clone()
-		geoPilar3.translate(-2*(this.anchoPilar/2 + this.anchoCajaReloj/2),0,0)
-		this.pilarMesh3 = new THREE.Mesh(geoPilar3, relojMaterial)
-
-		let geoPilar4 = geoPilar3.clone()
-		geoPilar4.translate(0,0,2*(this.grosorPilar/2 + this.grosorCajaReloj/2))
-		this.pilarMesh4 = new THREE.Mesh(geoPilar4, relojMaterial)
-
-
-
-
-
-		this.add(this.pilarMesh1)
-		this.add(this.pilarMesh2)
-		this.add(this.pilarMesh3)
-		this.add(this.pilarMesh4)
-
-
-		// Creacion de la puerta
-		/*
-		let geoPuerta = new THREE.BoxGeometry(this.anchoCajaReloj- 2*this.anchoLateral, this.altoCajaReloj, this.relojPuerta)
-		geoPuerta.translate((this.anchoCajaReloj- 2*this.anchoLateral)/2,0,0)
-
-		this.puertaMesh = new THREE.Mesh(geoPuerta, relojMaterial)
-
-		this.add(this.puertaMesh)
-
-		 */
-
-
-	}
-}
-
-class Manecillas extends THREE.Object3D{
-	constructor( dimensiones ={
-		separacion: 1
-
+		// Bases
+		// NOTE: La X y Z son sobresalientes de las dimensiones de la caja + 2*pilar
+		trapecioSuperior: {
+			XSup: 4,
+			ZSup: 4,
+			XInf: 2,
+			ZInf: 2,
+			Y: 2,
+		},
+		trapecioInferior: {
+			XSup: 2,
+			ZSup: 2,
+			XInf: 10,
+			ZInf: 10,
+			Y: 20,
+		},
 	})
 	{
 		super()
 
-		this.separacion= dimensiones.separacion
+		this.cajaX = dimensiones.cajaX
+		this.cajaY = dimensiones.cajaY
+		this.cajaZ = dimensiones.cajaZ
 
-		let relojMaterial = new THREE.MeshNormalMaterial({color: 0Xf1f1f1,opacity: 0.5,transparent: true})
+		this.pilarX = dimensiones.pilarX
+		this.pilarZ = dimensiones.pilarZ
+
+		this.cajaRelojX = dimensiones.cajaRelojX
+		this.separacionPuertaReloj = dimensiones.separacionPuertaReloj
+		this.profundidadPuertaReloj = dimensiones.profundidadPuertaReloj
+
+		this.separacionSuperiorReloj = dimensiones.separacionSuperiorReloj
+		this.radioReloj = dimensiones.radioReloj
+		this.profundidadReloj = dimensiones.profundidadReloj
+
+		this.radioPaloPendulo = dimensiones.radioPaloPendulo
+		this.altoPaloPendulo = dimensiones.altoPaloPendulo
+
+		this.radioPendulo = dimensiones.radioPendulo
+		this.profundidadPendulo = dimensiones.profundidadPendulo
+
+		this.tiempoPendulo = dimensiones.tiempoPendulo
+		this.rotacionPendulo = dimensiones.rotacionPendulo
+
+		this.trapSup = dimensiones.trapecioSuperior
+		this.trapInf = dimensiones.trapecioInferior
+
+		this.material = new THREE.MeshNormalMaterial({opacity: 0.5, transparent: true})
+
+		this.tieneManecillaHora = false
+		this.tieneManecillaMinuto = false
+
+		//
+		// Bases
+		//
+
+		let extraBaseTrapeciosX = this.cajaX + 2*this.pilarX
+		let extraBaseTrapeciosZ = this.cajaZ + 2*this.pilarZ
+
+		let geoTrapecioSuperior = new TrapezoidGeometry(this.trapSup.XInf + extraBaseTrapeciosX,
+			this.trapSup.ZInf + extraBaseTrapeciosZ, this.trapSup.XSup + extraBaseTrapeciosX,
+			this.trapSup.ZSup + extraBaseTrapeciosZ, this.trapSup.Y)
+		geoTrapecioSuperior.translate(0, this.cajaY/2 + this.trapSup.Y/2, 0)
+
+		let geoTrapecioInferior = new TrapezoidGeometry(this.trapInf.XInf + extraBaseTrapeciosX,
+			this.trapInf.ZInf + extraBaseTrapeciosZ, this.trapInf.XSup + extraBaseTrapeciosX,
+			this.trapInf.ZSup + extraBaseTrapeciosZ, this.trapInf.Y)
+		geoTrapecioInferior.translate(0, -(this.cajaY/2 + this.trapInf.Y/2), 0)
+
+		this.add(new THREE.Mesh(geoTrapecioSuperior, this.material))
+		this.add(new THREE.Mesh(geoTrapecioInferior, this.material))
+
+		//
+		// Pilares
+		//
+
+		let geoPilar = new THREE.BoxGeometry(this.pilarX, this.cajaY, this.pilarZ)
+
+		geoPilar.translate(-(this.cajaX/2 + this.pilarX/2), 0, this.cajaZ/2 + this.pilarZ/2)
+		this.add(new THREE.Mesh(geoPilar.clone(), this.material))
+
+		geoPilar.translate(this.cajaX + this.pilarX, 0, 0)
+		this.add(new THREE.Mesh(geoPilar.clone(), this.material))
+
+		geoPilar.translate(0, 0, -(this.cajaZ + this.pilarZ))
+		this.add(new THREE.Mesh(geoPilar.clone(), this.material))
+
+		geoPilar.translate(-(this.cajaX + this.pilarX), 0, 0)
+		this.add(new THREE.Mesh(geoPilar.clone(), this.material))
+
+		//
+		// Caja Interna
+		//
+
+		// Caja Interna del reloj
+		let geoCajaReloj = new THREE.BoxGeometry(this.cajaRelojX, this.cajaY, this.cajaZ - this.separacionPuertaReloj)
+		geoCajaReloj.translate(0, 0, -(this.separacionPuertaReloj/2))
+
+		this.add(new THREE.Mesh(geoCajaReloj, this.material))
+
+		// Cajas Laterales
+		let geoCajaRelojLateral = new THREE.BoxGeometry((this.cajaX - this.cajaRelojX)/2, this.cajaY, this.cajaZ)
+
+		geoCajaRelojLateral.translate(-(this.cajaRelojX/2 + (this.cajaX - this.cajaRelojX)/4), 0, 0)
+		this.add(new THREE.Mesh(geoCajaRelojLateral.clone(), this.material))
+
+		geoCajaRelojLateral.translate(this.cajaRelojX + (this.cajaX - this.cajaRelojX)/2, 0, 0)
+		this.add(new THREE.Mesh(geoCajaRelojLateral.clone(), this.material))
+
+		//
+		// Péndulo
+		//
+		this._crearPendulo()
+
+		//
+		// Puerta reloj
+		//
+		this._crearPuertaReloj()
 
 
+		//
+		// Animación
+		//
+
+		this._crearAnimacion()
+
+		//
+		// Interacción
+		//
+
+		this.meshPuertaReloj.traverse((anyNode) => {
+			anyNode.userData.interaction = {
+				interact: this.interactuarPuerta.bind(this)
+			}
+		})
+
+		this.meshReloj.userData.interaction = {
+			interact: this.ponerManecillas.bind(this)
+		}
+	}
+
+	_crearPendulo()
+	{
+		let geoReloj = new THREE.CylinderGeometry(this.radioReloj, this.radioReloj, this.profundidadReloj, 20)
+		geoReloj.rotateX(Math.PI/2)
+		geoReloj.translate(0, this.cajaY/2 - (this.radioReloj + this.separacionSuperiorReloj),
+			this.cajaZ/2 - this.separacionPuertaReloj + this.profundidadReloj/2)
+
+		let meshReloj = new THREE.Mesh(geoReloj, this.material)
+
+		// NOTE: A este O3 se meten directamente las agujas
+		this.O3Agujas = new THREE.Object3D()
+		this.O3Agujas.translateZ(this.profundidadReloj/2)
+
+		meshReloj.add(this.O3Agujas)
+
+		this.meshReloj = meshReloj
+		this.add(meshReloj)
+
+		//
+		// Péndulo
+		//
+
+		let O3Pendulo = new THREE.Object3D()
+
+		let alturaPaloPendulo = this.altoPaloPendulo + this.radioPendulo + this.radioReloj
+		let geoPaloPendulo = new THREE.CylinderGeometry(this.radioPaloPendulo, this.radioPaloPendulo,
+			alturaPaloPendulo)
+
+		geoPaloPendulo.translate(0, -alturaPaloPendulo/2, 0)
+
+		let geoPendulo = new THREE.CylinderGeometry(this.radioPendulo, this.radioPendulo, this.profundidadPendulo, 15)
+		geoPendulo.rotateX(Math.PI/2)
+		geoPendulo.translate(0, -alturaPaloPendulo , 0)
+
+		O3Pendulo.add(new THREE.Mesh(geoPaloPendulo, this.material))
+		O3Pendulo.add(new THREE.Mesh(geoPendulo, this.material))
+
+		O3Pendulo.translateY(alturaPaloPendulo/2 - this.separacionSuperiorReloj/2)
+		O3Pendulo.translateZ(this.cajaZ/2 - this.separacionPuertaReloj + this.profundidadReloj/2)
+
+		this.O3Pendulo = O3Pendulo
+		this.add(O3Pendulo)
+	}
+
+	_crearPuertaReloj()
+	{
+		let geoPuertaReloj = new THREE.BoxGeometry(this.cajaRelojX, this.cajaY, this.profundidadPuertaReloj)
+		geoPuertaReloj.translate(this.cajaRelojX/2, 0, 0)
+
+		let geoRelojRecorte = new THREE.CylinderGeometry(this.radioReloj, this.radioReloj, this.profundidadPuertaReloj, 20)
+		geoRelojRecorte.rotateX(Math.PI/2)
+		geoRelojRecorte.translate(this.cajaRelojX/2, this.cajaY/2 - this.separacionSuperiorReloj - this.radioReloj, 0)
+
+		let geoCajaRecorte = new THREE.BoxGeometry(2*this.radioPendulo, this.cajaY - (this.separacionSuperiorReloj + this.radioReloj) , this.profundidadPuertaReloj)
+		geoCajaRecorte.translate(this.cajaRelojX/2, -(this.separacionSuperiorReloj/2 + this.radioReloj/2), 0)
+
+		// Puerta
+		let csg = new CSG().union([new THREE.Mesh(geoPuertaReloj, this.material)])
+			.subtract([new THREE.Mesh(geoRelojRecorte, null), new THREE.Mesh(geoCajaRecorte, null)])
+
+		let meshPuertaReloj = csg.toMesh()
+
+		// TODO: Animación de rotación uwu
+		meshPuertaReloj.rotation.y = 0
+
+		meshPuertaReloj.translateX(-this.cajaRelojX/2)
+		meshPuertaReloj.translateZ(this.cajaZ/2 - this.profundidadPuertaReloj/2)
+
+		// Puerta Cristal
+		csg = new CSG().union([new THREE.Mesh(geoRelojRecorte, this.material),
+			new THREE.Mesh(geoCajaRecorte, this.material)])
+
+		meshPuertaReloj.add(csg.toMesh())
+
+		this.meshPuertaReloj = meshPuertaReloj
+		this.add(meshPuertaReloj)
+	}
+
+	_crearAnimacion()
+	{
+		this._animating = false
+		this.animaciones = {}
+
+		this.animaciones.pendulo = {
+			animacion: null
+		}
+
+		this.animaciones.puerta = {
+			animacionAbrir: null,
+			animacionCerrar: null,
+			estadoPuerta: 1 // 1 cerrada, 0 abierta
+		}
+
+		this.animaciones.manecillas = {
+			animacionManecillaHora: null,
+			animacionManecillaMinuto: null
+		}
+
+		//
+		// Péndulo
+		//
+
+		{
+			let framePendulo_Izda = { rZ: -this.rotacionPendulo }
+			let framePendulo_Dcha = { rZ: this.rotacionPendulo }
+
+			let animacionIzdaDcha = new TWEEN.Tween(framePendulo_Izda).to(framePendulo_Dcha, this.tiempoPendulo)
+				.easing(TWEEN.Easing.Quadratic.InOut)
+				.onUpdate(() => {
+					this.O3Pendulo.rotation.z = framePendulo_Izda.rZ
+				})
+				.onComplete(() => {
+					framePendulo_Izda.rZ = -this.rotacionPendulo
+				})
+
+			let animacionDchaIzda = new TWEEN.Tween(framePendulo_Dcha).to(framePendulo_Izda, this.tiempoPendulo)
+				.easing(TWEEN.Easing.Quadratic.InOut)
+				.onUpdate(() => {
+					this.O3Pendulo.rotation.z = framePendulo_Dcha.rZ
+				})
+				.onComplete(() => {
+					framePendulo_Dcha.rZ = this.rotacionPendulo
+				})
+
+			animacionIzdaDcha.chain(animacionDchaIzda)
+			animacionDchaIzda.chain(animacionIzdaDcha)
+
+			this.animaciones.pendulo.animacion = animacionIzdaDcha
+			animacionIzdaDcha.start()
+		}
+
+		//
+		// Puerta
+		//
+		{
+			let framePuertaCerrada = { rY: 0 }
+			let framePuertaAbierta = { rY: -Math.PI/2 }
+
+			let animacionAbrir = new TWEEN.Tween(framePuertaCerrada).to(framePuertaAbierta, 900)
+				.easing(TWEEN.Easing.Quadratic.Out)
+				.onUpdate(() => {
+					this.meshPuertaReloj.rotation.y = framePuertaCerrada.rY
+				})
+				.onComplete(() => {
+					this.animaciones.puerta.estadoPuerta = 0
+					framePuertaCerrada.rY = 0
+					this._animating = false
+				})
+
+			let animacionCerrar = new TWEEN.Tween(framePuertaAbierta).to(framePuertaCerrada, 800)
+				.easing(TWEEN.Easing.Cubic.Out)
+				.onUpdate(() => {
+					this.meshPuertaReloj.rotation.y = framePuertaAbierta.rY
+				})
+				.onComplete(() => {
+					this.animaciones.puerta.estadoPuerta = 1
+					framePuertaAbierta.rY = -Math.PI/2
+					this._animating = false
+				})
+
+			this.animaciones.puerta.animacionAbrir = animacionAbrir
+			this.animaciones.puerta.animacionCerrar = animacionCerrar
+		}
+	}
+
+	interactuarPuerta()
+	{
+		if (this._animating)
+			return
+
+		this._animating = true
+
+		if (this.animaciones.puerta.estadoPuerta === 1) // Cerrada
+			this.animaciones.puerta.animacionAbrir.start()
+		else
+			this.animaciones.puerta.animacionCerrar.start()
+	}
+
+	ponerManecillas()
+	{
+		if (this._animating)
+			return
+
+		if (GameState.flags.tieneManecillaHora)
+		{
+			GameState.flags.tieneManecillaHora = false
+			this.tieneManecillaHora = true
+
+			this._animating = true
+		}
+		else if (GameState.flags.tieneManecillaMinuto)
+		{
+			GameState.flags.tieneManecillaMinuto = false
+			this.tieneManecillaMinuto = true
+
+			this._animating = true
+		}
+
+		// Si están ambas manecillas
+		if (this.tieneManecillaHora && this.tieneManecillaMinuto)
+		{
+			this.meshReloj.userData = {}
+
+			console.log("Has completado el reloj")
+
+			// Poner la animación de apartar el reloj para dejar ver la nota
+		}
+	}
+}
+
+class ManecillaHoras extends THREE.Object3D
+{
+	constructor(dimensiones = {
+		separacion: 1
+	})
+	{
+		super()
+
+		this.separacion = dimensiones.separacion
+		this.material = new THREE.MeshNormalMaterial({opacity: 0.5,transparent: true})
 
 		let formaManecillaHoras= new THREE.Shape()
 
@@ -206,20 +411,28 @@ class Manecillas extends THREE.Object3D{
 		formaManecillaHoras.quadraticCurveTo(-2, 7, -1, 6)
 		formaManecillaHoras.lineTo(-1,0)
 
-		var options =  {bevelEnabled: false, depth: 2, steps: 1, curveSegments: 4,
-			bevelThickness: 4, bevelSize: 2 , bevelSegements :2};
+		const options = {bevelEnabled: false, depth: 2, steps: 1, curveSegments: 4,
+			bevelThickness: 4, bevelSize: 2 , bevelSegements :2}
 
-		var geoManecillaHoras= new THREE.ExtrudeGeometry(formaManecillaHoras,options);
+		let geoManecillaHoras = new THREE.ExtrudeGeometry(formaManecillaHoras,options)
 
-		this.extruManecillaHoras = new THREE.Mesh (geoManecillaHoras,relojMaterial);
+		this.extruManecillaHoras = new THREE.Mesh(geoManecillaHoras, this.material)
+		this.add(this.extruManecillaHoras)
+	}
+}
 
-		this.add(this.extruManecillaHoras);
-		this.extruManecillaHoras.position.x= -5
+class ManecillaMinutos extends THREE.Object3D
+{
+	constructor(dimensiones = {
+		separacion: 1
+	})
+	{
+		super()
 
+		this.separacion = dimensiones.separacion
+		this.material = new THREE.MeshNormalMaterial({opacity: 0.5,transparent: true})
 
-
-
-		let formaManecillaMinutos= new THREE.Shape()
+		let formaManecillaMinutos = new THREE.Shape()
 
 		formaManecillaMinutos.moveTo(1,0)
 		formaManecillaMinutos.lineTo(1,6)
@@ -232,31 +445,14 @@ class Manecillas extends THREE.Object3D{
 		formaManecillaMinutos.quadraticCurveTo(-2, 7, -1, 6)
 		formaManecillaMinutos.lineTo(-1,0)
 
-		var options =  {bevelEnabled: false, depth: 2, steps: 1, curveSegments: 4,
-			bevelThickness: 4, bevelSize: 2 , bevelSegements :2};
+		const options = {bevelEnabled: false, depth: 2, steps: 1, curveSegments: 4,
+			bevelThickness: 4, bevelSize: 2 , bevelSegements :2}
 
-		var geoManecillaMinutos = new THREE.ExtrudeGeometry(formaManecillaMinutos,options);
+		let geoManecillaMinutos = new THREE.ExtrudeGeometry(formaManecillaMinutos, options)
 
-		this.extruManecillaMinutos = new THREE.Mesh (geoManecillaMinutos,relojMaterial);
-
-		this.add(this.extruManecillaMinutos);
-
-		this.extruManecillaMinutos.position.x = 5
-
-
-
-
-
-		let contornoGeometry = new THREE.BufferGeometry()
-		contornoGeometry.setFromPoints(formaManecillaMinutos.getPoints())
-		this.add(new THREE.Line(contornoGeometry, new THREE.LineBasicMaterial({color: 0x585858})))
-
-
-
-
+		this.extruManecillaMinutos = new THREE.Mesh(geoManecillaMinutos, this.material)
+		this.add(this.extruManecillaMinutos)
 	}
-
-
 }
 
-export{Reloj, Manecillas}
+export {Reloj, ManecillaHoras, ManecillaMinutos}

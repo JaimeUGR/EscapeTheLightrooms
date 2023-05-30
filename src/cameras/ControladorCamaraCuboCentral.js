@@ -55,6 +55,10 @@ class ControladorCamaraCuboCentral extends ControladorCamara
 
 	onKeyUp(event)
 	{
+		// NOTE: Mientras se anima no se puede salir (evita bugs)
+		if (this._animating)
+			return
+
 		switch (event.code)
 		{
 			// NOTE: lo hacemos aquí para que el up se lance aquí
