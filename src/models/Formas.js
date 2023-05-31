@@ -62,7 +62,7 @@ class Pentagono extends THREE.ExtrudeGeometry
 
 class Prisma extends THREE.ExtrudeGeometry
 {
-	constructor(extrusion, numVertices)
+	constructor(extrusion, numVertices, extrudeOptions = null)
 	{
 		let shapeFormaRandom = new THREE.Shape()
 		const radius = 0.5; // Radio de la figura
@@ -85,7 +85,13 @@ class Prisma extends THREE.ExtrudeGeometry
 			currentAngle += angleIncrement
 		}
 
-		const options =  {bevelEnabled: false, depth: extrusion, steps: 2}
+		let options =  {bevelEnabled: false, depth: extrusion, steps: 2}
+
+		if (extrudeOptions !== null)
+		{
+			options = extrudeOptions
+			options.depth = extrusion
+		}
 
 		super(shapeFormaRandom, options)
 

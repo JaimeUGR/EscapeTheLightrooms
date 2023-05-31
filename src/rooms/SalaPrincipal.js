@@ -8,6 +8,7 @@ import {CuboCentral} from "../models/CuboCentral.js"
 import {Robot} from "../models/Robot.js"
 import {Lampara} from "../models/Lampara.js"
 
+import {PuzleLaser} from "../puzles/PuzleLaser.js"
 import {Destornillador} from "../models/items/Destornillador.js"
 
 import {GameState} from "../GameState.js"
@@ -223,6 +224,28 @@ class SalaPrincipal extends Sala
 			lampara.translateZ(this.largoParedZ/2)
 
 			this.add(lampara)*/
+		}
+
+		{
+			/*let anillo = new AnilloCristal()
+
+			anillo.translateX(this.largoParedX/2)
+			anillo.translateZ(this.largoParedZ/2)
+			anillo.translateY(25)
+			anillo.rotateY(Math.PI)
+
+			this.add(anillo)*/
+		}
+
+		{
+			let anillo = new PuzleLaser()
+
+			anillo.translateX(this.largoParedX/2)
+			anillo.translateZ(this.largoParedZ/2)
+			anillo.translateY(25)
+			anillo.rotateY(Math.PI)
+
+			this.add(anillo)
 		}
 	}
 
