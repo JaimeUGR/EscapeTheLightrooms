@@ -51,6 +51,8 @@ class PuzleFormas extends THREE.Object3D
 		this.offsetYPalancas = dimensiones.offsetYPalancas
 		this.offsetZPalancas = dimensiones.offsetZPalancas
 
+		this.callbackCompletar = null
+
 
 		this.materialContenedor = new THREE.MeshNormalMaterial({opacity: 0.5, transparent: true})
 		this.materialForma = new THREE.MeshBasicMaterial()
@@ -149,12 +151,18 @@ class PuzleFormas extends THREE.Object3D
 
 		console.log("Has completado el puzle de las formas!")
 
-		if (GameState.flags.tieneTarjeta)
+		if (this.callbackCompletar === null)
 			return
 
-		// TODO: Abrir la compuerta de la tarjeta
-		// TODO: esto va al recoger la tarjeta
-		GameState.flags.tieneTarjeta = true
+		this.callbackCompletar()
+
+		// NOTE: Para ignorar siguientes completaciones
+		this.callbackCompletar = null
+	}
+
+	setCallbackCompletar(callback)
+	{
+		this.callbackCompletar = callback
 	}
 
 	// Devuelve true si está completado el puzle

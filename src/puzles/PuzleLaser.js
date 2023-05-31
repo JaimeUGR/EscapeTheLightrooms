@@ -27,6 +27,11 @@ class PuzleLaser extends THREE.Object3D
 
 		//this._crearLasers()
 
+		//
+		// Animación
+		//
+
+		this._crearAnimaciones()
 
 		this.add(new THREE.AxesHelper(10))
 	}
@@ -75,9 +80,10 @@ class PuzleLaser extends THREE.Object3D
 			cristalBevelThickness: 0.6
 		})
 
-		this.anilloAzul.rotateY(-Math.PI/2)
+		// Rotaciones finales
+		/*this.anilloAzul.rotateY(-Math.PI/2)
 		this.anilloVerde.rotateY(Math.PI/2)
-		this.anilloRojo.rotateY(Math.PI)
+		this.anilloRojo.rotateY(Math.PI)*/
 
 		this.O3Anillos = new THREE.Object3D()
 		this.O3Anillos.add(this.anilloAzul)
@@ -87,16 +93,67 @@ class PuzleLaser extends THREE.Object3D
 		this.add(this.O3Anillos)
 	}
 
+	_crearAnimaciones()
+	{
+		let frameInicio = {
+			rXAzul: 0,
+			rYAzul: Math.PI,
+			rZAzul: 0,
+			rXVerde: Math.PI/2,
+			rYVerde: Math.PI,
+			rZVerde: 0,
+			rXRojo: -Math.PI,
+			rYRojo: Math.PI,
+			rZRojo: Math.PI/2
+		}
+
+		let frameFin = {
+			rXAzul: 0,
+			rYAzul: -Math.PI/2,
+			rZAzul: 0,
+			rXVerde: 0,
+			rYVerde: Math.PI/2,
+			rZVerde: 0,
+			rXRojo: Math.PI,
+			rYRojo: 0,
+			rZRojo: 0
+		}
+
+		// Aplicamos las rotaciones iniciales a los anillos
+		let aplicarRotacion = (frameR) => {
+			this.anilloAzul.rotation.x = frameR.rXAzul
+			this.anilloAzul.rotation.y = frameR.rYAzul
+			this.anilloAzul.rotation.z = frameR.rZAzul
+			this.anilloVerde.rotation.x = frameR.rXVerde
+			this.anilloVerde.rotation.y = frameR.rYVerde
+			this.anilloVerde.rotation.z = frameR.rZVerde
+			this.anilloRojo.rotation.x = frameR.rXRojo
+			this.anilloRojo.rotation.y = frameR.rYRojo
+			this.anilloRojo.rotation.z = frameR.rZRojo
+		}
+
+		aplicarRotacion(frameInicio)
+
+		this.animacionInicio = new TWEEN.Tween(frameInicio).to(frameFin, 3000)
+			.onUpdate(() => {
+				aplicarRotacion(frameInicio)
+			})
+			.onComplete(() => {
+				// Activar los lásers
+				this.laserAzul.activarLaser()
+				this.laserVerde.activarLaser()
+				this.laserRojo.activarLaser()
+
+				this.laserAzul.setCallbackCambioColor(this._comprobarColores.bind(this))
+				this.laserVerde.setCallbackCambioColor(this._comprobarColores.bind(this))
+				this.laserRojo.setCallbackCambioColor(this._comprobarColores.bind(this))
+			})
+	}
+
 	iniciarPuzle()
 	{
-		// Activar los lásers
-		this.laserAzul.activarLaser()
-		this.laserVerde.activarLaser()
-		this.laserRojo.activarLaser()
-
-		this.laserAzul.setCallbackCambioColor(this._comprobarColores.bind(this))
-		this.laserVerde.setCallbackCambioColor(this._comprobarColores.bind(this))
-		this.laserRojo.setCallbackCambioColor(this._comprobarColores.bind(this))
+		// Empezar la animación de inicio
+		this.animacionInicio.start()
 	}
 
 	// NOTE: Llamado cada vez que cambia el color de un laser

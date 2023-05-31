@@ -12,14 +12,6 @@ class Vitrina extends THREE.Object3D
 		cajaY: 10,
 		cajaZ: 10,
 
-		/*huecoLateralX: 1,
-		huecoLateralY: 1,
-		huecoLateralZ: 1,
-
-		huecoFrontalX: 1,
-		huecoFrontalY: 1,
-		huecoFrontalZ: 1,*/
-
 		bordeX: 1,
 		bordeY: 1,
 		bordeZ: 1
@@ -43,10 +35,15 @@ class Vitrina extends THREE.Object3D
 		this.huecoFrontalY = this.cajaY - 2*this.bordeY
 		this.huecoFrontalZ = this.cajaZ - this.bordeZ
 
-		let loader = GameState.txLoader
+		this.puertaAbierta = false
 
+		//
+		// Material
+		//
+
+		let loader = GameState.txLoader
 		let texturaParedes = loader.load("../../resources/textures/models/textura_pared.png")
-		let texturaPuerta = loader.load("../../resources/textures/models/textura_puerta.png")
+		let texturaPuerta = loader.load("../../resources/textures/models/puerta_persiana.png")
 
 		this.materialVitrina = new THREE.MeshLambertMaterial({map: texturaParedes})
 		this.materialCristal = new THREE.MeshPhysicalMaterial({
@@ -59,6 +56,10 @@ class Vitrina extends THREE.Object3D
 			clearcoatRoughness: 0.1, // Rugosidad de la capa de recubrimiento clara
 		})
 		this.materialPuerta = new THREE.MeshLambertMaterial({map: texturaPuerta})
+
+		//
+		// Modelado
+		//
 
 		let geoCaja = new THREE.BoxGeometry(this.cajaX, this.cajaY, this.cajaZ)
 		geoCaja.translate(0, 0, this.cajaZ/2)
@@ -110,9 +111,17 @@ class Vitrina extends THREE.Object3D
 		let lateralDchaMesh = new THREE.Mesh(geoLateralDcha, this.materialCristal)
 		this.add(lateralDchaMesh)
 
+		// Para colocar objetitos
+		this.O3Vitrina = new THREE.Object3D()
+		this.O3Vitrina.translateY(-this.cajaY/2)
+		this.O3Vitrina.translateZ(this.cajaZ/2)
+
+		this.add(this.O3Vitrina)
+
 		//
 		// Animación
 		//
+		this._crearAnimacion()
 	}
 
 	_crearAnimacion()
@@ -125,6 +134,9 @@ class Vitrina extends THREE.Object3D
 		this.animaciones.abrirPuerta = new TWEEN.Tween(frameCerrada).to(frameAbierta, 2000)
 			.onUpdate(() => {
 				this.meshPuerta.scale.y = frameCerrada.sY
+			})
+			.onComplete(() => {
+				this.puertaAbierta = true
 			})
 	}
 

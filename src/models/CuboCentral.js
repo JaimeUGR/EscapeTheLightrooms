@@ -416,12 +416,16 @@ class CuboCentral extends THREE.Object3D
 		let frameInicio = {tZ: 15 - this.infoPanSup.alturaPrisma}
 		let frameFin = {tZ: -this.bordeCubo}
 
-		this.animaciones.prisma = new TWEEN.Tween(frameInicio).to(frameFin, 5500)
+		this.animaciones.prisma = new TWEEN.Tween(frameInicio).to(frameFin, 1000)
 			.onStart(() => {
 				this.elementosPS.prismaFondo.add(GameState.items.prisma)
 			})
 			.onUpdate(() => {
 				GameState.items.prisma.position.z = frameInicio.tZ
+			})
+			.onComplete(() => {
+				GameState.systems.cameras.enableInput()
+				GameState.salas.salaPrincipal.puzleLaser.iniciarPuzle()
 			})
 	}
 

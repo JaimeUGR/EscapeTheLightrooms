@@ -4,6 +4,8 @@ import {PuzleFormas} from "../puzles/PuzleFormas.js"
 import {Laser} from "../models/Laser.js"
 import {GameState} from "../GameState.js"
 
+import {Vitrina} from "../models/Vitrina.js"
+
 class SalaIzquierda extends Sala
 {
 	constructor(largoParedX, largoParedZ, alturaPared, puertas = {
@@ -44,7 +46,42 @@ class SalaIzquierda extends Sala
 
 	colocarModelos()
 	{
+		// Vitrina con la tarjeta
+		{
+			let vitrina = new Vitrina({
+				cajaX: 10,
+				cajaY: 8,
+				cajaZ: 6,
+				bordeX: 1,
+				bordeY: 1,
+				bordeZ: 1
+			})
 
+			vitrina.rotateY(Math.PI/2)
+			vitrina.translateX( this.largoParedZ/4 - (this.largoParedZ + Sala.AnchoPuerta()/4))
+			vitrina.translateY(this.alturaPared/2)
+
+			let tarjeta = GameState.items.tarjeta
+			tarjeta.position.y = vitrina.cajaY/2
+			vitrina.O3Vitrina.add(tarjeta)
+
+			tarjeta.meshTarjeta.userData.interaction = {
+				interact: () => {
+					if (!vitrina.puertaAbierta)
+						return
+
+					GameState.flags.tieneTarjeta = true
+					tarjeta.position.y = 0
+					vitrina.O3Vitrina.remove(tarjeta)
+					tarjeta.meshTarjeta.userData = {}
+				}
+			}
+
+			this.add(vitrina)
+			this.vitrina = vitrina
+
+			GameState.systems.interaction.allInteractables.push(tarjeta)
+		}
 	}
 
 	colocarPuzles()
@@ -79,8 +116,9 @@ class SalaIzquierda extends Sala
 		puzleFormas.translateZ(-this.largoParedZ)
 		puzleFormas.translateY(this.alturaPared/2)
 
-		this.add(puzleFormas)
+		puzleFormas.setCallbackCompletar(this.vitrina.abrirPuerta.bind(this.vitrina))
 
+		this.add(puzleFormas)
 		this.puzleFormas = puzleFormas
 
 		//

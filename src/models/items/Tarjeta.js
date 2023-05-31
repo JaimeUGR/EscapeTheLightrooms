@@ -21,7 +21,9 @@ class Tarjeta extends THREE.Object3D
 
 		let geoTarjeta = new THREE.BoxGeometry(this.anchoTarjeta, this.altoTarjeta, this.profTarjeta)
 
-		this.add(new THREE.Mesh(geoTarjeta, this.materialTarjeta))
+		this.meshTarjeta = new THREE.Mesh(geoTarjeta, this.materialTarjeta)
+
+		this.add(this.meshTarjeta)
 		this.name = "Tarjeta"
 	}
 }

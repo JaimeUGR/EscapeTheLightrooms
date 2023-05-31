@@ -4,6 +4,7 @@ import {PuzleSimon} from "../puzles/PuzleSimon.js"
 import {GameState} from "../GameState.js"
 
 import {Laser} from "../models/Laser.js"
+import {Vitrina} from "../models/Vitrina.js"
 
 class SalaSuperior extends Sala
 {
@@ -45,12 +46,49 @@ class SalaSuperior extends Sala
 
 	colocarModelos()
 	{
+		// Vitrina con la tarjeta
+		{
+			let vitrina = new Vitrina({
+				cajaX: 10,
+				cajaY: 8,
+				cajaZ: 8,
+				bordeX: 1,
+				bordeY: 1,
+				bordeZ: 1
+			})
 
+			vitrina.rotateY(-Math.PI/2)
+			vitrina.translateY(this.alturaPared/2 - vitrina.cajaY/2)
+			vitrina.translateZ(-this.largoParedX)
+			vitrina.translateX(this.largoParedZ/2)
+
+			let prisma = GameState.items.prisma
+			prisma.rotateX(-Math.PI/2)
+			vitrina.O3Vitrina.add(prisma)
+
+			prisma.meshPrisma.userData.interaction = {
+				interact: () => {
+					if (!vitrina.puertaAbierta)
+						return
+
+					prisma.rotateX(Math.PI/2)
+
+					GameState.flags.tienePrisma = true
+					vitrina.O3Vitrina.remove(prisma)
+					prisma.meshPrisma.userData = {}
+				}
+			}
+
+			this.add(vitrina)
+			this.vitrina = vitrina
+
+			GameState.systems.interaction.allInteractables.push(prisma)
+		}
 	}
 
 	colocarPuzles()
 	{
-		let puzleSimon = new PuzleSimon(null) // TODO: Añadir la callback para abrir el contenedor del prisma
+		let puzleSimon = new PuzleSimon()
 		puzleSimon.rotateY(-Math.PI/2)
 		puzleSimon.position.set(this.largoParedX - puzleSimon.simon.panelZ,
 			this.alturaPared/2 - puzleSimon.simon.panelY, this.largoParedZ/4)
@@ -58,6 +96,8 @@ class SalaSuperior extends Sala
 		this.add(puzleSimon)
 
 		GameState.systems.interaction.allInteractables.push(puzleSimon)
+
+		puzleSimon.setCallbackCompletado(this.vitrina.abrirPuerta.bind(this.vitrina))
 
 		this.puzleSimon = puzleSimon
 

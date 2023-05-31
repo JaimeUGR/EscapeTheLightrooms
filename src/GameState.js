@@ -33,7 +33,7 @@ class GameState
 			tieneManecillaHora: false,
 			tieneManecillaMinuto: false,
 			tieneTarjeta: false,
-			tienePrisma: true
+			tienePrisma: false
 		}
 
 		this.salas = {

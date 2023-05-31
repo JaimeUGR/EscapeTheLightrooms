@@ -8,12 +8,12 @@ const NUM_NIVELES = 3
 
 class PuzleSimon extends THREE.Object3D
 {
-	constructor(callbackCompletado)
+	constructor()
 	{
 		super()
 
 		// Callback
-		this.callbackCompletado = callbackCompletado
+		this.callbackCompletado = null
 
 		// Creamos el modelo
 		this.simon = new Simon()
@@ -42,8 +42,8 @@ class PuzleSimon extends THREE.Object3D
 		this.luzBotones.add(targetLuz)
 		this.luzBotones.target = targetLuz
 
-		let lightHelper = new THREE.SpotLightHelper(this.luzBotones, 0xffffff)
-		GameState.scene.add(lightHelper)
+		/*let lightHelper = new THREE.SpotLightHelper(this.luzBotones, 0xffffff)
+		GameState.scene.add(lightHelper)*/
 
 		//this.simon.botones[0].add(this.luzBotones)
 
@@ -197,6 +197,11 @@ class PuzleSimon extends THREE.Object3D
 		this.animaciones.pulsacionBoton.animacion = animacionEmpezarPulsar
 	}
 
+	setCallbackCompletado(callback)
+	{
+		this.callbackCompletado = callback
+	}
+
 	_pulsacionBoton(numBoton)
 	{
 		if(this._animating)
@@ -248,8 +253,11 @@ class PuzleSimon extends THREE.Object3D
 	{
 		console.log("Completado Puzle Simón")
 
-		if (this.callbackCompletado !== null)
-			this.callbackCompletado()
+		if (this.callbackCompletado === null)
+			return
+
+		this.callbackCompletado()
+		this.callbackCompletado = null
 	}
 
 	_crearAnimacionInicio()
