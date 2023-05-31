@@ -22,17 +22,18 @@ class GameState
 		this.items = {
 			destornillador: null,
 			tarjeta: new Tarjeta(),
-			prisma: new Prisma()
+			prisma: new Prisma(),
+			manecillaMinuto: null,
+			manecillaHora: null
 		}
 
 		// Flags del juego
-		// TODO: TMP a true
 		this.flags = {
 			tieneDestornillador: false,
-			tieneManecillaHora: true,
-			tieneManecillaMinuto: true,
+			tieneManecillaHora: false,
+			tieneManecillaMinuto: false,
 			tieneTarjeta: false,
-			tienePrisma: true
+			tienePrisma: false
 		}
 
 		this.salas = {

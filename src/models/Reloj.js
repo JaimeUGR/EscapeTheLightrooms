@@ -188,7 +188,10 @@ class Reloj extends THREE.Object3D
 
 		// NOTE: A este O3 se meten directamente las agujas
 		this.O3Agujas = new THREE.Object3D()
-		this.O3Agujas.translateZ(this.profundidadReloj/2)
+		this.O3Agujas.translateY(this.cajaY/2 - (this.radioReloj + this.separacionSuperiorReloj))
+		this.O3Agujas.translateZ(this.cajaZ/2 - this.separacionPuertaReloj + this.profundidadReloj)
+
+		this.O3Agujas.add(new THREE.AxesHelper(10))
 
 		meshReloj.add(this.O3Agujas)
 
@@ -271,8 +274,15 @@ class Reloj extends THREE.Object3D
 		}
 
 		this.animaciones.manecillas = {
+			animacionPonerManecillaHora: null,
+			animacionPonerManecillaMinuto: null,
 			animacionManecillaHora: null,
 			animacionManecillaMinuto: null
+		}
+
+		this.animaciones.resolver = {
+			animacion: null,
+			posicionXInicio: 0
 		}
 
 		//
@@ -340,6 +350,91 @@ class Reloj extends THREE.Object3D
 			this.animaciones.puerta.animacionAbrir = animacionAbrir
 			this.animaciones.puerta.animacionCerrar = animacionCerrar
 		}
+
+		//
+		// Colocación de manecillas
+		//
+		{
+			// Horas
+
+			let frameMH_I = { pZ: 4 }
+			let frameMH_F = { pZ: 0 }
+
+			this.animaciones.manecillas.animacionPonerManecillaHora = new TWEEN.Tween(frameMH_I).to(frameMH_F, 1000)
+				.onStart(() => {
+					GameState.flags.tieneManecillaHora = false
+
+					console.log("PONGO LA MANECILLA DE HOARAS")
+
+					// Añadir la manecilla al reloj
+					this.O3Agujas.add(GameState.items.manecillaHora)
+				})
+				.onUpdate(() => {
+					GameState.items.manecillaHora.position.z = frameMH_I.pZ
+				})
+				.onComplete(() => {
+					this._animating = false
+					this.tieneManecillaHora = true
+
+					this.ponerManecillas()
+				})
+
+			// Minutos
+			let frameMM_I = { pZ: 4 }
+			let frameMM_M = { pZ: 0, rZ: 0 }
+			let frameMM_F = { rZ: -Math.PI/2}
+
+			let animacionPonerMinuto = new TWEEN.Tween(frameMM_I).to(frameMM_M, 1000)
+				.onStart(() => {
+					GameState.flags.tieneManecillaMinuto = false
+
+					// Añadir la manecilla al reloj
+					this.O3Agujas.add(GameState.items.manecillaMinuto)
+				})
+				.onUpdate(() => {
+					GameState.items.manecillaMinuto.position.z = frameMM_I.pZ
+				})
+
+			let animacionGirarMinuto = new TWEEN.Tween(frameMM_M).to(frameMM_F, 1000)
+				.easing(TWEEN.Easing.Sinusoidal.InOut)
+				.onStart(() => {
+					GameState.flags.tieneManecillaMinuto = false
+
+					// Añadir la manecilla al reloj
+					this.O3Agujas.add(GameState.items.manecillaMinuto)
+				})
+				.onUpdate(() => {
+					GameState.items.manecillaMinuto.rotation.z = frameMM_M.rZ
+				})
+				.onComplete(() => {
+					// Si tiene la del minuto la enganchamos
+					this._animating = false
+					this.tieneManecillaMinuto = true
+
+					this.ponerManecillas()
+				})
+
+			animacionPonerMinuto.chain(animacionGirarMinuto)
+
+			this.animaciones.manecillas.animacionPonerManecillaMinuto = animacionPonerMinuto
+		}
+
+		//
+		// Completar el puzle
+		//
+		{
+			let frameInicio = { rZ: 0, tX: 0}
+			let frameFin = { rZ: -Math.PI, tX: -(this.cajaRelojX + 2*this.pilarX + 2*this.trapSup.XInf) }
+
+			this.animaciones.resolver.animacion = new TWEEN.Tween(frameInicio).to(frameFin, 5000)
+				.onStart(() => {
+					this.animaciones.resolver.posicionXInicio = this.position.x
+				})
+				.onUpdate(() => {
+					this.O3Agujas.rotation.z = frameInicio.rZ
+					this.position.x = this.animaciones.resolver.posicionXInicio + frameInicio.tX
+				})
+		}
 	}
 
 	interactuarPuerta()
@@ -362,17 +457,13 @@ class Reloj extends THREE.Object3D
 
 		if (GameState.flags.tieneManecillaHora)
 		{
-			GameState.flags.tieneManecillaHora = false
-			this.tieneManecillaHora = true
-
 			this._animating = true
+			this.animaciones.manecillas.animacionPonerManecillaHora.start()
 		}
 		else if (GameState.flags.tieneManecillaMinuto)
 		{
-			GameState.flags.tieneManecillaMinuto = false
-			this.tieneManecillaMinuto = true
-
 			this._animating = true
+			this.animaciones.manecillas.animacionPonerManecillaMinuto.start()
 		}
 
 		// Si están ambas manecillas
@@ -382,20 +473,29 @@ class Reloj extends THREE.Object3D
 
 			console.log("Has completado el reloj")
 
-			// Poner la animación de apartar el reloj para dejar ver la nota
+			this.animaciones.resolver.animacion.start()
 		}
 	}
 }
 
-class ManecillaHoras extends THREE.Object3D
+class ManecillaHora extends THREE.Object3D
 {
 	constructor(dimensiones = {
-		separacion: 1
+		separacion: 1,
+		grosor: 0.5,
+		escalado: 1,
+		alturaCilindroContenedor: 0.75,
+		radioCilindroRecortado: 0.75
 	})
 	{
 		super()
 
+
 		this.separacion = dimensiones.separacion
+		this.grosor = dimensiones.grosor
+		this.escalado = dimensiones.escalado / 10
+		this.radioCilindroRecorte = dimensiones.radioCilindroRecortado
+
 		this.material = new THREE.MeshNormalMaterial({opacity: 0.5,transparent: true})
 
 		let formaManecillaHoras= new THREE.Shape()
@@ -411,25 +511,50 @@ class ManecillaHoras extends THREE.Object3D
 		formaManecillaHoras.quadraticCurveTo(-2, 7, -1, 6)
 		formaManecillaHoras.lineTo(-1,0)
 
-		const options = {bevelEnabled: false, depth: 2, steps: 1, curveSegments: 4,
+		const options = {bevelEnabled: false, depth: this.grosor, steps: 1, curveSegments: 4,
 			bevelThickness: 4, bevelSize: 2 , bevelSegements :2}
 
 		let geoManecillaHoras = new THREE.ExtrudeGeometry(formaManecillaHoras,options)
+		geoManecillaHoras.translate(0, 0, -this.grosor/2 + 0.5)
+		geoManecillaHoras.scale(this.escalado, this.escalado, this.escalado)
 
-		this.extruManecillaHoras = new THREE.Mesh(geoManecillaHoras, this.material)
-		this.add(this.extruManecillaHoras)
+		// Hacer el cilindro contenedor
+		let geoCilindro = new THREE.CylinderGeometry(1.2, 1.2,
+			dimensiones.alturaCilindroContenedor, 15)
+		geoCilindro.rotateX(Math.PI/2)
+		geoCilindro.translate(0, 0, 0.5)
+		geoCilindro.scale(this.escalado, this.escalado, this.escalado)
+
+		let geoCilindroRecorte = new THREE.CylinderGeometry(this.radioCilindroRecorte, this.radioCilindroRecorte,
+			dimensiones.alturaCilindroContenedor*this.escalado, 15)
+		geoCilindroRecorte.rotateX(Math.PI/2)
+		geoCilindroRecorte.translate(0, 0, 0.5*this.escalado)
+
+		let csg = new CSG().union([new THREE.Mesh(geoManecillaHoras, this.material),
+			new THREE.Mesh(geoCilindro, null)])
+			.subtract([new THREE.Mesh(geoCilindroRecorte, null)])
+
+		this.add(csg.toMesh())
 	}
 }
 
-class ManecillaMinutos extends THREE.Object3D
+class ManecillaMinuto extends THREE.Object3D
 {
 	constructor(dimensiones = {
-		separacion: 1
+		separacion: 1,
+		grosor: 0.5,
+		escalado: 1,
+		alturaCilindroContenedor: 0.75,
+		radioCilindroRecortado: 0.75
 	})
 	{
 		super()
 
 		this.separacion = dimensiones.separacion
+		this.grosor = dimensiones.grosor
+		this.escalado = dimensiones.escalado / 10
+		this.radioCilindroRecorte = dimensiones.radioCilindroRecortado
+
 		this.material = new THREE.MeshNormalMaterial({opacity: 0.5,transparent: true})
 
 		let formaManecillaMinutos = new THREE.Shape()
@@ -445,14 +570,31 @@ class ManecillaMinutos extends THREE.Object3D
 		formaManecillaMinutos.quadraticCurveTo(-2, 7, -1, 6)
 		formaManecillaMinutos.lineTo(-1,0)
 
-		const options = {bevelEnabled: false, depth: 2, steps: 1, curveSegments: 4,
+		const options = {bevelEnabled: false, depth: this.grosor, steps: 1, curveSegments: 4,
 			bevelThickness: 4, bevelSize: 2 , bevelSegements :2}
 
 		let geoManecillaMinutos = new THREE.ExtrudeGeometry(formaManecillaMinutos, options)
+		geoManecillaMinutos.translate(0, 0, -this.grosor/2 + 0.5)
+		geoManecillaMinutos.scale(this.escalado, this.escalado, this.escalado)
 
-		this.extruManecillaMinutos = new THREE.Mesh(geoManecillaMinutos, this.material)
-		this.add(this.extruManecillaMinutos)
+		// Hacer el cilindro contenedor
+		let geoCilindro = new THREE.CylinderGeometry(1.2, 1.2,
+			dimensiones.alturaCilindroContenedor, 15)
+		geoCilindro.rotateX(Math.PI/2)
+		geoCilindro.translate(0, 0, 0.5)
+		geoCilindro.scale(this.escalado, this.escalado, this.escalado)
+
+		let geoCilindroRecorte = new THREE.CylinderGeometry(this.radioCilindroRecorte, this.radioCilindroRecorte,
+			dimensiones.alturaCilindroContenedor*this.escalado, 15)
+		geoCilindroRecorte.rotateX(Math.PI/2)
+		geoCilindroRecorte.translate(0, 0, 0.5*this.escalado)
+
+		let csg = new CSG().union([new THREE.Mesh(geoManecillaMinutos, this.material),
+			new THREE.Mesh(geoCilindro, null)])
+			.subtract([new THREE.Mesh(geoCilindroRecorte, null)])
+
+		this.add(csg.toMesh())
 	}
 }
 
-export {Reloj, ManecillaHoras, ManecillaMinutos}
+export {Reloj, ManecillaHora, ManecillaMinuto}
