@@ -7,6 +7,9 @@ import {Reloj, ManecillaHora, ManecillaMinuto} from "../models/Reloj.js"
 
 import {GameState} from "../GameState.js"
 import {Taquilla} from "../models/Taquilla.js"
+
+import {Laser} from "../models/Laser.js"
+
 import {RandomInt} from "../Utils.js"
 
 
@@ -203,6 +206,33 @@ class SalaDerecha extends Sala
 
 		// TODO: Poner el póster con el código detrás
 		GameState.systems.interaction.allInteractables.push(reloj)
+
+		//
+		// Laser
+		//
+		{
+			const sp = GameState.salas.salaPrincipal
+			const puzleLaser = sp.puzleLaser
+
+			let laserVerde = new Laser()
+
+			// Posicionar el laser en la sala
+			laserVerde.rotateY(Math.PI/2)
+			laserVerde.translateY(laserVerde.alturaSoporte + laserVerde.alturaLaser/2)
+			laserVerde.translateX(-this.largoParedZ/2)
+			laserVerde.translateZ(this.largoParedX/2)
+
+			let largoHaz = this.largoParedX/2 + 4*Sala.GrosorPared() + sp.pasilloDerecha.largoPasillo
+				+ sp.largoParedX/2 - (puzleLaser.anilloVerde.radioInterno)
+
+			puzleLaser.setLaserVerde(laserVerde, largoHaz)
+			laserVerde.setHaz(largoHaz, false)
+
+			// TODO Color Haz Inicial
+			laserVerde.cambiarHaz(0x55ff55, false)
+
+			this.add(laserVerde)
+		}
 	}
 }
 

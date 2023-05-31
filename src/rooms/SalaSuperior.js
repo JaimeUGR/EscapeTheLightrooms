@@ -3,6 +3,8 @@ import {Sala} from "./Sala.js"
 import {PuzleSimon} from "../puzles/PuzleSimon.js"
 import {GameState} from "../GameState.js"
 
+import {Laser} from "../models/Laser.js"
+
 class SalaSuperior extends Sala
 {
 	constructor(largoParedX, largoParedZ, alturaPared, puertas = {
@@ -58,6 +60,33 @@ class SalaSuperior extends Sala
 		GameState.systems.interaction.allInteractables.push(puzleSimon)
 
 		this.puzleSimon = puzleSimon
+
+		//
+		// Laser
+		//
+		{
+			const sp = GameState.salas.salaPrincipal
+			const puzleLaser = sp.puzleLaser
+
+			let laserRojo = new Laser()
+
+			// Posicionar el laser en la sala
+			laserRojo.rotateY(Math.PI)
+			laserRojo.translateY(laserRojo.alturaSoporte + laserRojo.alturaLaser/2)
+			laserRojo.translateX(-this.largoParedX/2)
+			laserRojo.translateZ(-this.largoParedZ + laserRojo.radioSoporte)
+
+			let largoHaz = this.largoParedZ + 4*Sala.GrosorPared() + sp.pasilloSuperior.largoPasillo
+				+ sp.largoParedZ/2 - (puzleLaser.anilloRojo.radioInterno + laserRojo.radioSoporte)
+
+			puzleLaser.setLaserRojo(laserRojo, largoHaz)
+			laserRojo.setHaz(largoHaz, false)
+
+			// TODO Color Haz Inicial
+			laserRojo.cambiarHaz(0xff5555, false)
+
+			this.add(laserRojo)
+		}
 	}
 }
 

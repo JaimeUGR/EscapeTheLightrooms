@@ -1,6 +1,8 @@
 
 import {Sala} from "./Sala.js"
 import {PuzleFormas} from "../puzles/PuzleFormas.js"
+import {Laser} from "../models/Laser.js"
+import {GameState} from "../GameState.js"
 
 class SalaIzquierda extends Sala
 {
@@ -80,6 +82,33 @@ class SalaIzquierda extends Sala
 		this.add(puzleFormas)
 
 		this.puzleFormas = puzleFormas
+
+		//
+		// Laser
+		//
+		{
+			const sp = GameState.salas.salaPrincipal
+			const puzleLaser = sp.puzleLaser
+
+			let laserAzul = new Laser()
+
+			// Posicionar el laser en la sala
+			laserAzul.rotateY(-Math.PI/2)
+			laserAzul.translateY(laserAzul.alturaSoporte + laserAzul.alturaLaser/2)
+			laserAzul.translateX(this.largoParedZ/2)
+			laserAzul.translateZ(-this.largoParedX + laserAzul.radioSoporte)
+
+			let largoHaz = this.largoParedX + 4*Sala.GrosorPared() + sp.pasilloIzquierda.largoPasillo
+				+ sp.largoParedX/2 - (laserAzul.radioSoporte + puzleLaser.anilloAzul.radioInterno)
+
+			puzleLaser.setLaserAzul(laserAzul, largoHaz)
+			laserAzul.setHaz(largoHaz, false)
+
+			// TODO Color Haz Inicial
+			laserAzul.cambiarHaz(0x5555ff, false)
+
+			this.add(laserAzul)
+		}
 	}
 }
 

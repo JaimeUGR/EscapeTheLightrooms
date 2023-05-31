@@ -293,6 +293,9 @@ class Reloj extends THREE.Object3D
 			let framePendulo_Izda = { rZ: -this.rotacionPendulo }
 			let framePendulo_Dcha = { rZ: this.rotacionPendulo }
 
+			// NOTE: Establecer una rotación inicial
+			this.O3Pendulo.rotation.z = -this.rotacionPendulo
+
 			let animacionIzdaDcha = new TWEEN.Tween(framePendulo_Izda).to(framePendulo_Dcha, this.tiempoPendulo)
 				.easing(TWEEN.Easing.Quadratic.InOut)
 				.onUpdate(() => {
@@ -315,7 +318,6 @@ class Reloj extends THREE.Object3D
 			animacionDchaIzda.chain(animacionIzdaDcha)
 
 			this.animaciones.pendulo.animacion = animacionIzdaDcha
-			animacionIzdaDcha.start()
 		}
 
 		//
@@ -433,6 +435,9 @@ class Reloj extends THREE.Object3D
 				.onUpdate(() => {
 					this.O3Agujas.rotation.z = frameInicio.rZ
 					this.position.x = this.animaciones.resolver.posicionXInicio + frameInicio.tX
+				})
+				.onComplete(() => {
+					this.animaciones.pendulo.animacion.start()
 				})
 		}
 	}

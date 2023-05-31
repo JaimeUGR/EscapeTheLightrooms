@@ -238,14 +238,8 @@ class SalaPrincipal extends Sala
 		}
 
 		{
-			let anillo = new PuzleLaser()
+			// NOTE: Es importante saber que este puzle se rota 180º
 
-			anillo.translateX(this.largoParedX/2)
-			anillo.translateZ(this.largoParedZ/2)
-			anillo.translateY(25)
-			anillo.rotateY(Math.PI)
-
-			this.add(anillo)
 		}
 	}
 
@@ -311,6 +305,17 @@ class SalaPrincipal extends Sala
 		//
 		// Lasérs
 		//
+		{
+			let puzleLaser = new PuzleLaser()
+
+			puzleLaser.translateX(this.largoParedX/2)
+			puzleLaser.translateZ(this.largoParedZ/2)
+			puzleLaser.translateY(25)
+			puzleLaser.rotateY(Math.PI)
+
+			this.add(puzleLaser)
+			this.puzleLaser = puzleLaser
+		}
 	}
 }
 

@@ -15,7 +15,17 @@ class PuzleLaser extends THREE.Object3D
 	{
 		super()
 
+		this.distanciaLaserAzul = dimensiones.distanciaLaserAzul
+		this.distanciaLaserVerde = dimensiones.distanciaLaserVerde
+		this.distanciaLaserRojo = dimensiones.distanciaLaserRojo
+
+		this.laserAzul = null
+		this.laserVerde = null
+		this.laserRojo = null
+
 		this._crearAnillos()
+
+		//this._crearLasers()
 
 
 		this.add(new THREE.AxesHelper(10))
@@ -75,6 +85,42 @@ class PuzleLaser extends THREE.Object3D
 		this.O3Anillos.add(this.anilloRojo)
 
 		this.add(this.O3Anillos)
+	}
+
+	iniciarPuzle()
+	{
+		// Activar los lásers
+		this.laserAzul.activarLaser()
+		this.laserVerde.activarLaser()
+		this.laserRojo.activarLaser()
+
+		this.laserAzul.setCallbackCambioColor(this._comprobarColores.bind(this))
+		this.laserVerde.setCallbackCambioColor(this._comprobarColores.bind(this))
+		this.laserRojo.setCallbackCambioColor(this._comprobarColores.bind(this))
+	}
+
+	// NOTE: Llamado cada vez que cambia el color de un laser
+	_comprobarColores()
+	{
+		console.log("HOLA")
+		console.log(this.laserAzul.haz.material.color.getHex())
+		console.log(this.laserVerde.haz.material.color.getHex())
+		console.log(this.laserRojo.haz.material.color.getHex())
+	}
+
+	setLaserAzul(laser)
+	{
+		this.laserAzul = laser
+	}
+
+	setLaserVerde(laser)
+	{
+		this.laserVerde = laser
+	}
+
+	setLaserRojo(laser)
+	{
+		this.laserRojo = laser
 	}
 }
 
