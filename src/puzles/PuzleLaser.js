@@ -97,27 +97,28 @@ class PuzleLaser extends THREE.Object3D
 	{
 		let frameInicio = {
 			rXAzul: 0,
-			rYAzul: Math.PI,
+			rYAzul: Math.PI/2,
 			rZAzul: 0,
-			rXVerde: Math.PI/2,
-			rYVerde: Math.PI,
+			rXVerde: 0,
+			rYVerde: Math.PI/2,
 			rZVerde: 0,
-			rXRojo: -Math.PI,
+			rXRojo: Math.PI,
 			rYRojo: Math.PI,
-			rZRojo: Math.PI/2
+			rZRojo: 0
 		}
 
 		let frameFin = {
 			rXAzul: 0,
 			rYAzul: -Math.PI/2,
 			rZAzul: 0,
-			rXVerde: 0,
+			rXVerde: Math.PI/2,
 			rYVerde: Math.PI/2,
 			rZVerde: 0,
-			rXRojo: Math.PI,
+			rXRojo: -Math.PI,
 			rYRojo: 0,
-			rZRojo: 0
+			rZRojo: Math.PI/2
 		}
+
 
 		// Aplicamos las rotaciones iniciales a los anillos
 		let aplicarRotacion = (frameR) => {
