@@ -10,6 +10,7 @@ class ControladorCamaraCuboCentral extends ControladorCamara
 	{
 		super(camara)
 		this.isSceneCamera = false
+		this.inputEnabled = true
 
 		this.cuboCentral = cuboCentral
 
@@ -31,6 +32,7 @@ class ControladorCamaraCuboCentral extends ControladorCamara
 	enable()
 	{
 		GameState.tmp.cameraLock = true
+		this.inputEnabled = true
 
 		// RESET
 		this.rotacionCubo = 0
@@ -39,6 +41,8 @@ class ControladorCamaraCuboCentral extends ControladorCamara
 		this.cuboCentral.animaciones.camara.activa = true
 
 		// TODO: Desactivar el rango de interacción
+
+		// TODO: mostrar mensaje que para salir se pulse ESC
 	}
 
 	disable()
@@ -53,10 +57,23 @@ class ControladorCamaraCuboCentral extends ControladorCamara
 		// TODO: Reactivar el rango de interacción
 	}
 
+	enableInput(event)
+	{
+		this.inputEnabled = true
+	}
+
+	disableInput(event)
+	{
+		this.inputEnabled = false
+	}
+
 	onKeyUp(event)
 	{
 		// NOTE: Mientras se anima no se puede salir (evita bugs)
 		if (this._animating)
+			return
+
+		if (!this.inputEnabled)
 			return
 
 		switch (event.code)
@@ -73,6 +90,9 @@ class ControladorCamaraCuboCentral extends ControladorCamara
 	{
 		// NOTE: Si añadimos teclas que no animen, hay que mover esto
 		if (this._animating)
+			return
+
+		if (!this.inputEnabled)
 			return
 
 		switch (event.code)

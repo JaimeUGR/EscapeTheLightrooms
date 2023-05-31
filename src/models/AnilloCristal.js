@@ -2,6 +2,7 @@
 import * as THREE from "../../libs/three.module.js"
 import * as TWEEN from '../../libs/tween.esm.js'
 import {CSG} from "../../libs/CSG-v2.js"
+import {GameState} from "../GameState.js"
 
 import {Prisma} from "./Formas.js"
 
@@ -36,7 +37,30 @@ class AnilloCristal extends THREE.Object3D
 			thickness: dimensiones.cristalBevelThickness
 		}
 
-		this.material = new THREE.MeshNormalMaterial({opacity: 0.5, transparent: true, flatShading: true})
+		//
+		// Material
+		//
+
+		const txLoader = GameState.txLoader
+
+		let texturaOro = txLoader.load("../../resources/textures/models/oro1.jpeg")
+
+		this.materialAnillo = new THREE.MeshLambertMaterial({map: texturaOro })
+
+		// TODO: Cambiar el color del cristal al pasado en el constructor
+		this.materialCristal = new THREE.MeshPhysicalMaterial({
+			color: 0x7db3fa, // Color azul del cristal
+			transparent: true, // Habilitar transparencia
+			opacity: 0.95, // Opacidad del cristal (ajusta según tu preferencia)
+			roughness: 0.4, // Rugosidad del material
+			metalness: 0.0, // Metalicidad del material (0 para no metálico)
+			clearcoat: 1.0, // Capa de recubrimiento clara
+			clearcoatRoughness: 0.1, // Rugosidad de la capa de recubrimiento clara
+		})
+
+		//
+		// Modelado
+		//
 
 		let geoToroide = new THREE.TorusGeometry(this.radioInterno, this.radioTubo, this.numCaras, this.numRadios)
 		geoToroide.rotateX(Math.PI/2)
@@ -58,7 +82,7 @@ class AnilloCristal extends THREE.Object3D
 		// Recorte de los cristales
 		//
 
-		let csg = new CSG().union([new THREE.Mesh(geoToroide, this.material)])
+		let csg = new CSG().union([new THREE.Mesh(geoToroide, this.materialAnillo)])
 
 		for (let i = 0; i < 4; i++)
 		{
@@ -83,7 +107,7 @@ class AnilloCristal extends THREE.Object3D
 		geoCristal.translate(0, 0, this.radioInterno - this.profundidadSujetadorCristal)
 
 		// NOTE: por ahora hay un solo cristal y no es parametrizable
-		this.meshCristal = new THREE.Mesh(geoCristal, this.material)
+		this.meshCristal = new THREE.Mesh(geoCristal, this.materialCristal)
 
 		this.add(this.meshCristal)
 

@@ -1,6 +1,7 @@
 
 import * as THREE from "../../libs/three.module.js";
 import * as TWEEN from '../../libs/tween.esm.js'
+import {GameState} from "../GameState.js"
 
 const SEGMENTOS_SOPORTE = 10
 
@@ -22,8 +23,6 @@ class Palanca extends THREE.Object3D
 	{
 		super()
 
-		this.palancaMaterial = new THREE.MeshNormalMaterial({color: 0Xf1f1f1,opacity: 0.5,transparent: true})
-
 		this.radioSoporte = dimensiones.radioSoporte
 		this.alturaSoporte = dimensiones.alturaSoporte
 
@@ -38,10 +37,27 @@ class Palanca extends THREE.Object3D
 
 		this.callbackAnimacion = null
 
+		//
+		// Material
+		//
+
+		const txLoader = GameState.txLoader
+		let texturaSoporte = txLoader.load("../../resources/textures/models/textura_soporte.png")
+		let texturaBarra = txLoader.load("../../resources/textures/models/textura_barras.png")
+		let texturaMango = txLoader.load("../../resources/textures/models/textura_mango.png")
+
+		this.materialSoporte = new THREE.MeshLambertMaterial({map: texturaSoporte})
+		this.materialBarra = new THREE.MeshLambertMaterial({map: texturaBarra})
+		this.materialMango = new THREE.MeshLambertMaterial({map: texturaMango})
+
+		//
+		// Modelado
+		//
+
 		// Crear soporte
 		let geoSoporte = new THREE.CylinderGeometry(this.radioSoporte,this.radioSoporte,this.alturaSoporte,SEGMENTOS_SOPORTE, 2)
 		let soporte = new THREE.Object3D()
-		this.add(soporte.add(new THREE.Mesh(geoSoporte,this.palancaMaterial)).rotateZ(Math.PI/2))
+		this.add(soporte.add(new THREE.Mesh(geoSoporte, this.materialSoporte)).rotateZ(Math.PI/2))
 
 		// Crear palo
 		let geoPalo = new THREE.CylinderGeometry(this.radioPalo, this.radioPalo, this.alturaPalo + this.radioSoporte/2, SEGMENTOS_SOPORTE,2)
@@ -49,14 +65,14 @@ class Palanca extends THREE.Object3D
 
 		let palo =  new THREE.Object3D()
 
-		this.add(palo.add(new THREE.Mesh(geoPalo,this.palancaMaterial)))
+		this.add(palo.add(new THREE.Mesh(geoPalo, this.materialBarra)))
 
 		// Crear mango
 		let geoMango = new THREE.CylinderGeometry(this.radioMango, this.radioMango, this.alturaMango, SEGMENTOS_SOPORTE, 2)
 		geoMango.translate(0,this.alturaMango/2 + this.radioSoporte/2 + this.alturaPalo,0)
 		let mango = new THREE.Object3D();
 
-		palo.add(mango.add(new THREE.Mesh(geoMango,this.palancaMaterial)))
+		palo.add(mango.add(new THREE.Mesh(geoMango, this.materialMango)))
 
 		this.add(palo)
 

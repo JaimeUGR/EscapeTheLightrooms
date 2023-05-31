@@ -395,12 +395,34 @@ class CuboCentral extends THREE.Object3D
 		//
 		this._crearAnimacionPanelPrisma()
 
+		//
+		// Interacción
+		//
+
+		let metodoInteraccion = this._ponerPrisma.bind(this)
+
+		meshPanelSuperior.traverse((anyNode) => {
+			anyNode.userData.interaction = {
+				interact: metodoInteraccion
+			}
+		})
+
 		return meshPanelSuperior
 	}
 
 	_crearAnimacionPanelPrisma()
 	{
 		// TODO: Que no se nos olvide añadir el código de la cámara al método de interacción
+		let frameInicio = {tZ: 15 - this.infoPanSup.alturaPrisma}
+		let frameFin = {tZ: -this.bordeCubo}
+
+		this.animaciones.prisma = new TWEEN.Tween(frameInicio).to(frameFin, 5500)
+			.onStart(() => {
+				this.elementosPS.prismaFondo.add(GameState.items.prisma)
+			})
+			.onUpdate(() => {
+				GameState.items.prisma.position.z = frameInicio.tZ
+			})
 	}
 
 	crearPanelTornillos(meshPanelBase)
@@ -505,7 +527,7 @@ class CuboCentral extends THREE.Object3D
 				{
 					this._animating = false
 
-					// TODO: Desbloquear el input
+					GameState.systems.cameras.enableInput()
 				}
 			})
 	}
@@ -769,16 +791,16 @@ class CuboCentral extends THREE.Object3D
 		}
 
 		let frameFuera = {
-			pZ: 3*this.bordeCubo, // TODO: Asegurar que no se meta en la cámara
+			pZ: Math.min(6*this.bordeCubo, 13), // NOTE: Asegurar que no se meta en la cámara
 			pX: 0,
 			miPosX: 0
 		}
 
 		let frameMover = {
-			pX: 3*this.ladoCubo // TODO: Asegurar que está fuera de la cámara
+			pX: 2*this.ladoCubo // NOTE: Asegurar que está fuera de la cámara
 		}
 
-		let animacionSacar = new TWEEN.Tween(frameInicio).to(frameFuera, 1000)
+		let animacionSacar = new TWEEN.Tween(frameInicio).to(frameFuera, 800)
 			.onStart(() => {
 				frameInicio.miPosZ = this.animaciones.quitarPanel.panel.position.z
 			})
@@ -789,7 +811,7 @@ class CuboCentral extends THREE.Object3D
 				frameInicio.pz = 0
 			})
 
-		let animacionMover = new TWEEN.Tween(frameFuera).to(frameMover, 1000)
+		let animacionMover = new TWEEN.Tween(frameFuera).to(frameMover, 800)
 			.onStart(() => {
 				frameFuera.miPosX = this.animaciones.quitarPanel.panel.position.x
 			})
@@ -800,7 +822,7 @@ class CuboCentral extends THREE.Object3D
 				frameFuera.pX = 0
 				this.animaciones.quitarPanel.panel.parent.remove(this.animaciones.quitarPanel.panel)
 
-				// TODO: Desbloquear el input
+				GameState.systems.cameras.enableInput()
 				this._animating = false
 			})
 
@@ -828,7 +850,7 @@ class CuboCentral extends THREE.Object3D
 			.onComplete(() => {
 				frameInicio.r = 0
 
-				// TODO: Desbloquear el input
+				GameState.systems.cameras.enableInput()
 
 				// Iniciar la animación de abrir la puerta
 				this.animaciones.palancas.pasillo.desbloquear()
@@ -886,11 +908,10 @@ class CuboCentral extends THREE.Object3D
 		if (GameState.flags.tieneDestornillador === false)
 			return
 
-		// TODO
 		if (this._animating)
 			return
 
-		// TODO: Bloquear el input
+		GameState.systems.cameras.disableInput()
 
 		this.animaciones.tornillos.tornillo = this.elementosPD.tornillos[numTornillo]
 		this.animaciones.tornillos.animacion.start()
@@ -913,8 +934,30 @@ class CuboCentral extends THREE.Object3D
 
 		this._animating = true
 
-		// TODO: Bloquear el input
+		GameState.systems.cameras.disableInput()
 		this.animaciones.pasarTarjeta.animacion.start()
+	}
+
+	_ponerPrisma(event)
+	{
+		// Comprobar interacción cámara
+		if (!this.animaciones.camara.activa)
+		{
+			this._acercarCamara()
+			return
+		}
+
+		if (GameState.flags.tienePrisma === false)
+			return
+
+		if (this._animating)
+			return
+
+		this._animating = true
+		GameState.flags.tienePrisma = false
+
+		GameState.systems.cameras.disableInput()
+		this.animaciones.prisma.start()
 	}
 
 	_pulsarTeclaKeypad(event, numBoton)
@@ -931,7 +974,6 @@ class CuboCentral extends THREE.Object3D
 
 		this._animating = true
 
-		// TODO: Bloquear el input
 		this.animaciones.keypad.boton = this.elementosPT.botones[numBoton]
 		this.animaciones.keypad.animacion.start()
 	}
@@ -939,7 +981,7 @@ class CuboCentral extends THREE.Object3D
 	// PRE: Si se llama varias veces dará resultados inesperados
 	_quitarPanel(numPanel) // 0 derecha, 1 izda, 2 sup
 	{
-		// TODO: Bloquear el input
+		GameState.systems.cameras.disableInput()
 
 		let meshPadre = null
 
@@ -975,6 +1017,8 @@ class CuboCentral extends THREE.Object3D
 			return
 
 		this._animating = true
+
+		GameState.systems.cameras.disableInput()
 
 		this.animaciones.palancas.palanca = meshPalanca
 		this.animaciones.palancas.pasillo = pasillo

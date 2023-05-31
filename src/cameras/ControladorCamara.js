@@ -28,6 +28,16 @@ class ControladorCamara
 
 	}
 
+	enableInput(event)
+	{
+
+	}
+
+	disableInput(event)
+	{
+
+	}
+
 	enable()
 	{
 		this.enabled = true

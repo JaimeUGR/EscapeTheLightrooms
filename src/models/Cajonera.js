@@ -61,15 +61,24 @@ class Cajonera extends THREE.Object3D
 		// Colisiones
 		this.baseColliders = []
 
-		// Materiales
-		this.cajoneraMaterial = new THREE.MeshNormalMaterial({opacity: 0.5, transparent: true})
-		this.cajonFrontalMaterial = new THREE.MeshNormalMaterial({opacity: 0.5, transparent: true})
-		this.cajonParedesMaterial = new THREE.MeshNormalMaterial({opacity: 0.5, transparent: true})
-		this.cajonSueloMaterial = new THREE.MeshNormalMaterial({opacity: 0.5, transparent: true})
-		this.cajonAsaMaterial = new THREE.MeshNormalMaterial({opacity: 0.5, transparent: true})
+		//
+		// Material
+		//
+
+		const txLoader = GameState.txLoader
+
+		let texturaCajonera = txLoader.load("../../resources/textures/models/textura_mesa_normal.png")
+		let texturaCajones = txLoader.load("../../resources/textures/models/textura_cajones.png")
+
+		this.cajoneraMaterial = new THREE.MeshLambertMaterial({map: texturaCajonera})
+		this.cajonFrontalMaterial =  new THREE.MeshLambertMaterial({map: texturaCajones})
+		this.cajonParedesMaterial =  new THREE.MeshLambertMaterial({map: texturaCajones})
+		this.cajonSueloMaterial =  new THREE.MeshLambertMaterial({map: texturaCajones})
+		this.cajonAsaMaterial =  new THREE.MeshLambertMaterial({map: texturaCajonera})
+
 
 		//
-		//
+		// Modelado
 		//
 
 		// Crear la cajonera

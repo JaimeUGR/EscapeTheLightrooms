@@ -36,8 +36,21 @@ class Mesa extends THREE.Object3D
 
 		this.baseColliders = []
 
-		this.materialTablero = new THREE.MeshNormalMaterial({opacity: 0.5,transparent: true})
-		this.materialPatas = new THREE.MeshNormalMaterial({opacity: 0.5,transparent: true})
+		//
+		// Material
+		//
+
+
+		const txLoader = GameState.txLoader
+
+		let texturaMesa = txLoader.load("../../resources/textures/models/textura_mesa_normal.png")
+
+		this.materialTablero = new THREE.MeshLambertMaterial({map: texturaMesa})
+		this.materialPatas = new THREE.MeshLambertMaterial({map: texturaMesa})
+
+		//
+		// Modelado
+		//
 
 		// Crear el tablero
 		let geoTablero = new THREE.BoxGeometry(this.tableroX, this.tableroY, this.tableroZ)
@@ -131,9 +144,29 @@ class MesaCristal extends THREE.Object3D
 
 		this.baseColliders = []
 
-		this.materialTablero = new THREE.MeshNormalMaterial({opacity: 0.5, transparent: true})
-		this.materialCristal = new THREE.MeshNormalMaterial({opacity: 0.5, transparent: true})
-		this.materialPatas = new THREE.MeshNormalMaterial({opacity: 0.5, transparent: true})
+		//
+		// Material
+		//
+
+		const txLoader = GameState.txLoader
+
+		let texturaMesa = txLoader.load("../../resources/textures/models/textura_mesa_cristal.png")
+
+		this.materialTablero = new THREE.MeshLambertMaterial({map: texturaMesa})
+		this.materialPatas = new THREE.MeshLambertMaterial({map: texturaMesa})
+		this.materialCristal = new THREE.MeshPhysicalMaterial({
+			color: 0xc1dffc, // Color azul del cristal
+			transparent: true, // Habilitar transparencia
+			opacity: 0.7, // Opacidad del cristal (ajusta según tu preferencia)
+			roughness: 0.1, // Rugosidad del material
+			metalness: 0.0, // Metalicidad del material (0 para no metálico)
+			clearcoat: 1.0, // Capa de recubrimiento clara
+			clearcoatRoughness: 0.1, // Rugosidad de la capa de recubrimiento clara
+		})
+
+		//
+		// Modelado
+		//
 
 		// Crear el tablero
 		let geoTablero = new THREE.BoxGeometry(this.tableroX, this.tableroY, this.tableroZ)

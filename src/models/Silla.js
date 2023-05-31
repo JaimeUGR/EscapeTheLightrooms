@@ -2,6 +2,8 @@
 import * as THREE from "../../libs/three.module.js"
 import {CSG} from "../../libs/CSG-v2.js"
 
+import {GameState} from "../GameState.js"
+
 class Silla extends THREE.Object3D
 {
 	constructor(dimensiones = {
@@ -50,28 +52,41 @@ class Silla extends THREE.Object3D
 
 		this.separacionUniones = dimensiones.separacionUniones
 
-		this.materialTablero = new THREE.MeshNormalMaterial({opacity: 0.5,transparent: true})
-		this.materialPatas = new THREE.MeshNormalMaterial({opacity: 0.5,transparent: true})
+		//
+		// Material
+		//
+
+		const loader = GameState.txLoader
+
+		let texturaMadera = loader.load("../../resources/textures/models/fondo-madera-natural.jpg")
+		let texturaMetal = loader.load("../../resources/textures/models/textura_metalica.jpg")
+
+		this.materialMadera = new THREE.MeshLambertMaterial({map: texturaMadera})
+		this.materialMetal = new THREE.MeshPhongMaterial({map: texturaMetal})
+
+		//
+		// Modelado
+		//
 
 		// Crear el tablero
 		let geoTablero = new THREE.BoxGeometry(this.tableroX, this.tableroY, this.tableroZ)
 		geoTablero.translate(0, this.tableroY/2 + this.pataY, 0)
 
-		this.add(new THREE.Mesh(geoTablero, this.materialTablero))
+		this.add(new THREE.Mesh(geoTablero, this.materialMadera))
 
 		let geoPata = new THREE.BoxGeometry(this.pataX, this.pataY, this.pataZ)
 		geoPata.translate(-this.separacionPatasX + this.pataX/2, this.pataY/2, this.separacionPatasZ - this.pataZ/2)
 
-		this.add(new THREE.Mesh(geoPata.clone(), this.materialPatas))
+		this.add(new THREE.Mesh(geoPata.clone(), this.materialMadera))
 
 		geoPata.translate(2*this.separacionPatasX - this.pataX, 0, 0)
-		this.add(new THREE.Mesh(geoPata.clone(), this.materialPatas))
+		this.add(new THREE.Mesh(geoPata.clone(), this.materialMadera))
 
 		geoPata.translate(this.pataX - 2*this.separacionPatasX, 0, this.pataZ - 2*this.separacionPatasZ)
-		this.add(new THREE.Mesh(geoPata.clone(), this.materialPatas))
+		this.add(new THREE.Mesh(geoPata.clone(), this.materialMadera))
 
 		geoPata.translate(2*this.separacionPatasX - this.pataX, 0, 0)
-		this.add(new THREE.Mesh(geoPata.clone(), this.materialPatas))
+		this.add(new THREE.Mesh(geoPata.clone(), this.materialMadera))
 
 		// Para poder poner objetos encima
 		this.tableroO3D = new THREE.Object3D()
@@ -79,38 +94,42 @@ class Silla extends THREE.Object3D
 
 		this.add(this.tableroO3D)
 
-		let altoBarraTotal = this.altoBarra + 2*this.radioBarra
 
 		// Barras
+		let altoBarraTotal = this.altoBarra + 2*this.radioBarra
+
+		let barraRespaldo1 = new CSG()
+		let barraRespaldo2 = new CSG()
+
 		let geoBarraIzq = new THREE.CylinderGeometry(this.radioBarra, this.radioBarra, this.altoBarra, 30, 30)
 		geoBarraIzq.translate(this.separacionUniones * (this.respaldoX/2 - this.radioBarra ), this.altoBarra/2 + this.pataY + this.tableroY/2 ,-this.tableroZ/2 - this.radioBarra - this.respaldoZ)
 
-		this.add(new THREE.Mesh(geoBarraIzq.clone(), this.materialTablero))
+		barraRespaldo1.union([(new THREE.Mesh(geoBarraIzq.clone(), this.materialMetal))])
 
 		let geoBarraDcha = new THREE.CylinderGeometry(this.radioBarra, this.radioBarra, this.altoBarra, 30, 30)
 		geoBarraDcha.translate(this.separacionUniones * -(this.respaldoX/2 - this.radioBarra ), this.altoBarra/2 + this.pataY + this.tableroY/2 ,-this.tableroZ/2 - this.radioBarra - this.respaldoZ)
 
-		this.add(new THREE.Mesh(geoBarraDcha.clone(), this.materialTablero))
+		barraRespaldo2.union([new THREE.Mesh(geoBarraDcha.clone(), this.materialMetal)])
 
 		//Creación esferas para union
 		let geoUnionInfIzq = new THREE.SphereGeometry(this.radioBarra, 20, 20)
 		console.log(this.separacionUniones * (this.respaldoX/2 - this.radioBarra ))
 		geoUnionInfIzq.translate( this.separacionUniones * (this.respaldoX/2 - this.radioBarra ), this.pataY + this.tableroY/2,-this.tableroZ/2 - this.radioBarra - this.respaldoZ)
 
-		this.add(new THREE.Mesh(geoUnionInfIzq.clone(), this.materialTablero))
+		barraRespaldo1.union([new THREE.Mesh(geoUnionInfIzq.clone(), this.materialMetal)])
 
 		let geoUnionInfDcha = new THREE.SphereGeometry(this.radioBarra, 20, 20)
 		geoUnionInfDcha.translate(this.separacionUniones * -(this.respaldoX/2 - this.radioBarra ), this.pataY + this.tableroY/2,-this.tableroZ/2 - this.radioBarra - this.respaldoZ)
 
-		this.add(new THREE.Mesh(geoUnionInfDcha.clone(), this.materialTablero))
+		barraRespaldo2.union([new THREE.Mesh(geoUnionInfDcha.clone(), this.materialMetal)])
 
 		// UnionSupIzq
 		geoUnionInfIzq.translate(0,this.altoBarra,0)
-		this.add(new THREE.Mesh(geoUnionInfIzq.clone(), this.materialTablero))
+		barraRespaldo1.union([new THREE.Mesh(geoUnionInfIzq.clone(), this.materialMetal)])
 
 		//UnionSupDcha
 		geoUnionInfDcha.translate(0,this.altoBarra, 0)
-		this.add(new THREE.Mesh(geoUnionInfDcha.clone(), this.materialTablero))
+		barraRespaldo2.union([new THREE.Mesh(geoUnionInfDcha.clone(), this.materialMetal)])
 
 		//Conector
 
@@ -119,14 +138,14 @@ class Silla extends THREE.Object3D
 		geoConectorInfIzq.translate(0, 0, this.radioBarra/2 - this.respaldoZ/2)
 		geoConectorInfIzq.translate( this.separacionUniones * (this.respaldoX/2 - this.radioBarra ), this.pataY + this.tableroY/2,-this.tableroZ/2 - this.radioBarra)
 
-		this.add(new THREE.Mesh(geoConectorInfIzq.clone(), this.materialTablero))
+		barraRespaldo1.union([new THREE.Mesh(geoConectorInfIzq.clone(), this.materialMetal)])
 
 		let geoConectorInfDcha = new THREE.CylinderGeometry(this.radioBarra, this.radioBarra, this.radioBarra + this.respaldoZ, 10)
 		geoConectorInfDcha.rotateX(-Math.PI/2)
 		geoConectorInfDcha.translate(0, 0, this.radioBarra/2 - this.respaldoZ/2)
 		geoConectorInfDcha.translate( this.separacionUniones * -(this.respaldoX/2 - this.radioBarra ), this.pataY + this.tableroY/2,-this.tableroZ/2 - this.radioBarra)
 
-		this.add(new THREE.Mesh(geoConectorInfDcha.clone(), this.materialTablero))
+		barraRespaldo2.union([new THREE.Mesh(geoConectorInfDcha.clone(), this.materialMetal)])
 
 		// UnionSupIzq
 		let geoConectorSupIzq = new THREE.CylinderGeometry(this.radioBarra, this.radioBarra, this.radioBarra, 10)
@@ -135,7 +154,7 @@ class Silla extends THREE.Object3D
 		geoConectorSupIzq.translate(0,this.altoBarra,0)
 		geoConectorSupIzq.translate(0,0, this.radioBarra/2)
 
-		this.add(new THREE.Mesh(geoConectorSupIzq, this.materialTablero))
+		barraRespaldo1.union([new THREE.Mesh(geoConectorSupIzq, this.materialMetal)])
 
 		//UnionSupDcha
 		let geoConectorSupDcha = new THREE.CylinderGeometry(this.radioBarra, this.radioBarra, this.radioBarra, 10)
@@ -144,16 +163,18 @@ class Silla extends THREE.Object3D
 		geoConectorSupDcha.translate(0,this.altoBarra, 0)
 		geoConectorSupDcha.translate(0,0, this.radioBarra/2)
 
-		this.add(new THREE.Mesh(geoConectorSupDcha, this.materialTablero))
 
+		barraRespaldo2.union([new THREE.Mesh(geoConectorSupDcha, this.materialMetal)])
 
 		//Respaldo
 		let geoRespaldo = new THREE.BoxGeometry(this.respaldoX, this.respaldoY, this.respaldoZ)
 		geoRespaldo.translate(0, this.respaldoY/2 + this.pataY + altoBarraTotal - this.respaldoY/2 , (-this.respaldoZ/2 - (this.tableroZ/2)))
 
-		let respaldoMesh = new THREE.Mesh(geoRespaldo, this.materialTablero)
+		let respaldoMesh = new THREE.Mesh(geoRespaldo, this.materialMadera)
 
 		this.add(respaldoMesh)
+		this.add(barraRespaldo1.toMesh())
+		this.add(barraRespaldo2.toMesh())
 	}
 }
 

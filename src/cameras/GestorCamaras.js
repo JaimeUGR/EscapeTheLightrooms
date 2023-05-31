@@ -208,6 +208,16 @@ class GestorCamaras
 		this.activeController.onMouseMove(event)
 	}
 
+	enableInput(event)
+	{
+		this.activeController.enableInput(event)
+	}
+
+	disableInput(event)
+	{
+		this.activeController.disableInput(event)
+	}
+
 	update(deltaTime)
 	{
 		this.activeController.update(deltaTime)

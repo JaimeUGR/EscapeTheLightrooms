@@ -45,11 +45,19 @@ class Taquilla extends THREE.Object3D
 		//
 		this.baseColliders = []
 
-		// TODO Material temporal. Luego será la textura de las paredes.
-		this.taquillaMaterial = new THREE.MeshNormalMaterial({color: 0xf1f1f1, opacity: 0.5, transparent: true})
 
 		//
+		// Material
 		//
+
+		const txLoader = GameState.txLoader
+
+		let texturaTaquilla = txLoader.load("../../resources/textures/models/textura_taquilla.png")
+
+		this.taquillaMaterial = new THREE.MeshLambertMaterial({map: texturaTaquilla})
+
+		//
+		// Modelado
 		//
 
 		// Crear la caja de la taquilla

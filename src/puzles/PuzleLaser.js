@@ -39,21 +39,21 @@ class PuzleLaser extends THREE.Object3D
 			numCaras: 6, // No cambiar
 			numRadios: 8,// Hacerlo más o menos redondeado
 			profundidadSujetadorCristal: 0.4,
-			alturaSujetadorCristal: 3, // Se divide entre cada lado
+			alturaSujetadorCristal: 4.4, // Se divide entre cada lado
 
-			profundidadCristal: 0.2,
+			profundidadCristal: 0.35,
 
-			cristalBevelSize: 0.5,
-			cristalBevelThickness: 0.8
+			cristalBevelSize: 0.8,
+			cristalBevelThickness: 0.9
 		})
 
 		this.anilloVerde = new AnilloCristal({
 			radioInterno: 8,
-			radioTubo: 1.25,
+			radioTubo: 1,
 			numCaras: 6, // No cambiar
 			numRadios: 8,// Hacerlo más o menos redondeado
-			profundidadSujetadorCristal: 0.4,
-			alturaSujetadorCristal: 3, // Se divide entre cada lado
+			profundidadSujetadorCristal: 0.35,
+			alturaSujetadorCristal: 3.2, // Se divide entre cada lado
 
 			profundidadCristal: 0.2,
 
@@ -63,16 +63,16 @@ class PuzleLaser extends THREE.Object3D
 
 		this.anilloRojo = new AnilloCristal({
 			radioInterno: 4,
-			radioTubo: 1.25,
+			radioTubo: 0.75,
 			numCaras: 6, // No cambiar
 			numRadios: 8,// Hacerlo más o menos redondeado
-			profundidadSujetadorCristal: 0.4,
-			alturaSujetadorCristal: 3, // Se divide entre cada lado
+			profundidadSujetadorCristal: 0.2,
+			alturaSujetadorCristal: 2, // Se divide entre cada lado
 
 			profundidadCristal: 0.2,
 
-			cristalBevelSize: 0.5,
-			cristalBevelThickness: 0.8
+			cristalBevelSize: 0.3,
+			cristalBevelThickness: 0.6
 		})
 
 		this.anilloAzul.rotateY(-Math.PI/2)
