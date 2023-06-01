@@ -69,17 +69,47 @@ class CuboCentral extends THREE.Object3D
 		this.infoPanIzd = dimensiones.infoPanIzd
 		this.infoPanTras = dimensiones.infoPanTras
 
-		this.material = new THREE.MeshNormalMaterial({color: 0xf1f1f1, opacity: 0.5, transparent: true})
-		this.materialBordesCubo = new THREE.MeshNormalMaterial({color: 0xf1f1f1, opacity: 0.5, transparent: true})
-		this.materialPanel = new THREE.MeshNormalMaterial({color: 0xf1f1f1, opacity: 0.5, transparent: true})
-		this.materialCuboInterno = new THREE.MeshNormalMaterial({color: 0xf1f1f1, opacity: 0.5, transparent: true})
+		// Declarar los meshes para guardar los datos
+		this.elementosPS = {}
+		this.elementosPT = {}
+		this.elementosPI = {}
+		this.elementosPD = {}
+
+		this.animaciones = {}
+		this._animating = false
+
+		//
+		this.O3Cubo = new THREE.Object3D()
+
+		// Método de animación de acercamiento
+		this.animaciones.camara = {
+			metodoActivar: this._acercarCamara.bind(this),
+			idControlador: -1,
+			activa: false // Si está a true significa que estamos en la cámara del cubo
+		}
+
+		//
+		// Material
+		//
+
+		const txLoader = GameState.txLoader
+
+		// Pantalla Principal
+		this.materialPantalla = new THREE.MeshBasicMaterial({color: 0x222222})
+
+		// Bordes Cubo
+		//let texturaBordesMetal = txLoader.load("../../resources/textures/models/metal-blanco-reforzado.jpg")
+		//this.materialBordesCubo = new THREE.MeshLambertMaterial({map: texturaBordesMetal})
+
+		this.materialBordesCubo = new THREE.MeshPhongMaterial({color: 0xdddddd})
+		this.materialPanel = new THREE.MeshPhongMaterial({color: 0xfafafa})
+		this.materialCuboInterno = new THREE.MeshPhongMaterial({color: 0xfafafa})
+
 		this.materialPalanca = new THREE.MeshBasicMaterial({color: 0x334455})
-
 		this.materialTornillo = new THREE.MeshBasicMaterial({color: 0x222222})
-
 		this.materialLectorTarjetas = new THREE.MeshBasicMaterial({color: 0x222222})
-
 		this.materialKeypad = new THREE.MeshBasicMaterial({color: 0x343434})
+
 		// TODO: Este material será una textura que se cambiará por los * cada vez que se pulse
 		this.materialKeypadPant = new THREE.MeshBasicMaterial({color: 0x111111})
 
@@ -104,25 +134,9 @@ class CuboCentral extends THREE.Object3D
 		this.materialLatPrismaRojo = new THREE.MeshBasicMaterial({color: 0xff5555})
 		this.materialLatPrismaAzul = new THREE.MeshBasicMaterial({color: 0x5555ff})
 
-		// Declarar los meshes para guardar los datos
-		this.elementosPS = {}
-		this.elementosPT = {}
-		this.elementosPI = {}
-		this.elementosPD = {}
-
-		this.animaciones = {}
-		this._animating = false
-
 		//
-		this.O3Cubo = new THREE.Object3D()
-
-		// Método de animación de acercamiento
-		this.animaciones.camara = {
-			metodoActivar: this._acercarCamara.bind(this),
-			idControlador: -1,
-			activa: false // Si está a true significa que estamos en la cámara del cubo
-		}
-
+		// Modelado
+		//
 
 		//
 		// Cubo Interno (el que tendrá las palancas)
@@ -779,7 +793,7 @@ class CuboCentral extends THREE.Object3D
 		// Interacción
 		//
 
-		return new THREE.Mesh(geoPanel, this.material)
+		return new THREE.Mesh(geoPanel, this.materialPantalla)
 	}
 
 	_crearAnimacionQuitarPanel()

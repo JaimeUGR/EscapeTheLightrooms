@@ -7,8 +7,11 @@ import * as FORMAS from '../models/Formas.js'
 import {TriangularPrismGeometry} from "../geometry/PrismGeometry.js"
 import {Palanca} from "../models/Palanca.js"
 
-import {ShuffleArray} from "../Utils.js"
+import {RandomInt, ShuffleArray} from "../Utils.js"
 import {GameState} from "../GameState.js"
+
+const COLOR_FORMA = 0xbd8642
+const COLOR_FORMA_SELECCIONADA = 0x42bd61
 
 class PuzleFormas extends THREE.Object3D
 {
@@ -53,10 +56,21 @@ class PuzleFormas extends THREE.Object3D
 
 		this.callbackCompletar = null
 
+		//
+		// Material
+		//
 
-		this.materialContenedor = new THREE.MeshNormalMaterial({opacity: 0.5, transparent: true})
-		this.materialForma = new THREE.MeshBasicMaterial()
-		this.materialOperador = new THREE.MeshBasicMaterial()
+		const txLoader = GameState.txLoader
+
+		let texturaContenedor = txLoader.load("../../resources/textures/models/madera-oscura.jpg")
+
+		this.materialContenedor = new THREE.MeshLambertMaterial({map: texturaContenedor})
+		this.materialForma = new THREE.MeshBasicMaterial({color: COLOR_FORMA})
+		this.materialOperador = new THREE.MeshBasicMaterial({color: 0x30359c})
+
+		//
+		// Modelado
+		//
 
 		this.formasBase = this._crearFormas()
 		this.formasOperadores = this._crearFormasOperadores()
@@ -69,7 +83,10 @@ class PuzleFormas extends THREE.Object3D
 		]
 		this.palancas = []
 
-		this.formaObjetivo = this.formasBase[0].clone()
+		const idxFormaSeleccionada = RandomInt(this.formasBase.length - 1)
+		this.formaObjetivo = this.formasBase[idxFormaSeleccionada].clone(true)
+		this.formaObjetivo.children[0].material = this.formasBase[idxFormaSeleccionada].children[0].material.clone(true)
+		this.formaObjetivo.children[0].material.color.setHex(COLOR_FORMA_SELECCIONADA)
 
 		//
 		// Crear los raíles y palancas
@@ -124,7 +141,6 @@ class PuzleFormas extends THREE.Object3D
 			rail.position.x = offsetInicial
 
 			let palanca = this.palancas[i]
-
 			palanca.position.y = this.offsetYPalancas
 			palanca.position.z = this.offsetZPalancas
 
@@ -132,6 +148,9 @@ class PuzleFormas extends THREE.Object3D
 			operador.position.x = offsetInicial + mitadAnchoRail + this.separacionComplejosRail/2
 
 			offsetInicial += 2*mitadAnchoRail + this.separacionComplejosRail
+
+			// Seleccionamos la forma inicial
+			rail.getFormaSeleccionada().children[0].material.color.setHex(COLOR_FORMA_SELECCIONADA)
 		}
 
 		// Posicionar la forma objetivo
@@ -231,6 +250,7 @@ class PuzleFormas extends THREE.Object3D
 		// Crear los meshes
 		//
 		let meshContenedorCirculo = meshBaseForma.clone()
+
 		meshContenedorCirculo.add(new THREE.Mesh(geoCirculo, this.materialForma))
 		meshContenedorCirculo.userData = {
 			vertices: 0
@@ -425,6 +445,8 @@ class Rail extends THREE.Object3D
 		for (let i = 0; i < formasBase.length; i++)
 		{
 			let forma = formasBase[i].clone(true)
+			forma.children[0].material = formasBase[i].children[0].material.clone()
+			forma.children[0].material.needsUpdate = true
 			forma.position.copy(this.spline.getPointAt(posicionamiento))
 
 			this.formas.push(forma)
@@ -486,8 +508,7 @@ class Rail extends THREE.Object3D
 
 		this.animacion.rotacion.animacion = new TWEEN.Tween(frameInicio).to(frameFin, 1500)
 			.onStart(() => {
-				// TODO: Restaurar el color del material del contenedor de la forma seleccionada
-
+				this.getFormaSeleccionada().children[0].material.color.setHex(COLOR_FORMA)
 				frameFin.p = 1.0 / this.formas.length
 			})
 			.onUpdate(() => {
@@ -510,8 +531,7 @@ class Rail extends THREE.Object3D
 				else
 					this.indiceFormaSeleccionada %= this.formas.length
 
-				// TODO: Actualizar el color del material del contenedor de la forma seleccionada para
-				// TODO: que destaque
+				this.getFormaSeleccionada().children[0].material.color.setHex(COLOR_FORMA_SELECCIONADA)
 
 				frameInicio.p = 0
 				frameFin.p = 1

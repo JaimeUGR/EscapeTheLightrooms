@@ -3,6 +3,8 @@ import * as THREE from '../../libs/three.module.js'
 import {CSG} from '../../libs/CSG-v2.js'
 import {Bombilla} from "./Bombilla.js"
 
+import {GameState} from "../GameState.js"
+
 class Lampara extends THREE.Object3D
 {
 	constructor(dimensiones = {
@@ -49,23 +51,30 @@ class Lampara extends THREE.Object3D
 		this.posicionBarras = dimensiones.posicionBarras
 
 
-		this.materialLampara = new THREE.MeshNormalMaterial({color: 0Xf1f1f1,opacity: 0.5,transparent: true})
+		//
+		// Material
+		//
+		const txLoader = GameState.txLoader
 
-		// TODO: Cargar textura
-		/*let loader = new THREE.TextureLoader()
+		let texturaEnvoltura = txLoader.load("../../resources/textures/models/texturaEnvoltura.jpg")
+		texturaEnvoltura.wrapS = THREE.MirroredRepeatWrapping
+		texturaEnvoltura.wrapT = THREE.RepeatWrapping
+		texturaEnvoltura.repeat.set(2, 1)
 
-		let texturaLampara = loader.load("texturaEnvoltura.jpg")
-		texturaLampara.wrapS = THREE.RepeatWrapping //Indica cómo se repite en la X
-		texturaLampara.wrapT = THREE.RepeatWrapping //Indica cómo se repiten en la Y
-		texturaLampara.repeat.set(2, 1)*/
+		let texturaSoporte = txLoader.load("../../resources/textures/models/textura_soporte.png")
 
-		//let material = new THREE.MeshLambertMaterial({map: texturaLampara})
+		this.materialEnvoltura = new THREE.MeshLambertMaterial({map: texturaEnvoltura})
+		this.materialSoporte = new THREE.MeshLambertMaterial({map: texturaSoporte})
+
+		//
+		// Modelado
+		//
 
 		// Base de la lampara
 		let geoBase = new THREE.CylinderGeometry(this.radioBase, this.radioBase, this.altoBase, 30, 30)
 		geoBase.translate(0,this.altoBase/2, 0)
 
-		let baseMesh = new THREE.Mesh(geoBase, this.materialLampara)
+		let baseMesh = new THREE.Mesh(geoBase, this.materialSoporte)
 
 		this.add(baseMesh);
 
@@ -73,24 +82,22 @@ class Lampara extends THREE.Object3D
 		let geoPilar = new THREE.CylinderGeometry(this.radioPilar, this.radioPilar, this.altoPilar, 30, 30)
 		geoPilar.translate(0, this.altoBase + this.altoPilar/2 , 0)
 
-		let pilarMesh = new THREE.Mesh(geoPilar, this.materialLampara)
+		let pilarMesh = new THREE.Mesh(geoPilar, this.materialSoporte)
 		this.add(pilarMesh);
 
 		// Envoltura
 		let geoEnvoltura = new THREE.CylinderGeometry(this.radioEnvoltura, this.radioEnvoltura, this.altoEnvoltura, 30, 30)
 		geoEnvoltura.translate(0, this.altoEnvoltura/2 + this.altoBase,0)
 
-		let envolturaMesh = new THREE.Mesh(geoEnvoltura, this.materialLampara)
+		let envolturaMesh = new THREE.Mesh(geoEnvoltura, this.materialEnvoltura)
 
 		let geoHueco = new THREE.CylinderGeometry(this.radioHueco, this.radioHueco, this.altoEnvoltura, 30, 30)
 		geoHueco.translate(0, this.altoEnvoltura/2 + this.altoBase, 0)
 
-		let huecoMesh = new THREE.Mesh(geoHueco, this.materialLampara)
-
 		let envoltura = new CSG()
 
 		envoltura.union([envolturaMesh])
-		envoltura.subtract([huecoMesh])
+		envoltura.subtract([new THREE.Mesh(geoHueco, null)])
 
 		let resultadoEnvoltura = envoltura.toMesh()
 
@@ -101,7 +108,7 @@ class Lampara extends THREE.Object3D
 		geoBarra1.translate(0, this.altoBase + this.altoSoporteBombilla + (this.altoEnvoltura - 2*this.radioBarra) * this.posicionBarras , 0)
 		geoBarra1.translate(0, 0, this.altoBarra/2)
 
-		let barraMesh1 = new THREE.Mesh(geoBarra1, this.materialLampara)
+		let barraMesh1 = new THREE.Mesh(geoBarra1, this.materialSoporte)
 
 		let barraMesh2 = barraMesh1.clone()
 		barraMesh2.rotateY(Math.PI/2)
@@ -124,7 +131,7 @@ class Lampara extends THREE.Object3D
 		let geoUnion = new THREE.BoxGeometry(2*this.radioPilar, this.altoSoporteBombilla, 2*this.radioPilar)
 		geoUnion.translate(0,this.altoSoporteBombilla/2 + this.altoPilar + this.altoBase,0)
 
-		let unionMesh = new THREE.Mesh(geoUnion, this.materialLampara)
+		let unionMesh = new THREE.Mesh(geoUnion, this.materialSoporte)
 
 		this.add(unionMesh)
 

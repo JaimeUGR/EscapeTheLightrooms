@@ -15,7 +15,7 @@ class Bombilla extends THREE.Object3D {
 		this.radioBombillaBajo = dimensiones.radioBombillaBajo
 		this.altoBombillaBajo = dimensiones.altoBombillaBajo
 
-		this.materialLampara = new THREE.MeshNormalMaterial({opacity: 0.5, transparent: true})
+		this.materialBombilla = new THREE.MeshBasicMaterial({color: 0xe8ed53})
 
 		let shapeBombilla =  new THREE.Shape()
 
@@ -25,7 +25,7 @@ class Bombilla extends THREE.Object3D {
 		shapeBombilla.quadraticCurveTo(-this.radioBombillaAlto, this.altoBombillaBajo + 2*this.radioBombillaAlto, 0, this.altoBombillaBajo + 2*this.radioBombillaAlto)
 
 		let points = shapeBombilla.extractPoints(6).shape
-		let bombilla = new THREE.Mesh(new THREE.LatheGeometry (points, 12, 0, Math.PI* 2), this.materialLampara)
+		let bombilla = new THREE.Mesh(new THREE.LatheGeometry (points, 12, 0, Math.PI* 2), this.materialBombilla)
 
 		this.add(bombilla)
 

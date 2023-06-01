@@ -32,15 +32,36 @@ class Laser extends THREE.Object3D
 
 		this.baseCollider = null
 
-		this.materialSoporte = new THREE.MeshNormalMaterial({opacity: 0.5, transparent: true})
-		this.materialLaser = new THREE.MeshNormalMaterial({opacity: 0.5, transparent: true})
-		this.materialHaz = new THREE.MeshBasicMaterial({color: 0xFFFFFF})
-
 		this.haz = null
 		this.coloresHaz = null
 		this.colorSeleccionado = 0
 
 		this.callbackCambioColor = null
+
+		//
+		// Materiales
+		//
+
+		const txLoader = GameState.txLoader
+
+		let texturaSoporte = txLoader.load("../../resources/textures/models/metal-negro.jpg")
+		texturaSoporte.wrapS = THREE.MirroredRepeatWrapping
+		texturaSoporte.repeat.set(2, 1)
+
+		this.materialSoporte = new THREE.MeshLambertMaterial({
+			map: texturaSoporte
+		})
+
+		let texturaLaser = txLoader.load("../../resources/textures/models/metal-peligro.jpg")
+		texturaLaser.wrapS = THREE.RepeatWrapping
+		texturaLaser.repeat.set(2, 1)
+
+		this.materialLaser = new THREE.MeshLambertMaterial({
+			map: texturaLaser
+		})
+
+		// NO MODIFICAR
+		this.materialHaz = new THREE.MeshBasicMaterial({color: 0xFFFFFF})
 
 		//
 		// Soporte

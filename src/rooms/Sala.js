@@ -639,9 +639,9 @@ class Marcos extends THREE.Object3D
 		// Materiales
 		//
 
-		this.materialMarcosExteriores = new THREE.MeshNormalMaterial({opacity: 0.8, transparent: true})
-		this.materialMarcosInteriores = new THREE.MeshNormalMaterial({opacity: 0.8, transparent: true})
-		this.materialMarcoInteriorInferior = new THREE.MeshNormalMaterial({opacity: 0.8, transparent: true})
+		this.materialMarcosExteriores = new THREE.MeshBasicMaterial({color: 0x181818})
+		this.materialMarcosInteriores = new THREE.MeshBasicMaterial({color: 0x181818})
+		this.materialMarcoInteriorInferior = new THREE.MeshBasicMaterial({color: 0x181818})
 
 		//
 		// Modelado
