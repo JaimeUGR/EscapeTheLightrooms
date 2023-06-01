@@ -152,11 +152,6 @@ class PuzleLaser extends THREE.Object3D
 			cristalBevelThickness: 0.6
 		}, COLOR_ROJO)
 
-		// Rotaciones finales
-		/*this.anilloAzul.rotateY(-Math.PI/2)
-		this.anilloVerde.rotateY(Math.PI/2)
-		this.anilloRojo.rotateY(Math.PI)*/
-
 		this.O3Anillos = new THREE.Object3D()
 		this.O3Anillos.add(this.anilloAzul)
 		this.O3Anillos.add(this.anilloVerde)
@@ -237,7 +232,7 @@ class PuzleLaser extends THREE.Object3D
 				this.laserRojo.setCallbackCambioColor(this._comprobarColores.bind(this))
 			})
 
-		this.animaciones.animacionCompletar = new TWEEN.Tween(frameActivado).to(frameCompletado, 2000)
+		this.animaciones.animacionCompletar = new TWEEN.Tween(frameActivado).to(frameCompletado, 4000)
 			.easing(TWEEN.Easing.Sinusoidal.InOut)
 			.onUpdate(() => {
 				aplicarRotacion(frameActivado)
@@ -246,6 +241,43 @@ class PuzleLaser extends THREE.Object3D
 				// Invocar la callback de solucionado
 				this._crearColliders(true)
 				this.updateColliders()
+
+				// Colocar los cilindros
+				{
+					let radioCA = this.anilloAzul.radioTubo/4
+					let radioCV = this.anilloVerde.radioTubo/4
+					let radioCR = this.anilloRojo.radioTubo/4
+
+					let alturaCA = this.anilloAzul.radioTubo + this.anilloAzul.radioInterno
+						- (this.anilloVerde.radioInterno + this.anilloVerde.radioTubo)
+					let alturaCV = this.anilloVerde.radioTubo + this.anilloVerde.radioInterno
+						- (this.anilloRojo.radioInterno + this.anilloRojo.radioTubo)
+					let alturaCR = this.anilloRojo.radioTubo + this.anilloRojo.radioInterno
+
+
+					let geoCilindroAzul = new THREE.CylinderGeometry(radioCA, radioCA, alturaCA, 15)
+					geoCilindroAzul.translate(0, this.anilloAzul.radioInterno - alturaCA/2, 0)
+
+					let geoCilindroVerde = new THREE.CylinderGeometry(radioCV, radioCV, alturaCV, 15)
+					geoCilindroVerde.translate(0, this.anilloVerde.radioInterno - alturaCV/2, 0)
+
+					let geoCilindroRojo = new THREE.CylinderGeometry(radioCR, radioCR, alturaCR, 15)
+					geoCilindroRojo.translate(0, alturaCR/2, 0)
+
+					const meshCA = new THREE.Mesh(geoCilindroAzul, new THREE.MeshBasicMaterial({color: COLOR_AZUL}))
+					const meshCV = new THREE.Mesh(geoCilindroVerde, new THREE.MeshBasicMaterial({color: 0x55aaaa}))
+					const meshCR = new THREE.Mesh(geoCilindroRojo, new THREE.MeshBasicMaterial({color: 0xFFFFFF}))
+
+					this.add(meshCA)
+					this.add(meshCV)
+					this.add(meshCR)
+
+					setTimeout(() => {
+						this.remove(meshCA)
+						this.remove(meshCV)
+						this.remove(meshCR)
+					}, 2000)
+				}
 
 				// Romper el cristal
 				this.cristal.romper()

@@ -97,17 +97,23 @@ class CuboCentral extends THREE.Object3D
 		// Pantalla Principal
 		this.materialPantalla = new THREE.MeshBasicMaterial({color: 0x222222})
 
-		// Bordes Cubo
-		//let texturaBordesMetal = txLoader.load("../../resources/textures/models/metal-blanco-reforzado.jpg")
-		//this.materialBordesCubo = new THREE.MeshLambertMaterial({map: texturaBordesMetal})
-
+		// Cubo
 		this.materialBordesCubo = new THREE.MeshPhongMaterial({color: 0xdddddd})
 		this.materialPanel = new THREE.MeshPhongMaterial({color: 0xfafafa})
 		this.materialCuboInterno = new THREE.MeshPhongMaterial({color: 0xfafafa})
 
+		// Palanca
 		this.materialPalanca = new THREE.MeshBasicMaterial({color: 0x334455})
-		this.materialTornillo = new THREE.MeshBasicMaterial({color: 0x222222})
+
+		// Tornillos
+		let texturaTornillo = txLoader.load("../../resources/textures/models/tornillo.png")
+
+		this.materialTornillo = new THREE.MeshBasicMaterial({map: texturaTornillo, color: 0x666666})
+
+		// Lector de tarjetas
 		this.materialLectorTarjetas = new THREE.MeshBasicMaterial({color: 0x222222})
+
+		// Keypad
 		this.materialKeypad = new THREE.MeshBasicMaterial({color: 0x343434})
 
 		// TODO: Este material será una textura que se cambiará por los * cada vez que se pulse

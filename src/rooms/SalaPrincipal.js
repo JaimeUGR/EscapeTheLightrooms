@@ -2,6 +2,7 @@
 import * as THREE from "../../libs/three.module.js"
 
 import {Pasillo, Sala} from "./Sala.js"
+import {Puerta} from "./Puerta.js"
 
 import {Mesa, MesaCristal} from "../models/Mesa.js"
 import {Cajonera} from "../models/Cajonera.js"
@@ -29,6 +30,20 @@ class SalaPrincipal extends Sala
 		super(largoParedX, largoParedZ, alturaPared, puertas)
 
 		this.crearPasillos()
+
+		//
+		// Añadir la puerta
+		//
+
+		{
+			let puerta = new Puerta()
+
+			puerta.translateX(this.largoParedX/2)
+			this.add(puerta)
+
+			this.collidables.push(puerta)
+			GameState.systems.interaction.allInteractables.push(puerta)
+		}
 
 		GameState.salas.salaPrincipal = this
 
@@ -92,21 +107,36 @@ class SalaPrincipal extends Sala
 	colocarLuces()
 	{
 		// TODO: Hacer spot?
-		this.spotLight = new THREE.PointLight(0xffffff, 0.5, 110, 0.5);
-		GameState.luces.luzSalaPrincipal = this.spotLight
+		this.pointLight = new THREE.PointLight(0xffffff, 0.5, 110, 0.5);
+		GameState.luces.luzSalaPrincipal = this.pointLight
+
+		// Crear la lámpara
+		{
+			let lampara = new Lampara()
+			lampara.rotateX(Math.PI)
+			lampara.translateY(-this.alturaPared)
+			lampara.translateX(this.largoParedX/2)
+			lampara.translateZ(-this.largoParedZ/2)
+
+			this.add(lampara)
+			this.lampara = lampara
+		}
 
 		// NOTE: se engancharía a la lámpara
 		let targetTmp = new THREE.Object3D()
+		targetTmp.name = "TargetLuz"
 		targetTmp.position.set(this.largoParedX/2, 0, this.largoParedZ/2)
 
 		// Posicionarla con la lámpara del techo
-		this.spotLight.position.set(this.largoParedX/2, 50, this.largoParedZ/2);
-		this.spotLight.target = targetTmp
+		const posicionBombillaLampara = this.lampara.altoBase + this.lampara.altoPilar + this.lampara.altoSoporteBombilla
 
-		GameState.scene.add(new THREE.PointLightHelper(this.spotLight, 1, 0xffffff))
+		this.pointLight.position.set(this.largoParedX/2, this.alturaPared - posicionBombillaLampara, this.largoParedZ/2)
+		this.pointLight.target = targetTmp
+
+		GameState.scene.add(new THREE.PointLightHelper(this.pointLight, 1, 0xffffff))
 
 		this.add(targetTmp)
-		this.add(this.spotLight)
+		this.add(this.pointLight)
 	}
 
 	colocarModelos()

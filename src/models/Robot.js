@@ -511,6 +511,7 @@ class Robot extends THREE.Object3D
 				GameState.items.pila.position.z = framePilaGirada.tZ
 			})
 			.onComplete(() => {
+				GameState.flags.robotConPila = true
 				// TODO: hacer una animación de que está feliz o algo
 				console.log("El robot está feliz porque tiene la pila")
 			})

@@ -70,7 +70,7 @@ class SalaSuperior extends Sala
 		// Posicionarla con la lámpara del techo
 		const posicionBombillaLampara = this.lampara.altoBase + this.lampara.altoPilar + this.lampara.altoSoporteBombilla
 
-		this.pointLight.position.set(this.largoParedX/2, this.alturaPared - posicionBombillaLampara, this.largoParedZ/2);
+		this.pointLight.position.set(this.largoParedX/2, this.alturaPared - posicionBombillaLampara, this.largoParedZ/2)
 		this.pointLight.target = targetTmp
 
 		GameState.scene.add(new THREE.PointLightHelper(this.pointLight, 1, 0xffffff))

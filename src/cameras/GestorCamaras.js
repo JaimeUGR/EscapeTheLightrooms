@@ -143,8 +143,6 @@ class GestorCamaras
 					// TODO: TEMPORAL, NO FUNCIONARA CON OTROS CONTROLADORES
 					// Desbloqueamos la cámara
 					this.activeController.enable()
-
-
 				}
 				else
 				{

@@ -36,7 +36,8 @@ class GameState
 			tieneManecillaMinuto: false,
 			tieneTarjeta: false,
 			tienePrisma: true, // TODO: TMP
-			tienePila: false
+			tienePila: false,
+			robotConPila: true // TODO: TMP
 		}
 
 		this.salas = {
@@ -67,7 +68,6 @@ class GameState
 		}
 
 		this.systems = {
-			input: null,
 			collision: null,
 			interaction: null,
 			cameras: null

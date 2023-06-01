@@ -233,7 +233,7 @@ class EscapeTheLightrooms extends THREE.Scene
 		//
 
 		{
-			this.guiMenuLuces = {
+			/*this.guiMenuLuces = {
 				intensidadLuzSP: 0.5,
 				intensidadLuzSI: 0.5,
 				intensidadLuzSD: 0.5,
@@ -244,7 +244,7 @@ class EscapeTheLightrooms extends THREE.Scene
 
 			folder.add(this.guiMenuLuces, "intensidadLuzSP", 0, 1, 0.05)
 				.name("IL Sala Principal: ")
-				.onChange((value) => this.setLightIntensity(value))
+				.onChange((value) => this.setLightIntensity(value))*/
 		}
 
 		//
@@ -313,7 +313,7 @@ class EscapeTheLightrooms extends THREE.Scene
 
 	setLightIntensity(valor)
 	{
-		this.spotLight.intensity = valor;
+		//this.spotLight.intensity = valor
 	}
 
 	setAxisVisible(valor)
@@ -326,49 +326,40 @@ class EscapeTheLightrooms extends THREE.Scene
 		// Se recibe el lienzo sobre el que se van a hacer los renderizados. Un div definido en el html.
 
 		// Se instancia un Renderer   WebGL
-		var renderer = new THREE.WebGLRenderer();
+		var renderer = new THREE.WebGLRenderer()
 
 		// Se establece un color de fondo en las imágenes que genera el render
-		renderer.setClearColor(new THREE.Color(0xEEEEEE), 1.0);
+		renderer.setClearColor(new THREE.Color(0xEEEEEE), 1.0)
 
 		// Se establece el tamaño, se aprovecha la totalidad de la ventana del navegador
-		renderer.setSize(window.innerWidth, window.innerHeight);
+		renderer.setSize(window.innerWidth, window.innerHeight)
 
 		// La visualización se muestra en el lienzo recibido
-		$(myCanvas).append(renderer.domElement);
+		$(myCanvas).append(renderer.domElement)
 
-		return renderer;
+		return renderer
 	}
 
 	getCamera()
 	{
 		// En principio se devuelve la única cámara que tenemos
 		// Si hubiera varias cámaras, este método decidiría qué cámara devuelve cada vez que es consultado
-		return this.gestorCamaras.getCamaraActiva();
+		return this.gestorCamaras.getCamaraActiva()
 	}
 
 	setCameraAspect(ratio)
 	{
-		// TODO
-
 		this.gestorCamaras.setCameraAspect(ratio)
-		return
-
-		// Cada vez que el usuario modifica el tamaño de la ventana desde el gestor de ventanas de
-		// su sistema operativo hay que actualizar el ratio de aspecto de la cámara
-		this.camera.aspect = ratio;
-		// Y si se cambia ese dato hay que actualizar la matriz de proyección de la cámara
-		this.camera.updateProjectionMatrix();
 	}
 
 	onWindowResize()
 	{
 		// Este método es llamado cada vez que el usuario modifica el tamapo de la ventana de la aplicación
 		// Hay que actualizar el ratio de aspecto de la cámara
-		this.setCameraAspect (window.innerWidth / window.innerHeight);
+		this.setCameraAspect (window.innerWidth / window.innerHeight)
 
 		// Y también el tamaño del renderizador
-		this.renderer.setSize (window.innerWidth, window.innerHeight);
+		this.renderer.setSize (window.innerWidth, window.innerHeight)
 	}
 
 	update()

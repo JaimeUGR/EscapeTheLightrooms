@@ -1,11 +1,13 @@
 
 import * as THREE from '../../libs/three.module.js'
+import * as TWEEN from '../../libs/tween.esm.js'
 import {CSG} from "../../libs/CSG-v2.js"
 
-import {Sala} from "./Sala.js"
+import {Sala, Marcos} from "./Sala.js"
+import {GameState} from "../GameState.js"
+import {SistemaColisiones} from "../systems/SistemaColisiones.js"
 
 const Marco_X = 1
-const Maro_Z= 2
 
 class Puerta extends THREE.Object3D
 {
@@ -13,24 +15,123 @@ class Puerta extends THREE.Object3D
 	{
 		super()
 
-		this.puertaMaterial = new THREE.MeshNormalMaterial({color: 0Xf1f1f1,opacity: 0.5,transparent: true})
-		this.puertaGeo = new THREE.BoxGeometry(Sala.AnchoPuerta(),Sala.AltoPuerta(),Sala.GrosorPared())
-		this.puertaGeo.translate(Sala.AnchoPuerta()/2,Sala.AltoPuerta()/2,0)
+		this.puertaX = Sala.AnchoPuerta() - 2*Marcos.GrosorInterior()
+		this.puertaY = Sala.AltoPuerta() - Marcos.GrosorInterior()
+		this.puertaZ = Sala.GrosorPared()
 
-		this.puertaMesh = new THREE.Mesh(this.puertaGeo,this.puertaMaterial)
-		this.puertaMesh.position.x= -Sala.AnchoPuerta()/2
+		this.baseCollider = null
+
+		//
+		// Material
+		//
+
+		this.materialPuerta = new THREE.MeshNormalMaterial({opacity: 0.5,transparent: true})
+		this.materialPomo = new THREE.MeshNormalMaterial({opacity: 0.5,transparent: true})
+
+		//
+		// Modelado
+		//
+
+		let geoPuerta = new THREE.BoxGeometry(this.puertaX, this.puertaY, this.puertaZ)
+		geoPuerta.translate(this.puertaX/2, this.puertaY/2, -this.puertaZ/2)
+
+		this.meshPuerta = new THREE.Mesh(geoPuerta, this.materialPuerta)
 
 		let pomo = this.createPomo()
 
-		this.puertaMesh.add(pomo)
+		this.meshPuerta.add(pomo)
+		this.add(this.meshPuerta)
 
-		this.add(this.puertaMesh)
-		this.puertaMesh.rotateY(Math.PI/2)
+		// Para la animación
+		this.meshPuerta.translateX(-this.puertaX/2)
+		// NOTE: Modificar este valor para abrir la puerta
+		this.meshPuerta.rotation.y = 0
 
+		//
+		// Animación
+		//
+
+		this._crearAnimacion()
+
+		//
+		// Colisiones
+		//
+
+		this._crearColliders()
+
+		//
+		// Interacción
+		//
+
+		// TODO: TMP Para hacer pruebas. Solo si no hacemos lo del robot lo dejaremos
+		pomo.userData.interaction = {
+			interact: this.abrirPuerta.bind(this)
+		}
 	}
 
-	createPomo(){
-		let pomo = new THREE.Object3D()
+	_crearAnimacion()
+	{
+		this.animaciones = {}
+
+		let framePuertaCerrada = {rY: 0}
+		let framePuertaAbierta = {rY: -Math.PI/2}
+
+		this.animaciones.abrirPuerta = new TWEEN.Tween(framePuertaCerrada).to(framePuertaAbierta, 2000)
+			.easing(TWEEN.Easing.Sinusoidal.InOut)
+			.onStart(() => {
+				// NOTE: Iniciar cinemática y bloquear entrada
+			})
+			.onUpdate(() => {
+				this.meshPuerta.rotation.y = framePuertaCerrada.rY
+			})
+			.onComplete(() => {
+				// Cambiar el collider de la puerta al que tendría abierta
+				this._crearColliders(true)
+				this.updateColliders()
+			})
+	}
+
+	abrirPuerta()
+	{
+		if (!GameState.flags.robotConPila)
+			return
+
+		// NOTE: Por si acaso. Si no dejas la interacción manual no hace falta
+		GameState.flags.robotConPila = false
+
+		this.animaciones.abrirPuerta.start()
+	}
+
+	updateColliders()
+	{
+		let colSys = GameState.systems.collision
+
+		// Añado mis colliders
+		this.updateMatrixWorld(true)
+		colSys.aniadeRectColliders(this.uuid,
+			SistemaColisiones.Box3ArrayToRectArray([this.baseCollider], this.matrixWorld))
+	}
+
+	_crearColliders(estaAbierta = false)
+	{
+		if (!estaAbierta)
+		{
+			let tmpMin = new THREE.Vector3(-this.puertaX/2, 0, -this.puertaZ)
+			let tmpMax = new THREE.Vector3(this.puertaX/2, 0, 0)
+
+			this.baseCollider = new THREE.Box3(tmpMin, tmpMax)
+		}
+		else
+		{
+			let tmpMin = new THREE.Vector3(-this.puertaX/2, 0, 0)
+			let tmpMax = new THREE.Vector3(-this.puertaX/2 + this.puertaZ, 0, this.puertaX)
+
+			this.baseCollider = new THREE.Box3(tmpMin, tmpMax)
+		}
+	}
+
+	createPomo()
+	{
 		let points = []
 
 		points.push(new THREE.Vector3(1,0,0))
@@ -40,73 +141,12 @@ class Puerta extends THREE.Object3D
 		points.push(new THREE.Vector3(1,1,0))
 		points.push(new THREE.Vector3(0,1,0))
 
-		let pomoMesh = new THREE.Mesh( new THREE.LatheGeometry (points,50,0,Math.PI* 2),this.puertaMaterial)
-		pomoMesh.rotateX(Math.PI/2)
-		pomoMesh.position.set(Sala.AnchoPuerta()/2+Sala.AnchoPuerta()/4,Sala.AltoPuerta()/2,Sala.GrosorPared()/2)
-		pomo.add(pomoMesh)
+		let geoPomo = new THREE.LatheGeometry(points, 20, 0, Math.PI* 2)
+		geoPomo.rotateX(Math.PI/2)
+		geoPomo.translate(this.puertaX - this.puertaX/4, this.puertaY/2, 0)
 
-		return pomo
-	}
-
-}
-
-
-class MarcoPasillo extends THREE.Object3D
-{
-	constructor() {
-		super();
-
-		this.marcoMaterial = new THREE.MeshNormalMaterial({color: 0Xf1f1f1,opacity: 0.5,transparent: true})
-		this.geoMarco = new THREE.BoxGeometry(Sala.AnchoPuerta() + 2*Marco_X, Sala.AltoPuerta() + Marco_X, Sala.GrosorPared())
-		this.geoMarco.translate(0,(Sala.AltoPuerta() + Marco_X)/2,0)
-
-		// this.add(new THREE.Mesh(geoMarco,this.marcoMaterial))
-
-		let geoPuerta = new THREE.BoxGeometry(Sala.AnchoPuerta(),Sala.AltoPuerta(),Sala.GrosorPared())
-		geoPuerta.translate(0,Sala.AltoPuerta()/2,0)
-
-		//this.add(new THREE.Mesh(geoPuerta,this.marcoMaterial))
-
-		this.add(new CSG().union([new THREE.Mesh(this.geoMarco, this.marcoMaterial)]).subtract([new THREE.Mesh(geoPuerta, null)]).toMesh())
+		return new THREE.Mesh(geoPomo, this.materialPomo)
 	}
 }
 
-class MarcoPuerta extends MarcoPasillo
-{
-	constructor(dimensiones = {
-		soporteX: 1,
-		soporteY: 1,
-		soporteZ: 1
-
-	})
-	{
-		super();
-		this.soporteMaterial = new THREE.MeshNormalMaterial({color: 0Xf1f1f1,opacity: 0.5,transparent: true})
-
-		let anchoSoporte= dimensiones.soporteX;
-		let altoSoporte= dimensiones.soporteY;
-		let grosorSoporte= dimensiones.soporteZ;
-
-		let geoSoportes1 = new THREE.BoxGeometry(anchoSoporte,altoSoporte,grosorSoporte)
-		geoSoportes1.translate(-(anchoSoporte/2)-Sala.AnchoPuerta()/2,altoSoporte/2,grosorSoporte/2+Sala.GrosorPared()/2)
-
-		let geoSoportes2 = new THREE.BoxGeometry(anchoSoporte,altoSoporte,grosorSoporte)
-		geoSoportes2.translate((anchoSoporte/2)+Sala.AnchoPuerta()/2,altoSoporte/2,grosorSoporte/2+Sala.GrosorPared()/2)
-
-
-
-		this.add(new THREE.Mesh(geoSoportes1,this.soporteMaterial))
-		this.add(new  THREE.Mesh(geoSoportes2,this.soporteMaterial))
-
-
-	}
-
-
-
-
-
-
-}
-
-
-export {MarcoPasillo,Puerta,MarcoPuerta}
+export {Puerta}
