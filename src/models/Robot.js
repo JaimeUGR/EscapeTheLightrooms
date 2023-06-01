@@ -3,6 +3,8 @@ import * as THREE from '../../libs/three.module.js'
 import * as TWEEN from '../../libs/tween.esm.js'
 import {CSG} from '../../libs/CSG-v2.js'
 
+import {GameState} from "../GameState.js"
+
 class Robot extends THREE.Object3D
 {
 	constructor(gui, dimensiones = {
@@ -21,10 +23,11 @@ class Robot extends THREE.Object3D
 			troncoSupY: 5,
 			troncoInfY: 3,
 
-			radioPila: 1,
-			alturaPila: 2.5, // Menos que tronco Z
-			radioZonaPila: 2,
-			levantamientoZonaPila: 1, // Este levantamiento también se añade por dentro para que no se vea el fondo
+			radioPila: GameState.items.pila.radioGrande,//1,
+			alturaPila: GameState.items.pila.alturaGrande,//2.5, // Menos que tronco Z
+
+			radioZonaPila: 1,
+			levantamientoZonaPila: 0.5, // Este levantamiento también se añade por dentro para que no se vea el fondo
 			separacionYZonaPila: 0.5, // NO TOCAR
 		},
 		brazos: {
@@ -202,7 +205,7 @@ class Robot extends THREE.Object3D
 
 			let geoUnion = new THREE.BoxGeometry(this.dimPiernas.unionX, this.dimPiernas.unionY, this.dimPiernas.unionZ)
 
-			// TODO: Trasladar hacia abajo el escalado de la pierna
+			// NOTE: Trasladar hacia abajo el escalado de la pierna
 			let meshUnion = new THREE.Mesh(geoUnion, this.material)
 			meshUnion.name = "MU"
 			meshUnion.position.y = -meshPiernaSup.scale.y * this.dimPiernas.piernaSupY
@@ -225,7 +228,7 @@ class Robot extends THREE.Object3D
 			let geoPie = new THREE.BoxGeometry(this.dimPiernas.piernaX, this.dimPiernas.pieY, this.dimPiernas.pieZ)
 			geoPie.translate(0, -this.dimPiernas.pieY/2, this.dimPiernas.pieZ/2 - this.dimPiernas.piernaZ/2)
 
-			// TODO: Trasladar el escalado del pie inferior
+			// NOTE: Trasladar el escalado del pie inferior
 			let meshPie = new THREE.Mesh(geoPie, this.material)
 			meshPie.name = "MP"
 
@@ -240,7 +243,7 @@ class Robot extends THREE.Object3D
 			// O3Pierna.rotation.x = -Math.PI/2
 			// O3Pierna.rotation.y = 0
 
-			// TODO: Recordar que la unión no aporta altura (se suman las alturas de las piernas)
+			// NOTE: Recordar que la unión no aporta altura (se suman las alturas de las piernas)
 			// Añadir la pierna
 			O3Pierna.position.y = -this.dimTronco.troncoInfY
 
@@ -282,14 +285,14 @@ class Robot extends THREE.Object3D
 
 		// Recorte de la zona de la pila
 		let alturaZonaPila = (this.dimTronco.troncoSupY - 2*this.dimTronco.radioZonaPila)*this.dimTronco.separacionYZonaPila + this.dimTronco.radioZonaPila
-		let geoZonaPila = new THREE.CylinderGeometry(this.dimTronco.radioZonaPila, this.dimTronco.radioZonaPila, 2*this.dimTronco.levantamientoZonaPila + this.dimTronco.alturaPila)
+		let geoZonaPila = new THREE.CylinderGeometry(this.dimTronco.radioZonaPila, this.dimTronco.radioZonaPila, 2*this.dimTronco.levantamientoZonaPila + this.dimTronco.alturaPila, 15)
 
 		geoZonaPila.rotateX(Math.PI/2)
 		geoZonaPila.translate(0,
 			alturaZonaPila,
 			this.dimTronco.troncoZ/2 + this.dimTronco.levantamientoZonaPila/2 - (this.dimTronco.alturaPila/2 + this.dimTronco.separacionYZonaPila))
 
-		let geoPilaRecorte = new THREE.CylinderGeometry(this.dimTronco.radioPila, this.dimTronco.radioPila, this.dimTronco.alturaPila + this.dimTronco.levantamientoZonaPila)
+		let geoPilaRecorte = new THREE.CylinderGeometry(this.dimTronco.radioPila, this.dimTronco.radioPila, this.dimTronco.alturaPila + this.dimTronco.levantamientoZonaPila, 10)
 		geoPilaRecorte.rotateX(Math.PI/2)
 
 		// NOTA: Luego hay que trasladarla en la Z el levantamiento de la zona y volver a recortar
@@ -310,12 +313,16 @@ class Robot extends THREE.Object3D
 		let O3Pila = new THREE.Object3D()
 		O3Pila.position.set(0, alturaZonaPila, this.dimTronco.troncoZ/2 - this.dimTronco.alturaPila/2)
 
-		// TODO: A la hora de añadir la pila, meterla a este mesh. Tiene que estar centrada y rotada mirando para el eje X la cabeza
-		let pilaTMP = new THREE.CylinderGeometry(this.dimTronco.radioPila, this.dimTronco.radioPila, this.dimTronco.alturaPila)
+		//
+		// NOTE: AÑADIR PILA
+		//
+		// Note: A la hora de añadir la pila, meterla a este mesh. Tiene que estar centrada y rotada mirando para el eje Z la cabeza
+		/*let pilaTMP = new THREE.CylinderGeometry(this.dimTronco.radioPila, this.dimTronco.radioPila, this.dimTronco.alturaPila)
 		pilaTMP.rotateX(Math.PI/2)
 
-		O3Pila.add(new THREE.Mesh(pilaTMP, new THREE.MeshBasicMaterial()))
+		O3Pila.add(new THREE.Mesh(pilaTMP, new THREE.MeshBasicMaterial()))*/
 
+		this.O3Pila = O3Pila
 		this.zonaPila.add(O3Pila)
 		this.troncoSuperior.add(this.zonaPila)
 
@@ -455,11 +462,62 @@ class Robot extends THREE.Object3D
 		this.enAnimacionContinua = false
 		this.esperaAnimacion = 30000 // EN MS
 
+		this._crearAnimacionPila()
+
+		//
+		// Interacción
+		//
+
+		let metodoInteraccion = (event) => {
+			if (!GameState.flags.tienePila)
+				return
+
+			GameState.flags.tienePila = false
+			this.O3Pila.add(GameState.items.pila)
+			this.animaciones.colocarPila.start()
+		}
+
+		this.zonaPila.userData.interaction = {
+			interact: metodoInteraccion
+		}
+
 		// DEBUG
-		this.axis = new THREE.AxesHelper (10);
-		this.add (this.axis)
+		/*this.axis = new THREE.AxesHelper (10);
+		this.add (this.axis)*/
 
 		this.createGUI(gui)
+	}
+
+	_crearAnimacionPila()
+	{
+		let frameInicio = { rX: 0 }
+		let framePilaGirada = {
+			rX: Math.PI/2,
+			tZ: 2*this.dimTronco.alturaPila
+		}
+		let framePilaColocada = { tZ:  0 }
+
+		let animacionGirarPila = new TWEEN.Tween(frameInicio).to(framePilaGirada, 600)
+			.easing(TWEEN.Easing.Sinusoidal.InOut)
+			.onStart(() => {
+				GameState.items.pila.position.z = 2*this.dimTronco.alturaPila
+			})
+			.onUpdate(() => {
+				GameState.items.pila.rotation.x = frameInicio.rX
+			})
+
+		let animacionMeterPila = new TWEEN.Tween(framePilaGirada).to(framePilaColocada, 1200)
+			.onUpdate(() => {
+				GameState.items.pila.position.z = framePilaGirada.tZ
+			})
+			.onComplete(() => {
+				// TODO: hacer una animación de que está feliz o algo
+				console.log("El robot está feliz porque tiene la pila")
+			})
+
+		animacionGirarPila.chain(animacionMeterPila)
+
+		this.animaciones.colocarPila = animacionGirarPila
 	}
 
 	_crearAnimacionContinua()

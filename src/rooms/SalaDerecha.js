@@ -9,6 +9,7 @@ import {GameState} from "../GameState.js"
 import {Taquilla} from "../models/Taquilla.js"
 
 import {Laser} from "../models/Laser.js"
+import {PalancaPared} from "../models/PalancaPared.js"
 
 import {RandomInt} from "../Utils.js"
 
@@ -226,14 +227,28 @@ class SalaDerecha extends Sala
 			let largoHaz = this.largoParedX/2 + 4*Sala.GrosorPared() + sp.pasilloDerecha.largoPasillo
 				+ sp.largoParedX/2 - (puzleLaser.anilloVerde.radioInterno)
 
-			puzleLaser.setLaserVerde(laserVerde, largoHaz)
-			laserVerde.setHaz(largoHaz, false)
-
-			// TODO Color Haz Inicial
-			laserVerde.cambiarHaz(0x55ff55, false)
+			laserVerde.name = "LaserVerde"
+			puzleLaser.setLaser(laserVerde, largoHaz)
 
 			this.add(laserVerde)
 			this.collidables.push(laserVerde)
+
+			//
+			// Palanca del láser
+			//
+
+			let palancaLaser = new PalancaPared()
+
+			palancaLaser.rotateY(Math.PI/2)
+			palancaLaser.translateX(-this.largoParedZ/2)
+			palancaLaser.translateY(this.alturaPared/4 - (palancaLaser.soporteY/2 + palancaLaser.bordeSoporte))
+
+			palancaLaser.setCallbackActivar(laserVerde.siguienteColorHaz.bind(laserVerde))
+
+			this.add(palancaLaser)
+			this.collidables.push(palancaLaser)
+
+			GameState.systems.interaction.allInteractables.push(palancaLaser)
 		}
 	}
 }

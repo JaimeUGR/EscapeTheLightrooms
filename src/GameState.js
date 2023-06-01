@@ -4,12 +4,14 @@ import {Rect} from "./structures/Rect.js"
 
 import {Tarjeta} from "./models/items/Tarjeta.js"
 import {Prisma} from "./models/items/Prisma.js"
+import {Pila} from "./models/Pila.js"
 
 class GameState
 {
 	static Initialize(scene)
 	{
 		this.scene = scene
+		this.txLoader = new TextureLoader()
 
 		this.player = {
 			initialPosition: new Vector3(0, 25, 5),
@@ -23,7 +25,8 @@ class GameState
 			tarjeta: new Tarjeta(),
 			prisma: new Prisma(),
 			manecillaMinuto: null,
-			manecillaHora: null
+			manecillaHora: null,
+			pila: new Pila(0.5, 1.5, 0.1, 0.075)
 		}
 
 		// Flags del juego
@@ -32,7 +35,8 @@ class GameState
 			tieneManecillaHora: false,
 			tieneManecillaMinuto: false,
 			tieneTarjeta: false,
-			tienePrisma: true
+			tienePrisma: true, // TODO: TMP
+			tienePila: false
 		}
 
 		this.salas = {
@@ -53,8 +57,6 @@ class GameState
 			interaction: null,
 			cameras: null
 		}
-
-		this.txLoader = new TextureLoader()
 	}
 }
 

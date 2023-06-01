@@ -1,32 +1,29 @@
 
 import * as THREE from "../../libs/three.module.js"
+import * as TWEEN from '../../libs/tween.esm.js'
 import {CSG} from "../../libs/CSG-v2.js"
 
 import {GameState} from "../GameState.js"
+import {SistemaColisiones} from "../systems/SistemaColisiones.js"
 
 class PalancaPared extends THREE.Object3D
 {
 	constructor(dimensiones = {
-		soporteX: 50,
-		soporteY: 60,
-		soporteZ: 20,
+		soporteX: 8,
+		soporteY: 10,
+		soporteZ: 2,
 
-		bordeSoporte: 5,
-		separacionRailes: 5,
-
-		railX: 5,
-		railY: 1,
-		railZ: 1,
+		bordeSoporte: 1,
+		separacionRailes: 2,
 
 		barraX: 1,
-		barraY: 5,
-		barraZ: 40,
+		barraY: 1,
+		barraZ: 4, // > SoporteZ
 
-		radioMango: 5,
-		alturaMango: 10,
+		radioMango: 1,
+		alturaMango: 4,
 
 		posicionPalanca: 1
-
 	}){
 
 		super()
@@ -36,20 +33,22 @@ class PalancaPared extends THREE.Object3D
 
 		this.bordeSoporte = dimensiones.bordeSoporte
 
-
 		this.railX = this.soporteX - 2*this.bordeSoporte - (this.soporteX/2 - this.bordeSoporte) - this.soporteX/4
 		this.railY = this.soporteY - 2*this.bordeSoporte
 		this.railZ = this.soporteZ - this.bordeSoporte
-		console.log(this.railX)
 
 		this.barraX = this.railX
-		console.log(this.barraX)
 		this.barraY = dimensiones.barraY
 		this.barraZ = dimensiones.barraZ
 
 		this.radioMango = dimensiones.radioMango
-		this.alturaMango = this.soporteX - 2*this.bordeSoporte + dimensiones.alturaMango
+		this.alturaMango = dimensiones.alturaMango
 		this.posicionPalanca = dimensiones.posicionPalanca
+
+
+		this.baseCollider = null
+
+		this.callbackAnimacion = null
 
 		//
 		// Material
@@ -127,6 +126,106 @@ class PalancaPared extends THREE.Object3D
 
 
 		this.add(palanca)
+		this.palanca = palanca
+
+		//
+		// Animación
+		//
+
+		this._crearAnimacion()
+
+		//
+		// Colisiones
+		//
+
+		this._crearColliders()
+
+		//
+		// Interacción
+		//
+
+		this.palanca.traverse((anyNode) => {
+			anyNode.userData.interaction = {
+				interact: this.activar.bind(this)
+			}
+		})
+	}
+
+	_crearAnimacion()
+	{
+		this._animating = false
+
+		this.animaciones = {}
+
+		this.animaciones.tirarPalanca = {
+			animacion: null
+		}
+
+		let frameInicio = { tY: 0 }
+		let frameFin = { tY: this.barraY - this.railY}
+
+		let animacionSoltar = new TWEEN.Tween(frameFin).to(frameInicio, 400)
+			.easing(TWEEN.Easing.Quadratic.In)
+			.onUpdate(() => {
+				this.palanca.position.y = frameFin.tY
+			})
+			.onComplete(() => {
+				frameFin.tY = this.barraY - this.railY
+				this._animating = false
+			})
+
+		let handlerContinuar = () => {
+			animacionSoltar.start()
+		}
+
+		let animacionTirar = new TWEEN.Tween(frameInicio).to(frameFin, 600)
+			.easing(TWEEN.Easing.Sinusoidal.Out)
+			.onUpdate(() => {
+				this.palanca.position.y = frameInicio.tY
+			})
+			.onComplete(() => {
+				frameInicio.tY = 0
+
+				if (this.callbackAnimacion != null)
+					this.callbackAnimacion()
+
+				setTimeout(handlerContinuar, 200)
+			})
+
+		this.animaciones.tirarPalanca.animacion = animacionTirar
+	}
+
+	activar()
+	{
+		if (this._animating)
+			return
+
+		this._animating = true
+		this.animaciones.tirarPalanca.animacion.start()
+	}
+
+	setCallbackActivar(callback)
+	{
+		this.callbackAnimacion = callback
+	}
+
+	updateColliders()
+	{
+		let colSys = GameState.systems.collision
+
+		// Añado mis colliders
+		this.updateMatrixWorld(true)
+		colSys.aniadeRectColliders(this.uuid,
+			SistemaColisiones.Box3ArrayToRectArray([this.baseCollider], this.matrixWorld))
+	}
+
+	_crearColliders()
+	{
+		let tmpMin = new THREE.Vector3(-(this.soporteX/2 + this.bordeSoporte), 0, 0)
+		let tmpMax = new THREE.Vector3(this.soporteX/2 + this.bordeSoporte, 0,
+			this.bordeSoporte + this.barraZ + this.radioMango)
+
+		this.baseCollider = new THREE.Box3(tmpMin, tmpMax)
 	}
 }
 

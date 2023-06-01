@@ -20,7 +20,7 @@ class AnilloCristal extends THREE.Object3D
 
 		cristalBevelSize: 0.5,
 		cristalBevelThickness: 0.8
-	})
+	}, colorCristal = 0x7db3fa)
 	{
 		super()
 
@@ -49,13 +49,13 @@ class AnilloCristal extends THREE.Object3D
 
 		// TODO: Cambiar el color del cristal al pasado en el constructor
 		this.materialCristal = new THREE.MeshPhysicalMaterial({
-			color: 0x7db3fa, // Color azul del cristal
+			color: colorCristal, // Color azul del cristal
 			transparent: true, // Habilitar transparencia
-			opacity: 0.95, // Opacidad del cristal (ajusta según tu preferencia)
-			roughness: 0.4, // Rugosidad del material
-			metalness: 0.0, // Metalicidad del material (0 para no metálico)
-			clearcoat: 1.0, // Capa de recubrimiento clara
-			clearcoatRoughness: 0.1, // Rugosidad de la capa de recubrimiento clara
+			opacity: 0.85, // Opacidad del cristal (ajusta según tu preferencia)
+			roughness: 0, // Rugosidad del material
+			metalness: 0, // Metalicidad del material (0 para no metálico)
+			clearcoat: 0, // Capa de recubrimiento clara
+			clearcoatRoughness: 0, // Rugosidad de la capa de recubrimiento clara
 		})
 
 		//

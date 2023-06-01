@@ -3,8 +3,10 @@ import {Sala} from "./Sala.js"
 import {PuzleSimon} from "../puzles/PuzleSimon.js"
 import {GameState} from "../GameState.js"
 
-import {Laser} from "../models/Laser.js"
 import {Vitrina} from "../models/Vitrina.js"
+
+import {Laser} from "../models/Laser.js"
+import {PalancaPared} from "../models/PalancaPared.js"
 
 class SalaSuperior extends Sala
 {
@@ -122,14 +124,27 @@ class SalaSuperior extends Sala
 			let largoHaz = this.largoParedZ + 4*Sala.GrosorPared() + sp.pasilloSuperior.largoPasillo
 				+ sp.largoParedZ/2 - (puzleLaser.anilloRojo.radioInterno + laserRojo.radioSoporte)
 
-			puzleLaser.setLaserRojo(laserRojo, largoHaz)
-			laserRojo.setHaz(largoHaz, false)
-
-			// TODO Color Haz Inicial
-			laserRojo.cambiarHaz(0xff5555, false)
+			laserRojo.name = "LaserRojo"
+			puzleLaser.setLaser(laserRojo, largoHaz)
 
 			this.add(laserRojo)
 			this.collidables.push(laserRojo)
+
+			//
+			// Palanca del láser
+			//
+
+			let palancaLaser = new PalancaPared()
+
+			palancaLaser.translateX((this.largoParedX/2 - Sala.AnchoPuerta()/2)/2)
+			palancaLaser.translateY(Sala.AltoPuerta()/2 - (palancaLaser.soporteY/2 + palancaLaser.bordeSoporte))
+
+			palancaLaser.setCallbackActivar(laserRojo.siguienteColorHaz.bind(laserRojo))
+
+			this.add(palancaLaser)
+			this.collidables.push(palancaLaser)
+
+			GameState.systems.interaction.allInteractables.push(palancaLaser)
 		}
 	}
 }

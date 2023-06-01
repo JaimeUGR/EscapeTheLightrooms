@@ -2,8 +2,11 @@
 import * as THREE from "../../libs/three.module.js"
 import * as TWEEN from '../../libs/tween.esm.js'
 import {CSG} from "../../libs/CSG-v2.js"
+
 import {GameState} from "../GameState.js"
 import {SistemaColisiones} from "../systems/SistemaColisiones.js"
+
+import {ShuffleArray} from "../Utils.js"
 
 class Laser extends THREE.Object3D
 {
@@ -34,6 +37,9 @@ class Laser extends THREE.Object3D
 		this.materialHaz = new THREE.MeshBasicMaterial({color: 0xFFFFFF})
 
 		this.haz = null
+		this.coloresHaz = null
+		this.colorSeleccionado = 0
+
 		this.callbackCambioColor = null
 
 		//
@@ -86,14 +92,11 @@ class Laser extends THREE.Object3D
 	_crearAnimaciones()
 	{
 		this.animaciones = {}
-		this.animaciones.activacion = {
-			animacion: null
-		}
 
 		let frameDesactivado = { tY: 0 }
 		let frameActivado = { tY: this.alturaLaser }
 
-		this.animaciones.activacion.animacion = new TWEEN.Tween(frameDesactivado).to(frameActivado, this.tiempoActivacion)
+		this.animaciones.activacion = new TWEEN.Tween(frameDesactivado).to(frameActivado, this.tiempoActivacion)
 			.onUpdate(() => {
 				this.meshSoporteSuperior.position.y = frameDesactivado.tY
 			})
@@ -101,9 +104,19 @@ class Laser extends THREE.Object3D
 				this.haz.visible = true
 				this.activado = true
 
-				// TODO: TMP
-				if (this.callbackCambioColor !== null)
-					this.callbackCambioColor()
+				frameDesactivado.tY = 0
+			})
+
+		this.animaciones.desactivacion = new TWEEN.Tween(frameActivado).to(frameDesactivado, this.tiempoActivacion)
+			.onStart(() => {
+				this.haz.visible = false
+				this.activado = false
+			})
+			.onUpdate(() => {
+				this.meshSoporteSuperior.position.y = frameActivado.tY
+			})
+			.onComplete(() => {
+				frameActivado.tY = this.alturaLaser
 			})
 	}
 
@@ -115,10 +128,21 @@ class Laser extends THREE.Object3D
 			return
 		}
 
-		this.animaciones.activacion.animacion.start()
+		this.animaciones.activacion.start()
 	}
 
-	setHaz(largoHaz, visible = false)
+	desactivarLaser()
+	{
+		if (!this.activado)
+		{
+			console.error("El laser ya estaba desactivado")
+			return
+		}
+
+		this.animaciones.desactivacion.start()
+	}
+
+	setHaz(largoHaz, colores, visible = false)
 	{
 		if (this.haz !== null)
 		{
@@ -130,8 +154,14 @@ class Laser extends THREE.Object3D
 		geoHaz.rotateX(Math.PI/2)
 		geoHaz.translate(0, 0, largoHaz/2)
 
+		ShuffleArray(colores)
+		this.coloresHaz = colores
+		this.colorSeleccionado = -1 // NOTE: Luego se llama a seleccionar el siguiente color y se actualizará
+
 		this.haz = new THREE.Mesh(geoHaz, this.materialHaz)
 		this.haz.visible = visible
+
+		this.siguienteColorHaz()
 
 		this.add(this.haz)
 	}
@@ -141,20 +171,25 @@ class Laser extends THREE.Object3D
 		this.callbackCambioColor = callback
 	}
 
-	cambiarHaz(hexColor, visible = false)
+	siguienteColorHaz()
 	{
-		if (this.haz === null)
+		if (this.haz === null || this.coloresHaz.length === 0)
 		{
-			console.error("Has intentado cambiar un haz antes de setearlo")
+			console.error("Fallo al cambiar color. El haz es nulo o no hay colores")
 			return
 		}
 
-		this.materialHaz.color.setHex(hexColor)
+		this.colorSeleccionado = (this.colorSeleccionado + 1) % this.coloresHaz.length
+		this.materialHaz.color.setHex(this.coloresHaz[this.colorSeleccionado])
 		this.materialHaz.needsUpdate = true
-		this.haz.visible = visible
 
 		if (this.callbackCambioColor !== null)
 			this.callbackCambioColor()
+	}
+
+	getColorHaz()
+	{
+		return this.materialHaz.color.getHex()
 	}
 
 	updateColliders()

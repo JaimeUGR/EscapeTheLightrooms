@@ -207,13 +207,7 @@ class SalaPrincipal extends Sala
 
 		{
 			this.robot = new Robot(GameState.scene.gui)
-
 			this.cajoneraRobot.cajoneraO3D.add(this.robot)
-
-			/*this.robot.translateY(25)
-			this.robot.translateZ(this.largoParedZ/2)
-			this.robot.translateX(this.largoParedX/2)
-			this.add(this.robot)*/
 		}
 
 		// TODO: TMP

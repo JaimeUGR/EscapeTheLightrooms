@@ -4,16 +4,39 @@ import * as TWEEN from '../../libs/tween.esm.js'
 import {CSG} from "../../libs/CSG-v2.js"
 
 import {AnilloCristal} from "../models/AnilloCristal.js"
+import {CristalContenedor} from "../models/CristalContenedor.js"
+import {Pila} from "../models/Pila.js"
+
 import {GameState} from "../GameState.js";
 import {SistemaColisiones} from "../systems/SistemaColisiones.js"
 
+import {ShuffleArray} from "../Utils.js"
+
+const COLOR_AZUL = 0x5555ff
+const COLOR_VERDE = 0x55ff55
+const COLOR_ROJO = 0xff5555
+
+const COLOR_AMARILLO = 0xffc72b
+const COLOR_MORADO = 0xae46eb
+const COLOR_ROSA = 0xf19afc
+
+
 class PuzleLaser extends THREE.Object3D
 {
+	static Colores()
+	{
+
+	}
+
 	constructor()
 	{
 		super()
 
 		this.baseColliders = []
+		this.coloresLaser = [COLOR_AZUL, COLOR_VERDE, COLOR_ROJO, COLOR_AMARILLO,
+			COLOR_ROSA, COLOR_MORADO]
+
+		this.estaResuelto = false
 
 		this.laserAzul = null
 		this.laserVerde = null
@@ -25,7 +48,8 @@ class PuzleLaser extends THREE.Object3D
 
 		this._crearAnillos()
 
-		//this._crearLasers()
+		// Añadir el cristal
+		this._crearCristalContenedor()
 
 		//
 		// Animación
@@ -42,6 +66,48 @@ class PuzleLaser extends THREE.Object3D
 		this.add(new THREE.AxesHelper(10))
 	}
 
+	_crearCristalContenedor()
+	{
+		let cristal = new CristalContenedor({
+			numVertices: 8,
+			sX: this.anilloRojo.radioInterno,
+			sY: this.anilloRojo.radioInterno,
+			sZ: this.anilloRojo.radioInterno
+		})
+
+		this.add(cristal)
+		this.cristal = cristal
+
+		//
+		// Añadir la pila con su interacción bloqueada
+		//
+		let pila = GameState.items.pila
+
+		this.add(pila)
+
+		// Interacción de la pila
+
+		let metodoInteraccionPila = (event) => {
+			if (!cristal.estaRoto)
+				return
+
+			this.remove(pila)
+			GameState.flags.tienePila = true
+
+			pila.traverse((anyNode) => {
+				anyNode.userData = {}
+			})
+		}
+
+		pila.traverse((anyNode) => {
+			anyNode.userData.interaction = {
+				interact: metodoInteraccionPila
+			}
+		})
+
+		GameState.systems.interaction.allInteractables.push(pila)
+	}
+
 	_crearAnillos()
 	{
 		this.anilloAzul = new AnilloCristal({
@@ -56,7 +122,7 @@ class PuzleLaser extends THREE.Object3D
 
 			cristalBevelSize: 0.8,
 			cristalBevelThickness: 0.9
-		})
+		}, COLOR_AZUL)
 
 		this.anilloVerde = new AnilloCristal({
 			radioInterno: 8,
@@ -70,7 +136,7 @@ class PuzleLaser extends THREE.Object3D
 
 			cristalBevelSize: 0.5,
 			cristalBevelThickness: 0.8
-		})
+		}, COLOR_VERDE)
 
 		this.anilloRojo = new AnilloCristal({
 			radioInterno: 4,
@@ -84,7 +150,7 @@ class PuzleLaser extends THREE.Object3D
 
 			cristalBevelSize: 0.3,
 			cristalBevelThickness: 0.6
-		})
+		}, COLOR_ROJO)
 
 		// Rotaciones finales
 		/*this.anilloAzul.rotateY(-Math.PI/2)
@@ -108,7 +174,7 @@ class PuzleLaser extends THREE.Object3D
 			rYAzul: Math.PI/2,
 			rZAzul: 0,
 			rXVerde: 0,
-			rYVerde: Math.PI/2,
+			rYVerde: -Math.PI/2,
 			rZVerde: 0,
 			rXRojo: Math.PI,
 			rYRojo: Math.PI,
@@ -128,15 +194,15 @@ class PuzleLaser extends THREE.Object3D
 		}
 
 		let frameCompletado = {
-			rXAzul: 0,
-			rYAzul: -Math.PI/2,
+			rXAzul: -Math.PI/2,
+			rYAzul: 0,
 			rZAzul: 0,
-			rXVerde: Math.PI/2,
-			rYVerde: Math.PI/2,
+			rXVerde: -Math.PI/2,
+			rYVerde: 0,
 			rZVerde: 0,
-			rXRojo: -Math.PI,
+			rXRojo: -Math.PI/2,
 			rYRojo: 0,
-			rZRojo: Math.PI/2
+			rZRojo: 0
 		}
 
 
@@ -155,7 +221,8 @@ class PuzleLaser extends THREE.Object3D
 
 		aplicarRotacion(frameInicio)
 
-		this.animaciones.animacionInicio = new TWEEN.Tween(frameInicio).to(frameActivado, 3000)
+		this.animaciones.animacionInicio = new TWEEN.Tween(frameInicio).to(frameActivado, 4000)
+			.easing(TWEEN.Easing.Sinusoidal.InOut)
 			.onUpdate(() => {
 				aplicarRotacion(frameInicio)
 			})
@@ -170,11 +237,35 @@ class PuzleLaser extends THREE.Object3D
 				this.laserRojo.setCallbackCambioColor(this._comprobarColores.bind(this))
 			})
 
-		this.animaciones.animacionCompletar = null
+		this.animaciones.animacionCompletar = new TWEEN.Tween(frameActivado).to(frameCompletado, 2000)
+			.easing(TWEEN.Easing.Sinusoidal.InOut)
+			.onUpdate(() => {
+				aplicarRotacion(frameActivado)
+			})
+			.onComplete(() => {
+				// Invocar la callback de solucionado
+				this._crearColliders(true)
+				this.updateColliders()
+
+				// Romper el cristal
+				this.cristal.romper()
+			})
 	}
 
 	iniciarPuzle()
 	{
+		// Comprobar los colores
+		while (this.laserAzul.getColorHaz() === COLOR_AZUL
+			&& this.laserVerde.getColorHaz() === COLOR_VERDE
+			&& this.laserRojo.getColorHaz() === COLOR_ROJO)
+		{
+			console.log("Lásers resueltos. Reordenando")
+
+			ShuffleArray(this.laserAzul.coloresLaser)
+			ShuffleArray(this.laserVerde.coloresLaser)
+			ShuffleArray(this.laserRojo.coloresLaser)
+		}
+
 		// Empezar la animación de inicio
 		this.animaciones.animacionInicio.start()
 	}
@@ -182,25 +273,37 @@ class PuzleLaser extends THREE.Object3D
 	// NOTE: Llamado cada vez que cambia el color de un laser
 	_comprobarColores()
 	{
-		console.log("HOLA")
-		console.log(this.laserAzul.haz.material.color.getHex())
-		console.log(this.laserVerde.haz.material.color.getHex())
-		console.log(this.laserRojo.haz.material.color.getHex())
+		if (this.laserAzul.getColorHaz() !== COLOR_AZUL
+			|| this.laserVerde.getColorHaz() !== COLOR_VERDE
+			|| this.laserRojo.getColorHaz() !== COLOR_ROJO)
+			return
+
+		if (this.estaResuelto)
+			return
+
+		this.estaResuelto = true
+
+		console.log("Has resuelto el puzle de los lásers")
+
+		this.laserAzul.desactivarLaser()
+		this.laserVerde.desactivarLaser()
+		this.laserRojo.desactivarLaser()
+
+		this.animaciones.animacionCompletar.start()
 	}
 
-	setLaserAzul(laser)
+	setLaser(laser, largoHaz)
 	{
-		this.laserAzul = laser
-	}
+		laser.setHaz(largoHaz, [...this.coloresLaser], false)
 
-	setLaserVerde(laser)
-	{
-		this.laserVerde = laser
-	}
-
-	setLaserRojo(laser)
-	{
-		this.laserRojo = laser
+		if (laser.name === "LaserAzul")
+			this.laserAzul = laser
+		else if (laser.name === "LaserVerde")
+			this.laserVerde = laser
+		else if (laser.name === "LaserRojo")
+			this.laserRojo = laser
+		else
+			console.error("No has definido el nombre del láser / no es conocido")
 	}
 
 	updateColliders()
@@ -213,14 +316,28 @@ class PuzleLaser extends THREE.Object3D
 			SistemaColisiones.Box3ArrayToRectArray(this.baseColliders, this.matrixWorld))
 	}
 
-	_crearColliders()
+	_crearColliders(shortMode = false)
 	{
-		let radioAnilloAzul = this.anilloAzul.radioInterno + 2*this.anilloAzul.radioTubo
+		if (!shortMode)
+		{
+			let radioAnilloAzul = this.anilloAzul.radioInterno + 2*this.anilloAzul.radioTubo
 
-		let tmpMin = new THREE.Vector3(-radioAnilloAzul, 0, -radioAnilloAzul)
-		let tmpMax = new THREE.Vector3(radioAnilloAzul, 0, radioAnilloAzul)
+			let tmpMin = new THREE.Vector3(-radioAnilloAzul, 0, -radioAnilloAzul)
+			let tmpMax = new THREE.Vector3(radioAnilloAzul, 0, radioAnilloAzul)
 
-		this.baseColliders.push(new THREE.Box3(tmpMin, tmpMax))
+			this.baseColliders.push(new THREE.Box3(tmpMin, tmpMax))
+		}
+		else
+		{
+			this.baseColliders = []
+
+			let radioAnilloAzul = this.anilloAzul.radioInterno + 2*this.anilloAzul.radioTubo
+
+			let tmpMin = new THREE.Vector3(-radioAnilloAzul, 0, -this.anilloAzul.radioTubo)
+			let tmpMax = new THREE.Vector3(radioAnilloAzul, 0, this.anilloAzul.radioTubo)
+
+			this.baseColliders.push(new THREE.Box3(tmpMin, tmpMax))
+		}
 	}
 }
 

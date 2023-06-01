@@ -3,6 +3,7 @@ import * as THREE from "../../libs/three.module.js"
 import {CSG} from "../../libs/CSG-v2.js"
 
 import {GameState} from "../GameState.js"
+import {SistemaColisiones} from "../systems/SistemaColisiones";
 
 class Silla extends THREE.Object3D
 {
@@ -47,10 +48,12 @@ class Silla extends THREE.Object3D
 		this.respaldoY = dimensiones.respaldoY
 		this.respaldoZ = dimensiones.respaldoZ
 
-		this.radioBarra= dimensiones.radioBarra
+		this.radioBarra = dimensiones.radioBarra
 		this.altoBarra = dimensiones.altoBarra
 
 		this.separacionUniones = dimensiones.separacionUniones
+
+		this.baseCollider = null
 
 		//
 		// Material
@@ -175,6 +178,31 @@ class Silla extends THREE.Object3D
 		this.add(respaldoMesh)
 		this.add(barraRespaldo1.toMesh())
 		this.add(barraRespaldo2.toMesh())
+
+		//
+		// Colisiones
+		//
+
+		this._crearColliders()
+	}
+
+	// TODO: Revisar
+	updateColliders()
+	{
+		let colSys = GameState.systems.collision
+
+		// Añado mis colliders
+		this.updateMatrixWorld(true)
+		colSys.aniadeRectColliders(this.uuid,
+			SistemaColisiones.Box3ArrayToRectArray([this.baseCollider], this.matrixWorld))
+	}
+
+	_crearColliders()
+	{
+		let tmpMin = new THREE.Vector3(-this.tableroX/2, 0, -(this.tableroZ/2 + this.respaldoZ + 2*this.radioBarra))
+		let tmpMax = new THREE.Vector3(this.tableroX/2, 0, this.tableroZ/2)
+
+		this.baseCollider = new THREE.Box3(tmpMin, tmpMax)
 	}
 }
 
