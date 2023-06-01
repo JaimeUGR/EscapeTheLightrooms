@@ -4,6 +4,7 @@ import * as TWEEN from '../../libs/tween.esm.js'
 import {CSG} from "../../libs/CSG-v2.js"
 
 import {GameState} from "../GameState.js"
+import {SistemaColisiones} from "../systems/SistemaColisiones.js"
 
 class Vitrina extends THREE.Object3D
 {
@@ -36,6 +37,8 @@ class Vitrina extends THREE.Object3D
 		this.huecoFrontalZ = this.cajaZ - this.bordeZ
 
 		this.puertaAbierta = false
+
+		this.baseCollider = null
 
 		//
 		// Material
@@ -121,7 +124,14 @@ class Vitrina extends THREE.Object3D
 		//
 		// Animación
 		//
+
 		this._crearAnimacion()
+
+		//
+		// Colisiones
+		//
+
+		this._crearColliders()
 	}
 
 	_crearAnimacion()
@@ -143,6 +153,27 @@ class Vitrina extends THREE.Object3D
 	abrirPuerta()
 	{
 		this.animaciones.abrirPuerta.start()
+	}
+
+	updateColliders()
+	{
+		let colSys = GameState.systems.collision
+
+		// Añado mis colliders
+		this.updateMatrixWorld(true)
+		colSys.aniadeRectColliders(this.uuid,
+			SistemaColisiones.Box3ArrayToRectArray([this.baseCollider], this.matrixWorld))
+	}
+
+	_crearColliders()
+	{
+		let ladoX = this.cajaX/2 + this.bordeX
+		let ladoZ = this.cajaZ/2 + this.bordeZ
+
+		let tmpMin = new THREE.Vector3(-ladoX, 0, 0)
+		let tmpMax = new THREE.Vector3(ladoX, 0, 2*ladoZ)
+
+		this.baseCollider = new THREE.Box3(tmpMin, tmpMax)
 	}
 }
 

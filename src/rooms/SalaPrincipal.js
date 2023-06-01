@@ -315,6 +315,8 @@ class SalaPrincipal extends Sala
 
 			this.add(puzleLaser)
 			this.puzleLaser = puzleLaser
+
+			this.collidables.push(puzleLaser)
 		}
 	}
 }

@@ -4,24 +4,24 @@ import * as TWEEN from '../../libs/tween.esm.js'
 import {CSG} from "../../libs/CSG-v2.js"
 
 import {AnilloCristal} from "../models/AnilloCristal.js"
+import {GameState} from "../GameState.js";
+import {SistemaColisiones} from "../systems/SistemaColisiones.js"
 
 class PuzleLaser extends THREE.Object3D
 {
-	constructor(dimensiones = {
-		distanciaLaserAzul: 10,
-		distanciaLaserVerde: 10,
-		distanciaLaserRojo: 10,
-	})
+	constructor()
 	{
 		super()
 
-		this.distanciaLaserAzul = dimensiones.distanciaLaserAzul
-		this.distanciaLaserVerde = dimensiones.distanciaLaserVerde
-		this.distanciaLaserRojo = dimensiones.distanciaLaserRojo
+		this.baseColliders = []
 
 		this.laserAzul = null
 		this.laserVerde = null
 		this.laserRojo = null
+
+		//
+		// Modelado
+		//
 
 		this._crearAnillos()
 
@@ -32,6 +32,12 @@ class PuzleLaser extends THREE.Object3D
 		//
 
 		this._crearAnimaciones()
+
+		//
+		// Colisión
+		//
+
+		this._crearColliders()
 
 		this.add(new THREE.AxesHelper(10))
 	}
@@ -95,6 +101,8 @@ class PuzleLaser extends THREE.Object3D
 
 	_crearAnimaciones()
 	{
+		this.animaciones = {}
+
 		let frameInicio = {
 			rXAzul: 0,
 			rYAzul: Math.PI/2,
@@ -107,7 +115,19 @@ class PuzleLaser extends THREE.Object3D
 			rZRojo: 0
 		}
 
-		let frameFin = {
+		let frameActivado = {
+			rXAzul: 0,
+			rYAzul: -Math.PI/2,
+			rZAzul: 0,
+			rXVerde: Math.PI/2,
+			rYVerde: Math.PI/2,
+			rZVerde: 0,
+			rXRojo: -Math.PI,
+			rYRojo: 0,
+			rZRojo: Math.PI/2
+		}
+
+		let frameCompletado = {
 			rXAzul: 0,
 			rYAzul: -Math.PI/2,
 			rZAzul: 0,
@@ -135,7 +155,7 @@ class PuzleLaser extends THREE.Object3D
 
 		aplicarRotacion(frameInicio)
 
-		this.animacionInicio = new TWEEN.Tween(frameInicio).to(frameFin, 3000)
+		this.animaciones.animacionInicio = new TWEEN.Tween(frameInicio).to(frameActivado, 3000)
 			.onUpdate(() => {
 				aplicarRotacion(frameInicio)
 			})
@@ -149,12 +169,14 @@ class PuzleLaser extends THREE.Object3D
 				this.laserVerde.setCallbackCambioColor(this._comprobarColores.bind(this))
 				this.laserRojo.setCallbackCambioColor(this._comprobarColores.bind(this))
 			})
+
+		this.animaciones.animacionCompletar = null
 	}
 
 	iniciarPuzle()
 	{
 		// Empezar la animación de inicio
-		this.animacionInicio.start()
+		this.animaciones.animacionInicio.start()
 	}
 
 	// NOTE: Llamado cada vez que cambia el color de un laser
@@ -179,6 +201,26 @@ class PuzleLaser extends THREE.Object3D
 	setLaserRojo(laser)
 	{
 		this.laserRojo = laser
+	}
+
+	updateColliders()
+	{
+		let colSys = GameState.systems.collision
+
+		// Añado mis colliders
+		this.updateMatrixWorld(true)
+		colSys.aniadeRectColliders(this.uuid,
+			SistemaColisiones.Box3ArrayToRectArray(this.baseColliders, this.matrixWorld))
+	}
+
+	_crearColliders()
+	{
+		let radioAnilloAzul = this.anilloAzul.radioInterno + 2*this.anilloAzul.radioTubo
+
+		let tmpMin = new THREE.Vector3(-radioAnilloAzul, 0, -radioAnilloAzul)
+		let tmpMax = new THREE.Vector3(radioAnilloAzul, 0, radioAnilloAzul)
+
+		this.baseColliders.push(new THREE.Box3(tmpMin, tmpMax))
 	}
 }
 

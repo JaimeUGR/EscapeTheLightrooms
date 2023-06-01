@@ -2,6 +2,8 @@
 import * as THREE from "../../libs/three.module.js"
 import * as TWEEN from '../../libs/tween.esm.js'
 import {CSG} from "../../libs/CSG-v2.js"
+import {GameState} from "../GameState.js"
+import {SistemaColisiones} from "../systems/SistemaColisiones.js"
 
 class Laser extends THREE.Object3D
 {
@@ -24,6 +26,8 @@ class Laser extends THREE.Object3D
 
 		this.tiempoActivacion = dimensiones.tiempoAnimacionActivacion
 		this.activado = false
+
+		this.baseCollider = null
 
 		this.materialSoporte = new THREE.MeshNormalMaterial({opacity: 0.5, transparent: true})
 		this.materialLaser = new THREE.MeshNormalMaterial({opacity: 0.5, transparent: true})
@@ -71,6 +75,12 @@ class Laser extends THREE.Object3D
 		//
 
 		this._crearAnimaciones()
+
+		//
+		// Colisiones
+		//
+
+		this._crearColliders()
 	}
 
 	_crearAnimaciones()
@@ -145,6 +155,24 @@ class Laser extends THREE.Object3D
 
 		if (this.callbackCambioColor !== null)
 			this.callbackCambioColor()
+	}
+
+	updateColliders()
+	{
+		let colSys = GameState.systems.collision
+
+		// Añado mis colliders
+		this.updateMatrixWorld(true)
+		colSys.aniadeRectColliders(this.uuid,
+			SistemaColisiones.Box3ArrayToRectArray([this.baseCollider], this.matrixWorld))
+	}
+
+	_crearColliders()
+	{
+		let tmpMin = new THREE.Vector3(-this.radioSoporte, 0, -this.radioSoporte)
+		let tmpMax = new THREE.Vector3(this.radioSoporte, 0, this.radioSoporte)
+
+		this.baseCollider = new THREE.Box3(tmpMin, tmpMax)
 	}
 }
 

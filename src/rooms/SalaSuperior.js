@@ -64,6 +64,7 @@ class SalaSuperior extends Sala
 
 			let prisma = GameState.items.prisma
 			prisma.rotateX(-Math.PI/2)
+			prisma.position.y = vitrina.bordeY
 			vitrina.O3Vitrina.add(prisma)
 
 			prisma.meshPrisma.userData.interaction = {
@@ -72,6 +73,7 @@ class SalaSuperior extends Sala
 						return
 
 					prisma.rotateX(Math.PI/2)
+					prisma.position.y = 0
 
 					GameState.flags.tienePrisma = true
 					vitrina.O3Vitrina.remove(prisma)
@@ -81,6 +83,7 @@ class SalaSuperior extends Sala
 
 			this.add(vitrina)
 			this.vitrina = vitrina
+			this.collidables.push(vitrina)
 
 			GameState.systems.interaction.allInteractables.push(prisma)
 		}
@@ -126,6 +129,7 @@ class SalaSuperior extends Sala
 			laserRojo.cambiarHaz(0xff5555, false)
 
 			this.add(laserRojo)
+			this.collidables.push(laserRojo)
 		}
 	}
 }

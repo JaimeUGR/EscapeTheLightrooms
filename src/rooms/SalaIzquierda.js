@@ -79,6 +79,7 @@ class SalaIzquierda extends Sala
 
 			this.add(vitrina)
 			this.vitrina = vitrina
+			this.collidables.push(vitrina)
 
 			GameState.systems.interaction.allInteractables.push(tarjeta)
 		}
@@ -146,6 +147,7 @@ class SalaIzquierda extends Sala
 			laserAzul.cambiarHaz(0x5555ff, false)
 
 			this.add(laserAzul)
+			this.collidables.push(laserAzul)
 		}
 	}
 }

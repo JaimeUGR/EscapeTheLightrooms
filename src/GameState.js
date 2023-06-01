@@ -2,7 +2,6 @@
 import {Vector2, Vector3, TextureLoader} from "../libs/three.module.js"
 import {Rect} from "./structures/Rect.js"
 
-import {Destornillador} from "./models/items/Destornillador.js"
 import {Tarjeta} from "./models/items/Tarjeta.js"
 import {Prisma} from "./models/items/Prisma.js"
 
@@ -33,7 +32,7 @@ class GameState
 			tieneManecillaHora: false,
 			tieneManecillaMinuto: false,
 			tieneTarjeta: false,
-			tienePrisma: false
+			tienePrisma: true
 		}
 
 		this.salas = {

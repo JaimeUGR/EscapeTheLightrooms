@@ -206,6 +206,7 @@ class SalaDerecha extends Sala
 
 		// TODO: Poner el póster con el código detrás
 		GameState.systems.interaction.allInteractables.push(reloj)
+		this.collidables.push(reloj)
 
 		//
 		// Laser
@@ -232,6 +233,7 @@ class SalaDerecha extends Sala
 			laserVerde.cambiarHaz(0x55ff55, false)
 
 			this.add(laserVerde)
+			this.collidables.push(laserVerde)
 		}
 	}
 }

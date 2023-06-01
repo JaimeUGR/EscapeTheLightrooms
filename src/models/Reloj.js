@@ -2,8 +2,11 @@
 import * as THREE from "../../libs/three.module.js"
 import * as TWEEN from '../../libs/tween.esm.js'
 import {CSG} from "../../libs/CSG-v2.js"
+
 import {TrapezoidGeometry} from "../geometry/TrapezoidGeometry.js"
+
 import {GameState} from "../GameState.js"
+import {SistemaColisiones} from "../systems/SistemaColisiones.js"
 
 class Reloj extends THREE.Object3D
 {
@@ -88,6 +91,8 @@ class Reloj extends THREE.Object3D
 		this.tieneManecillaHora = false
 		this.tieneManecillaMinuto = false
 
+		this.baseCollider = null
+
 		//
 		// Bases
 		//
@@ -163,6 +168,12 @@ class Reloj extends THREE.Object3D
 		this._crearAnimacion()
 
 		//
+		// Colisión
+		//
+
+		this._crearColliders()
+
+		//
 		// Interacción
 		//
 
@@ -190,8 +201,6 @@ class Reloj extends THREE.Object3D
 		this.O3Agujas = new THREE.Object3D()
 		this.O3Agujas.translateY(this.cajaY/2 - (this.radioReloj + this.separacionSuperiorReloj))
 		this.O3Agujas.translateZ(this.cajaZ/2 - this.separacionPuertaReloj + this.profundidadReloj)
-
-		this.O3Agujas.add(new THREE.AxesHelper(10))
 
 		meshReloj.add(this.O3Agujas)
 
@@ -327,7 +336,7 @@ class Reloj extends THREE.Object3D
 			let framePuertaCerrada = { rY: 0 }
 			let framePuertaAbierta = { rY: -Math.PI/2 }
 
-			let animacionAbrir = new TWEEN.Tween(framePuertaCerrada).to(framePuertaAbierta, 900)
+			let animacionAbrir = new TWEEN.Tween(framePuertaCerrada).to(framePuertaAbierta, 750)
 				.easing(TWEEN.Easing.Quadratic.Out)
 				.onUpdate(() => {
 					this.meshPuertaReloj.rotation.y = framePuertaCerrada.rY
@@ -338,7 +347,7 @@ class Reloj extends THREE.Object3D
 					this._animating = false
 				})
 
-			let animacionCerrar = new TWEEN.Tween(framePuertaAbierta).to(framePuertaCerrada, 800)
+			let animacionCerrar = new TWEEN.Tween(framePuertaAbierta).to(framePuertaCerrada, 650)
 				.easing(TWEEN.Easing.Cubic.Out)
 				.onUpdate(() => {
 					this.meshPuertaReloj.rotation.y = framePuertaAbierta.rY
@@ -435,6 +444,7 @@ class Reloj extends THREE.Object3D
 				.onUpdate(() => {
 					this.O3Agujas.rotation.z = frameInicio.rZ
 					this.position.x = this.animaciones.resolver.posicionXInicio + frameInicio.tX
+					this.updateColliders()
 				})
 				.onComplete(() => {
 					this.animaciones.pendulo.animacion.start()
@@ -480,6 +490,28 @@ class Reloj extends THREE.Object3D
 
 			this.animaciones.resolver.animacion.start()
 		}
+	}
+
+	updateColliders()
+	{
+		let colSys = GameState.systems.collision
+
+		// Añado mis colliders
+		this.updateMatrixWorld(true)
+		colSys.aniadeRectColliders(this.uuid,
+			SistemaColisiones.Box3ArrayToRectArray([this.baseCollider], this.matrixWorld))
+	}
+
+	_crearColliders()
+	{
+		// NOTE: Se hace con el superior porque el reloj estará un poco metido en el suelo
+		let radioX = this.trapSup.XSup + this.cajaX/2 + this.pilarX
+		let radioZ = this.trapSup.ZSup + this.cajaZ/2 + this.pilarZ
+
+		let tmpMin = new THREE.Vector3(-radioX, 0, -radioZ)
+		let tmpMax = new THREE.Vector3(radioX, 0, radioZ)
+
+		this.baseCollider = new THREE.Box3(tmpMin, tmpMax)
 	}
 }
 

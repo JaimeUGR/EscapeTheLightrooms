@@ -225,36 +225,68 @@ class EscapeTheLightrooms extends THREE.Scene
 	createGUI()
 	{
 		// Se crea la interfaz gráfica de usuario
-		var gui = new GUI();
+		const gui = new GUI()
 
-		// La escena le va a añadir sus propios controles.
-		// Se definen mediante una   new function()
-		// En este caso la intensidad de la luz y si se muestran o no los ejes
-		this.guiControls = {
-			// En el contexto de una función   this   alude a la función
-			lightIntensity : 0.5,
-			axisOnOff : true,
-			fpsLimit: FPSLimit
+		//
+		// Folder Luces
+		//
+
+		{
+			this.guiMenuLuces = {
+				intensidadLuzSP: 0.5
+			}
+
+			const folder = gui.addFolder("Luces")
+
+			folder.add(this.guiMenuLuces, "intensidadLuzSP", 0, 1, 0.05)
+				.name("IL Sala Principal: ")
+				.onChange((value) => this.setLightIntensity(value))
 		}
 
-		// Se crea una sección para los controles de esta clase
-		var folder = gui.addFolder ('Luz y Ejes');
+		//
+		// Folder Opciones
+		//
 
-		// Se le añade un control para la intensidad de la luz
-		folder.add (this.guiControls, 'lightIntensity', 0, 1, 0.1)
-			.name('Intensidad de la Luz : ')
-			.onChange ( (value) => this.setLightIntensity (value) );
+		{
+			this.guiMenuOpciones = {
+				hayLimiteFPS: true,
+				limiteFPS: 30
+			}
 
-		// Y otro para mostrar u ocultar los ejes
-		folder.add (this.guiControls, 'axisOnOff')
-			.name ('Mostrar ejes : ')
-			.onChange ( (value) => this.setAxisVisible (value) );
+			const folder = gui.addFolder("Opciones")
 
-		folder.add(this.guiControls, 'fpsLimit')
-			.name('Límite FPS : ')
-			.onChange((value) => FPSLimit = value).listen()
+			folder.add(this.guiMenuOpciones, "hayLimiteFPS")
+				.name("Límite FPS Activado: ")
+				.onChange((value) => FPSLimit = value).listen()
 
-		return gui;
+			folder.add(this.guiMenuOpciones, "limiteFPS", 15, 240, 5)
+				.name("Límite FPS: ")
+				.onChange((value) => myDeltaTime = 1.0 / value).listen()
+		}
+
+		//
+		// Folder Debug
+		//
+
+		{
+			this.guiMenuDebug = {
+				controlesVuelo: false,
+				resetearPosicion: () => {
+					let iniPos = GameState.player.initialPosition
+					GameState.player.position.set(iniPos.x, iniPos.y, iniPos.z)
+				}
+			}
+
+			const folder = gui.addFolder("Debug y Ayuda")
+
+			folder.add(this.guiMenuDebug, "controlesVuelo")
+				.name("Controles Vuelo Activados: ")
+
+			folder.add(this.guiMenuDebug, "resetearPosicion")
+				.name("[ RESETEAR POSICIÓN ]")
+		}
+
+		return gui
 	}
 
 	createLights()
@@ -267,7 +299,7 @@ class EscapeTheLightrooms extends THREE.Scene
 		// La añadimos a la escena
 		this.add (ambientLight);
 
-		this.spotLight = new THREE.PointLight( 0xffffff, this.guiControls.lightIntensity, 110, 0.5);
+		this.spotLight = new THREE.PointLight( 0xffffff, this.guiMenuLuces.intensidadLuzSP, 110, 0.5);
 
 		let targetTmp = new THREE.Object3D()
 		targetTmp.position.set(0, 0, 110/2)
@@ -352,17 +384,18 @@ class EscapeTheLightrooms extends THREE.Scene
 				myDelta -= myDeltaTime
 
 				// Le decimos al renderizador "visualiza la escena que te indico usando la cámara que te estoy pasando"
-				this.renderer.render (this, this.getCamera());
+				this.renderer.render (this, this.getCamera())
 			}
 		}
 		else
 		{
-			this.renderer.render (this, this.getCamera());
+			this.renderer.render (this, this.getCamera())
 		}
 
+		// NOTE: Si el límite de fps está activo, puede haber problemas. No recomendado.
 		if (isWindowFocused)
 		{
-			// TODO: TMP
+			// TODO: TMP para el contro manual
 			this.salaPrincipal.robot.update()
 
 			// Se actualiza la posición de la cámara según su controlador
