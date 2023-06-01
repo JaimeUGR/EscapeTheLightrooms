@@ -106,7 +106,7 @@ class Simon extends THREE.Object3D
 		for (let i = 0; i < this.botones.length; i++)
 			this.add(this.botones[i])
 
-		let geoIndicador = new THREE.CylinderGeometry(this.radioIndicador, this.radioIndicador, this.alturaIndicador)
+		let geoIndicador = new THREE.CylinderGeometry(this.radioIndicador, this.radioIndicador, this.alturaIndicador, 15)
 		geoIndicador.rotateX(Math.PI/2)
 		geoIndicador.translate(-this.panelX/2, this.panelY, this.alturaIndicador/2) // Esquina sup izquierda centrado
 

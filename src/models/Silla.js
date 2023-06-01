@@ -3,30 +3,30 @@ import * as THREE from "../../libs/three.module.js"
 import {CSG} from "../../libs/CSG-v2.js"
 
 import {GameState} from "../GameState.js"
-import {SistemaColisiones} from "../systems/SistemaColisiones";
+import {SistemaColisiones} from "../systems/SistemaColisiones.js"
 
 class Silla extends THREE.Object3D
 {
 	constructor(dimensiones = {
 		// Tablero
-		tableroX: 20,
-		tableroY: 5,
-		tableroZ: 20,
+		tableroX: 12,
+		tableroY: 2,
+		tableroZ: 10,
 
 		// Patas
-		pataX: 4,
-		pataY: 20,
-		pataZ: 5,
+		pataX: 3,
+		pataY: 10,
+		pataZ: 3,
 
-		separacionPatasX: 10, // Separación desde la esquina de la pata (la que se vería) hasta el centro
-		separacionPatasZ: 10, // Separación desde la esquina de la pata (la que se vería) hasta el centro
+		separacionPatasX: 6, // Separación desde la esquina de la pata (la que se vería) hasta el centro
+		separacionPatasZ: 5, // Separación desde la esquina de la pata (la que se vería) hasta el centro
 
-		respaldoX: 20,
-		respaldoY: 10,
-		respaldoZ: 1,
+		respaldoX: 12,
+		respaldoY: 6,
+		respaldoZ: 2,
 
-		radioBarra: 2,
-		altoBarra: 20,
+		radioBarra: 1,
+		altoBarra: 10,
 
 		separacionUniones:0.5
 	})

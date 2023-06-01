@@ -226,7 +226,7 @@ class PuzleSimon extends THREE.Object3D
 			if(this.indiceSecuencia < this.secuenciaBotones.length)
 				return
 
-			this.simon.indicadores[this.nivel].material.color.set(0x123456)
+			this.simon.indicadores[this.nivel].material.color.set(0x28b851)
 			this.nivel++
 
 			this.estaJugando = false

@@ -25,8 +25,13 @@ class Puerta extends THREE.Object3D
 		// Material
 		//
 
-		this.materialPuerta = new THREE.MeshNormalMaterial({opacity: 0.5,transparent: true})
-		this.materialPomo = new THREE.MeshNormalMaterial({opacity: 0.5,transparent: true})
+		const txLoader = GameState.txLoader
+
+		let texturaPuerta = txLoader.load("../../resources/textures/models/madera-clara.jpg")
+		let texturaPomo = txLoader.load("../../resources/textures/models/oro1.jpeg")
+
+		this.materialPuerta = new THREE.MeshLambertMaterial({map: texturaPuerta})
+		this.materialPomo = new THREE.MeshLambertMaterial({map: texturaPomo})
 
 		//
 		// Modelado

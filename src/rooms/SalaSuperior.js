@@ -5,11 +5,16 @@ import {Sala} from "./Sala.js"
 import {PuzleSimon} from "../puzles/PuzleSimon.js"
 import {GameState} from "../GameState.js"
 
+import {Silla} from "../models/Silla.js"
+import {Tarta} from "../models/Tarta.js"
+
 import {Vitrina} from "../models/Vitrina.js"
 
 import {Laser} from "../models/Laser.js"
 import {PalancaPared} from "../models/PalancaPared.js"
 import {Lampara} from "../models/Lampara.js"
+import {Taquilla} from "../models/Taquilla.js"
+import {Cuadro} from "../models/Cuadro.js"
 
 class SalaSuperior extends Sala
 {
@@ -73,7 +78,7 @@ class SalaSuperior extends Sala
 		this.pointLight.position.set(this.largoParedX/2, this.alturaPared - posicionBombillaLampara, this.largoParedZ/2)
 		this.pointLight.target = targetTmp
 
-		GameState.scene.add(new THREE.PointLightHelper(this.pointLight, 1, 0xffffff))
+		//GameState.scene.add(new THREE.PointLightHelper(this.pointLight, 1, 0xffffff))
 
 		this.add(targetTmp)
 		this.add(this.pointLight)
@@ -121,6 +126,66 @@ class SalaSuperior extends Sala
 			this.collidables.push(vitrina)
 
 			GameState.systems.interaction.allInteractables.push(prisma)
+		}
+
+		// Silla y tarta
+		{
+			let silla = new Silla()
+			silla.rotateY(Math.PI)
+
+			silla.translateZ(silla.tableroZ/2 + silla.respaldoZ + 2*silla.radioBarra- this.largoParedZ)
+			silla.translateX(-(this.largoParedX/4 - Sala.AnchoPuerta()/4))
+
+			this.add(silla)
+
+			let tarta = new Tarta(4, 5)
+			silla.tableroO3D.add(tarta)
+
+			this.collidables.push(silla)
+		}
+
+		// Taquilla
+		{
+			let taq = new Taquilla({
+				taquillaX: 15, // x interna
+				taquillaY: 35, // y interna
+				taquillaZ: 12, // z interna
+				taquillaBorde: 0.75,
+				puertaZ: 0.5, // <= borde
+				numEstantes: 5,
+				estanteY: 0.2,
+				separacionInferiorEstantes: 2,
+				rejillaX: 10, // <= x interna
+				rejillaY: 2,
+				separacionRejillas: 2,
+				separacionSuperiorRejillas: 5
+			})
+
+			taq.rotateY(Math.PI)
+			taq.translateX((taq.taquillaX/2 + taq.taquillaBorde) - this.largoParedX + taq.taquillaX/2)
+			taq.translateZ(taq.taquillaZ/2 + taq.taquillaBorde - this.largoParedZ)
+
+			this.add(taq)
+			this.collidables.push(taq)
+			GameState.systems.interaction.allInteractables.push(taq)
+		}
+
+		// Cuadro
+		{
+			let cuadro = new Cuadro({
+				baseX: 50,
+				baseY: 30,
+				baseZ: 0.5,
+
+				borde: 2,
+				huecoZ: 0.3
+			}, undefined, "../../resources/textures/models/payasos_1.jpg")
+
+			cuadro.rotateY(Math.PI/2)
+			cuadro.translateX(-(this.largoParedZ/2 + cuadro.baseX/2))
+			cuadro.translateY(this.alturaPared/2 - cuadro.baseY/2)
+
+			this.add(cuadro)
 		}
 	}
 

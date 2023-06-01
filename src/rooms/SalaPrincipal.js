@@ -10,6 +10,7 @@ import {Taquilla} from "../models/Taquilla.js"
 import {CuboCentral} from "../models/CuboCentral.js"
 import {Robot} from "../models/Robot.js"
 import {Lampara} from "../models/Lampara.js"
+import {Sofa} from "../models/Sofa.js"
 
 import {PuzleLaser} from "../puzles/PuzleLaser.js"
 import {Destornillador} from "../models/items/Destornillador.js"
@@ -133,7 +134,7 @@ class SalaPrincipal extends Sala
 		this.pointLight.position.set(this.largoParedX/2, this.alturaPared - posicionBombillaLampara, this.largoParedZ/2)
 		this.pointLight.target = targetTmp
 
-		GameState.scene.add(new THREE.PointLightHelper(this.pointLight, 1, 0xffffff))
+		//GameState.scene.add(new THREE.PointLightHelper(this.pointLight, 1, 0xffffff))
 
 		this.add(targetTmp)
 		this.add(this.pointLight)
@@ -228,6 +229,18 @@ class SalaPrincipal extends Sala
 			GameState.systems.interaction.allInteractables.push(taq)
 		}
 
+		// Sofa
+		{
+			let sofa = new Sofa()
+			sofa.rotateY(Math.PI)
+
+			sofa.translateZ(sofa.baseZ/2 + sofa.parteTraseraZ - this.largoParedZ)
+			sofa.translateX(-(sofa.baseX/2 + sofa.lateralX))
+
+			this.add(sofa)
+			this.collidables.push(sofa)
+		}
+
 		//
 		// Mesa y CuboPC
 		//
@@ -255,32 +268,11 @@ class SalaPrincipal extends Sala
 		{
 			this.robot = new Robot(GameState.scene.gui)
 			this.cajoneraRobot.cajoneraO3D.add(this.robot)
-		}
 
-		// TODO: TMP
-		{
-			/*let lampara = new Lampara()
-
-			lampara.translateX(this.largoParedX/2)
-			lampara.translateZ(this.largoParedZ/2)
-
-			this.add(lampara)*/
-		}
-
-		{
-			/*let anillo = new AnilloCristal()
-
-			anillo.translateX(this.largoParedX/2)
-			anillo.translateZ(this.largoParedZ/2)
-			anillo.translateY(25)
-			anillo.rotateY(Math.PI)
-
-			this.add(anillo)*/
-		}
-
-		{
-			// NOTE: Es importante saber que este puzle se rota 180º
-
+			// TODO: TMP
+			setTimeout(() => {
+				this.robot.iniciaAnimacionContinua()
+			}, 5000)
 		}
 	}
 

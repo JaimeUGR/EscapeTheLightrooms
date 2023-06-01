@@ -80,7 +80,7 @@ class SalaDerecha extends Sala
 		this.pointLight.position.set(this.largoParedX/2, this.alturaPared - posicionBombillaLampara, this.largoParedZ/2)
 		this.pointLight.target = targetTmp
 
-		GameState.scene.add(new THREE.PointLightHelper(this.pointLight, 1, 0xffffff))
+		//GameState.scene.add(new THREE.PointLightHelper(this.pointLight, 1, 0xffffff))
 
 		this.add(targetTmp)
 		this.add(this.pointLight)

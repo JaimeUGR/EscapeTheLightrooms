@@ -63,7 +63,7 @@ class PuzleLaser extends THREE.Object3D
 
 		this._crearColliders()
 
-		this.add(new THREE.AxesHelper(10))
+		//this.add(new THREE.AxesHelper(10))
 	}
 
 	_crearCristalContenedor()

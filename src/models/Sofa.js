@@ -3,33 +3,34 @@ import * as THREE from "../../libs/three.module.js"
 import {CSG} from "../../libs/CSG-v2.js"
 
 import {GameState} from "../GameState.js"
+import {SistemaColisiones} from "../systems/SistemaColisiones.js"
 
 class Sofa extends THREE.Object3D
 {
 	constructor(dimensiones = {
 
-		curvaX: 0.7,
-		curvaY: 0.7,
+		curvaX: 0.9,
+		curvaY: 0.9,
 
-		lateralX: 2,
-		lateralY: 6,
+		lateralX: 5,
+		lateralY: 13,
 
-		baseX: 12,
-		baseY: 2,
+		baseX: 30,
+		baseY: 1.5,
 		baseZ: 1,
 
-		cojinY: 1,
-		cojinZ: 5,
+		cojinY: 4,
+		cojinZ: 15,
 
-		respaldoY: 5,
-		respaldoZ: 1,
+		respaldoY: 12,
+		respaldoZ: 3,
 
-		parteTraseraY : 9,
-		parteTraseraZ : 1,
+		parteTraseraY : 20,
+		parteTraseraZ : 2,
 
-		numCojines: 3,
+		numCojines: 4,
 
-		separacionInteriorY: 0.2,
+		separacionInteriorY: 0.3,
 
 	}, curva = {
 		infDcha: true,
@@ -37,8 +38,6 @@ class Sofa extends THREE.Object3D
 
 		supIzq: true,
 		infIzq: true
-
-
 	})
 	{
 		super()
@@ -78,17 +77,15 @@ class Sofa extends THREE.Object3D
 
 		this.parteTraseraX = 2*this.lateralX + this.baseX
 
+		this.baseCollider = null
+
 		let loader = GameState.txLoader
-
 		let texturaSofa = loader.load("../../resources/textures/models/textura_sofa.png")
+		texturaSofa.wrapS = THREE.RepeatWrapping
+		texturaSofa.wrapT = THREE.RepeatWrapping
 
-		/*
-		this.materialSofa =  new THREE.MeshStandardMaterial({
-		color: 0x808080, // Color de la tela (gris)
-		roughness: 0.5, // Rugosidad del material (ajusta según la tela)
-		metalness: 0.1, // Metalicidad del material
-	});
-	*/
+		texturaSofa.repeat.set(this.baseX/5, this.baseY/5)
+
 		this.materialSofa = new THREE.MeshLambertMaterial({map: texturaSofa})
 
 
@@ -235,8 +232,29 @@ class Sofa extends THREE.Object3D
 		let parteTraseraMesh = new THREE.Mesh(geoParteTrasera, this.materialSofa)
 		this.add(parteTraseraMesh)
 
+		//
+		// Colisiones
+		//
 
+		this._crearColliders()
+	}
 
+	updateColliders()
+	{
+		let colSys = GameState.systems.collision
+
+		// Añado mis colliders
+		this.updateMatrixWorld(true)
+		colSys.aniadeRectColliders(this.uuid,
+			SistemaColisiones.Box3ArrayToRectArray([this.baseCollider], this.matrixWorld))
+	}
+
+	_crearColliders()
+	{
+		let tmpMin = new THREE.Vector3(-(this.baseX/2 + this.lateralX), 0, -(this.baseZ/2 + this.parteTraseraZ))
+		let tmpMax = new THREE.Vector3(this.baseX/2 + this.lateralX, 0, this.baseZ/2)
+
+		this.baseCollider = new THREE.Box3(tmpMin, tmpMax)
 	}
 }
 

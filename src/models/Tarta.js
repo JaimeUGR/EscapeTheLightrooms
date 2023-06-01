@@ -19,10 +19,6 @@ class Tarta extends THREE.Object3D
 		let loader = GameState.txLoader
 
 		let texturaTarta = loader.load("../../resources/textures/models/textura_chocolate.jpg")
-		//texturaTarta.wrapS = THREE.RepeatWrapping //Indica cómo se repite en la X
-		//texturaTarta.wrapT = THREE.RepeatWrapping //Indica cómo se repiten en la Y
-		//texturaTarta.repeat.set(2, 1)
-
 		let material = new THREE.MeshLambertMaterial({map: texturaTarta})
 
 		let geoTarta = new THREE.CylinderGeometry(this.radio, this.radio, this.altura, 20)
