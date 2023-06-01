@@ -15,6 +15,15 @@ class SistemaInteraccion
 		this.cached = {
 			vect: new Vector2()
 		}
+
+		let geoPlano = new THREE.CircleGeometry(GameState.gameData.interactionRange)
+		geoPlano.rotateX(Math.PI/2)
+
+		this.debugPlayerBBInteraccion = new THREE.LineSegments(new THREE.WireframeGeometry(geoPlano), new THREE.LineBasicMaterial({
+			color: 0xd66aafb
+		}))
+
+		GameState.debug.O3Player.add(this.debugPlayerBBInteraccion)
 	}
 
 	onMouseClick(event, camera)
@@ -25,7 +34,7 @@ class SistemaInteraccion
 		let height = window.innerHeight
 
 		// Si estamos en modo bloqueado, se usan las coordenadas del ratón
-		if (GameState.tmp.cameraLock)
+		if (GameState.gameData.cameraLock)
 		{
 			mouse.x = (event.clientX / width) * 2 - 1
 			mouse.y = 1 - 2 * (event.clientY / height)
@@ -43,6 +52,14 @@ class SistemaInteraccion
 		if (interactables.length > 0)
 		{
 			let interactionResult = interactables[0]
+
+			if (GameState.gameData.interactionRangeEnabled && interactionResult.distance >
+				GameState.gameData.interactionRange)
+			{
+				console.log("Fuera del rango de interacción")
+				return
+			}
+
 			let interactable = interactionResult.object
 
 			if (interactable.userData && interactable.userData.interaction)

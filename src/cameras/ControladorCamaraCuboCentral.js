@@ -31,7 +31,7 @@ class ControladorCamaraCuboCentral extends ControladorCamara
 
 	enable()
 	{
-		GameState.tmp.cameraLock = true
+		GameState.gameData.cameraLock = true
 		this.inputEnabled = true
 
 		// RESET
@@ -47,7 +47,7 @@ class ControladorCamaraCuboCentral extends ControladorCamara
 
 	disable()
 	{
-		GameState.tmp.cameraLock = false
+		GameState.gameData.cameraLock = false
 
 		this.cuboCentral.O3Cubo.rotation.y = 0
 		this.O3Camara.rotation.x = 0

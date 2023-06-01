@@ -1,4 +1,6 @@
 
+import * as THREE from "../../libs/three.module.js"
+
 import {Pasillo, Sala} from "./Sala.js"
 
 import {Mesa, MesaCristal} from "../models/Mesa.js"
@@ -89,7 +91,22 @@ class SalaPrincipal extends Sala
 
 	colocarLuces()
 	{
+		// TODO: Hacer spot?
+		this.spotLight = new THREE.PointLight(0xffffff, 0.5, 110, 0.5);
+		GameState.luces.luzSalaPrincipal = this.spotLight
 
+		// NOTE: se engancharía a la lámpara
+		let targetTmp = new THREE.Object3D()
+		targetTmp.position.set(this.largoParedX/2, 0, this.largoParedZ/2)
+
+		// Posicionarla con la lámpara del techo
+		this.spotLight.position.set(this.largoParedX/2, 50, this.largoParedZ/2);
+		this.spotLight.target = targetTmp
+
+		GameState.scene.add(new THREE.PointLightHelper(this.spotLight, 1, 0xffffff))
+
+		this.add(targetTmp)
+		this.add(this.spotLight)
 	}
 
 	colocarModelos()

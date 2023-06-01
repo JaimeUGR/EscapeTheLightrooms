@@ -60,7 +60,6 @@ class EscapeTheLightrooms extends THREE.Scene
 		// Se crea la interfaz gráfica de usuario
 		this.gui = this.createGUI()
 
-
 		this.inicializarGameState()
 
 		// Construimos los distinos elementos que tendremos en la escena
@@ -133,6 +132,8 @@ class EscapeTheLightrooms extends THREE.Scene
 		GameState.systems.collision = this.collisionSystem
 		GameState.systems.interaction = this.interactionSystem
 		GameState.systems.cameras = this.gestorCamaras
+
+		this.add(GameState.debug.O3Player)
 	}
 
 	// Crear las salas, unirlas y colocarlas
@@ -197,9 +198,9 @@ class EscapeTheLightrooms extends THREE.Scene
 		console.log("Recibo click")
 
 		// TODO: Temporal
-		if (!GameState.tmp.gameStarted)
+		if (!GameState.gameData.gameStarted)
 		{
-			GameState.tmp.gameStarted = true
+			GameState.gameData.gameStarted = true
 			console.log("Iniciando...")
 			this.gestorCamaras.cambiarAControladorPrincipal()
 		}
@@ -233,7 +234,10 @@ class EscapeTheLightrooms extends THREE.Scene
 
 		{
 			this.guiMenuLuces = {
-				intensidadLuzSP: 0.5
+				intensidadLuzSP: 0.5,
+				intensidadLuzSI: 0.5,
+				intensidadLuzSD: 0.5,
+				intensidadLuzSS: 0.5
 			}
 
 			const folder = gui.addFolder("Luces")
@@ -271,6 +275,14 @@ class EscapeTheLightrooms extends THREE.Scene
 		{
 			this.guiMenuDebug = {
 				controlesVuelo: false,
+				toggleRangoInteraccion: () => {
+					if (GameState.gameData.interactionRangeEnabled)
+						console.log("DEBUG: Desactivado rango interacción")
+					else
+						console.log("DEBUG: Activado rango interacción")
+
+					GameState.gameData.interactionRangeEnabled = !GameState.gameData.interactionRangeEnabled
+				},
 				resetearPosicion: () => {
 					let iniPos = GameState.player.initialPosition
 					GameState.player.position.set(iniPos.x, iniPos.y, iniPos.z)
@@ -280,7 +292,10 @@ class EscapeTheLightrooms extends THREE.Scene
 			const folder = gui.addFolder("Debug y Ayuda")
 
 			folder.add(this.guiMenuDebug, "controlesVuelo")
-				.name("Controles Vuelo Activados: ")
+				.name("Controles Vuelo Activados: ").onChange((value) => GameState.debug.controlesVuelo = value)
+
+			folder.add(this.guiMenuDebug, "toggleRangoInteraccion")
+				.name("[ TOGGLE RANGO INTERACCIÓN ]")
 
 			folder.add(this.guiMenuDebug, "resetearPosicion")
 				.name("[ RESETEAR POSICIÓN ]")
@@ -291,24 +306,9 @@ class EscapeTheLightrooms extends THREE.Scene
 
 	createLights()
 	{
-		// Se crea una luz ambiental, evita que se vean complentamente negras las zonas donde no incide de manera directa una fuente de luz
-		// La luz ambiental solo tiene un color y una intensidad
-		// Se declara como   var   y va a ser una variable local a este método
-		//    se hace así puesto que no va a ser accedida desde otros métodos
-		var ambientLight = new THREE.AmbientLight(0xccddee, 0.45);
-		// La añadimos a la escena
-		this.add (ambientLight);
-
-		this.spotLight = new THREE.PointLight( 0xffffff, this.guiMenuLuces.intensidadLuzSP, 110, 0.5);
-
-		let targetTmp = new THREE.Object3D()
-		targetTmp.position.set(0, 0, 110/2)
-
-		this.spotLight.position.set( 0, 50, 110/2 );
-		this.spotLight.target = targetTmp
-
-		this.add(targetTmp)
-		this.add (this.spotLight);
+		// Ambiental
+		const ambientLight = new THREE.AmbientLight(0xccddee, 0.45)
+		this.add(ambientLight)
 	}
 
 	setLightIntensity(valor)

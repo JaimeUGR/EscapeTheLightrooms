@@ -10,7 +10,7 @@ class Lampara extends THREE.Object3D
 		altoBase: 1.25,
 
 		radioPilar: 0.5,
-		altoPilar: 20,
+		altoPilar: 10,
 
 		radioEnvoltura: 3.5,
 		altoEnvoltura: 8,

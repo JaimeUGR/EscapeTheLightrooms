@@ -94,6 +94,42 @@ class Reloj extends THREE.Object3D
 		this.baseCollider = null
 
 		//
+		// Materiales
+		//
+
+		let texturaBases = GameState.txLoader.load("../../resources/textures/models/textura_bases_reloj.jpg")
+		let texturaPilares = GameState.txLoader.load("../../resources/textures/models/textura_pilares_reloj.jpg")
+		let texturaCajaInterior = GameState.txLoader.load("../../resources/textures/models/textura_caja_reloj.jpg")
+		let texturaCajaExterior = GameState.txLoader.load("../../resources/textures/models/textura_bases_reloj.jpg")
+
+		let texturaPendulo = GameState.txLoader.load("../../resources/textures/models/oro1.jpeg")
+
+		let texturaReloj = GameState.txLoader.load("../../resources/textures/models/textura_reloj_circulo.png")
+		texturaReloj.center.set(0.5, 0.5)
+		texturaReloj.rotation = Math.PI/2
+
+		this.materialBases = new THREE.MeshLambertMaterial({map: texturaBases})
+		this.materialPilares = new THREE.MeshLambertMaterial({map: texturaPilares})
+		this.materialCajaInterior = new THREE.MeshLambertMaterial({map: texturaCajaInterior})
+		this.materialCajaExterior = new THREE.MeshLambertMaterial({map: texturaCajaExterior})
+		this.materialPendulo = new THREE.MeshLambertMaterial({map: texturaPendulo})
+		this.materialReloj = new THREE.MeshBasicMaterial({map: texturaReloj})
+		this.materialCristal = new THREE.MeshPhysicalMaterial({
+			color: 0x999994,
+			transparent: true,
+			opacity: 1,
+			roughness: 0.1,
+			metalness: 0,
+			transmission: 0.9,
+			clearcoat: 0.2,
+			clearcoatRoughness: 0.5
+		})
+
+		//
+		// Modelado
+		//
+
+		//
 		// Bases
 		//
 
@@ -110,8 +146,8 @@ class Reloj extends THREE.Object3D
 			this.trapInf.ZSup + extraBaseTrapeciosZ, this.trapInf.Y)
 		geoTrapecioInferior.translate(0, -(this.cajaY/2 + this.trapInf.Y/2), 0)
 
-		this.add(new THREE.Mesh(geoTrapecioSuperior, this.material))
-		this.add(new THREE.Mesh(geoTrapecioInferior, this.material))
+		this.add(new THREE.Mesh(geoTrapecioSuperior, this.materialBases))
+		this.add(new THREE.Mesh(geoTrapecioInferior, this.materialBases))
 
 		//
 		// Pilares
@@ -120,16 +156,16 @@ class Reloj extends THREE.Object3D
 		let geoPilar = new THREE.BoxGeometry(this.pilarX, this.cajaY, this.pilarZ)
 
 		geoPilar.translate(-(this.cajaX/2 + this.pilarX/2), 0, this.cajaZ/2 + this.pilarZ/2)
-		this.add(new THREE.Mesh(geoPilar.clone(), this.material))
+		this.add(new THREE.Mesh(geoPilar.clone(), this.materialPilares))
 
 		geoPilar.translate(this.cajaX + this.pilarX, 0, 0)
-		this.add(new THREE.Mesh(geoPilar.clone(), this.material))
+		this.add(new THREE.Mesh(geoPilar.clone(), this.materialPilares))
 
 		geoPilar.translate(0, 0, -(this.cajaZ + this.pilarZ))
-		this.add(new THREE.Mesh(geoPilar.clone(), this.material))
+		this.add(new THREE.Mesh(geoPilar.clone(), this.materialPilares))
 
 		geoPilar.translate(-(this.cajaX + this.pilarX), 0, 0)
-		this.add(new THREE.Mesh(geoPilar.clone(), this.material))
+		this.add(new THREE.Mesh(geoPilar.clone(), this.materialPilares))
 
 		//
 		// Caja Interna
@@ -139,16 +175,16 @@ class Reloj extends THREE.Object3D
 		let geoCajaReloj = new THREE.BoxGeometry(this.cajaRelojX, this.cajaY, this.cajaZ - this.separacionPuertaReloj)
 		geoCajaReloj.translate(0, 0, -(this.separacionPuertaReloj/2))
 
-		this.add(new THREE.Mesh(geoCajaReloj, this.material))
+		this.add(new THREE.Mesh(geoCajaReloj, this.materialCajaInterior))
 
 		// Cajas Laterales
 		let geoCajaRelojLateral = new THREE.BoxGeometry((this.cajaX - this.cajaRelojX)/2, this.cajaY, this.cajaZ)
 
 		geoCajaRelojLateral.translate(-(this.cajaRelojX/2 + (this.cajaX - this.cajaRelojX)/4), 0, 0)
-		this.add(new THREE.Mesh(geoCajaRelojLateral.clone(), this.material))
+		this.add(new THREE.Mesh(geoCajaRelojLateral.clone(), this.materialCajaExterior))
 
 		geoCajaRelojLateral.translate(this.cajaRelojX + (this.cajaX - this.cajaRelojX)/2, 0, 0)
-		this.add(new THREE.Mesh(geoCajaRelojLateral.clone(), this.material))
+		this.add(new THREE.Mesh(geoCajaRelojLateral.clone(), this.materialCajaExterior))
 
 		//
 		// Péndulo
@@ -195,7 +231,7 @@ class Reloj extends THREE.Object3D
 		geoReloj.translate(0, this.cajaY/2 - (this.radioReloj + this.separacionSuperiorReloj),
 			this.cajaZ/2 - this.separacionPuertaReloj + this.profundidadReloj/2)
 
-		let meshReloj = new THREE.Mesh(geoReloj, this.material)
+		let meshReloj = new THREE.Mesh(geoReloj, this.materialReloj)
 
 		// NOTE: A este O3 se meten directamente las agujas
 		this.O3Agujas = new THREE.Object3D()
@@ -223,8 +259,8 @@ class Reloj extends THREE.Object3D
 		geoPendulo.rotateX(Math.PI/2)
 		geoPendulo.translate(0, -alturaPaloPendulo , 0)
 
-		O3Pendulo.add(new THREE.Mesh(geoPaloPendulo, this.material))
-		O3Pendulo.add(new THREE.Mesh(geoPendulo, this.material))
+		O3Pendulo.add(new THREE.Mesh(geoPaloPendulo, this.materialPendulo))
+		O3Pendulo.add(new THREE.Mesh(geoPendulo, this.materialPendulo))
 
 		O3Pendulo.translateY(alturaPaloPendulo/2 - this.separacionSuperiorReloj/2)
 		O3Pendulo.translateZ(this.cajaZ/2 - this.separacionPuertaReloj + this.profundidadReloj/2)
@@ -246,7 +282,7 @@ class Reloj extends THREE.Object3D
 		geoCajaRecorte.translate(this.cajaRelojX/2, -(this.separacionSuperiorReloj/2 + this.radioReloj/2), 0)
 
 		// Puerta
-		let csg = new CSG().union([new THREE.Mesh(geoPuertaReloj, this.material)])
+		let csg = new CSG().union([new THREE.Mesh(geoPuertaReloj, this.materialCajaExterior)])
 			.subtract([new THREE.Mesh(geoRelojRecorte, null), new THREE.Mesh(geoCajaRecorte, null)])
 
 		let meshPuertaReloj = csg.toMesh()
@@ -258,8 +294,8 @@ class Reloj extends THREE.Object3D
 		meshPuertaReloj.translateZ(this.cajaZ/2 - this.profundidadPuertaReloj/2)
 
 		// Puerta Cristal
-		csg = new CSG().union([new THREE.Mesh(geoRelojRecorte, this.material),
-			new THREE.Mesh(geoCajaRecorte, this.material)])
+		csg = new CSG().union([new THREE.Mesh(geoRelojRecorte, this.materialCristal),
+			new THREE.Mesh(geoCajaRecorte, this.materialCristal)])
 
 		meshPuertaReloj.add(csg.toMesh())
 
@@ -533,7 +569,7 @@ class ManecillaHora extends THREE.Object3D
 		this.escalado = dimensiones.escalado / 10
 		this.radioCilindroRecorte = dimensiones.radioCilindroRecortado
 
-		this.material = new THREE.MeshNormalMaterial({opacity: 0.5,transparent: true})
+		this.material = new THREE.MeshBasicMaterial({color: 0x222222})
 
 		let formaManecillaHoras= new THREE.Shape()
 
@@ -592,7 +628,7 @@ class ManecillaMinuto extends THREE.Object3D
 		this.escalado = dimensiones.escalado / 10
 		this.radioCilindroRecorte = dimensiones.radioCilindroRecortado
 
-		this.material = new THREE.MeshNormalMaterial({opacity: 0.5,transparent: true})
+		this.material = new THREE.MeshBasicMaterial({color: 0x222222})
 
 		let formaManecillaMinutos = new THREE.Shape()
 

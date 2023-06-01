@@ -720,7 +720,7 @@ class CuboCentral extends THREE.Object3D
 				switch (this.animaciones.keypad.boton.name)
 				{
 					case "OK":
-						if (this.animaciones.keypad.codigoActual === GameState.tmp.keypadCode)
+						if (this.animaciones.keypad.codigoActual === GameState.gameData.keypadCode)
 						{
 							this._quitarPanel(2)
 						}
@@ -739,7 +739,7 @@ class CuboCentral extends THREE.Object3D
 					default:
 						this.animaciones.keypad.codigoActual += this.animaciones.keypad.boton.name
 
-						if (this.animaciones.keypad.codigoActual.length > GameState.tmp.keypadCode.length)
+						if (this.animaciones.keypad.codigoActual.length > GameState.gameData.keypadCode.length)
 						{
 							// Limpiar la pantalla y actualizar la textura haciendo una animación
 							this.animaciones.keypad.codigoActual = ""

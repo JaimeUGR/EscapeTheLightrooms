@@ -1,4 +1,6 @@
 
+import * as THREE from "../../libs/three.module.js"
+
 import {Sala} from "./Sala.js"
 import {PuzleSimon} from "../puzles/PuzleSimon.js"
 import {GameState} from "../GameState.js"
@@ -7,6 +9,7 @@ import {Vitrina} from "../models/Vitrina.js"
 
 import {Laser} from "../models/Laser.js"
 import {PalancaPared} from "../models/PalancaPared.js"
+import {Lampara} from "../models/Lampara.js"
 
 class SalaSuperior extends Sala
 {
@@ -43,7 +46,37 @@ class SalaSuperior extends Sala
 
 	colocarLuces()
 	{
+		this.pointLight = new THREE.PointLight(0xffeeee,
+			0.2, Math.max(this.largoParedZ, this.largoParedX)*0.8, 0.5)
+		GameState.luces.luzSalaSuperior = this.pointLight
 
+		// Crear la lámpara
+		{
+			let lampara = new Lampara()
+			lampara.rotateX(Math.PI)
+			lampara.translateY(-this.alturaPared)
+			lampara.translateX(this.largoParedX/2)
+			lampara.translateZ(-this.largoParedZ/2)
+
+			this.add(lampara)
+			this.lampara = lampara
+		}
+
+		// NOTE: se engancharía a la lámpara
+		let targetTmp = new THREE.Object3D()
+		targetTmp.name = "TargetLuz"
+		targetTmp.position.set(this.largoParedX/2, 0, this.largoParedZ/2)
+
+		// Posicionarla con la lámpara del techo
+		const posicionBombillaLampara = this.lampara.altoBase + this.lampara.altoPilar + this.lampara.altoSoporteBombilla
+
+		this.pointLight.position.set(this.largoParedX/2, this.alturaPared - posicionBombillaLampara, this.largoParedZ/2);
+		this.pointLight.target = targetTmp
+
+		GameState.scene.add(new THREE.PointLightHelper(this.pointLight, 1, 0xffffff))
+
+		this.add(targetTmp)
+		this.add(this.pointLight)
 	}
 
 	colocarModelos()

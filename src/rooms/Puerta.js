@@ -1,15 +1,17 @@
 
 import * as THREE from '../../libs/three.module.js'
+import {CSG} from "../../libs/CSG-v2.js"
+
 import {Sala} from "./Sala.js"
-import {CSG} from "../../libs/CSG-v2.js";
 
 const Marco_X = 1
 const Maro_Z= 2
 
 class Puerta extends THREE.Object3D
 {
-	constructor() {
-		super();
+	constructor()
+	{
+		super()
 
 		this.puertaMaterial = new THREE.MeshNormalMaterial({color: 0Xf1f1f1,opacity: 0.5,transparent: true})
 		this.puertaGeo = new THREE.BoxGeometry(Sala.AnchoPuerta(),Sala.AltoPuerta(),Sala.GrosorPared())
@@ -28,22 +30,22 @@ class Puerta extends THREE.Object3D
 	}
 
 	createPomo(){
-		let pomo = new THREE.Object3D();
-		let points = [];
+		let pomo = new THREE.Object3D()
+		let points = []
 
-		points.push(new THREE.Vector3(1,0,0));
-		points.push(new THREE.Vector3(1,0.5,0));
-		points.push(new THREE.Vector3(1.5,0.5,0));
-		points.push(new THREE.Vector3(1.5,1,0));
-		points.push(new THREE.Vector3(1,1,0));
-		points.push(new THREE.Vector3(0,1,0));
+		points.push(new THREE.Vector3(1,0,0))
+		points.push(new THREE.Vector3(1,0.5,0))
+		points.push(new THREE.Vector3(1.5,0.5,0))
+		points.push(new THREE.Vector3(1.5,1,0))
+		points.push(new THREE.Vector3(1,1,0))
+		points.push(new THREE.Vector3(0,1,0))
 
-		let pomoMesh = new THREE.Mesh( new THREE.LatheGeometry (points,50,0,Math.PI* 2),this.puertaMaterial);
+		let pomoMesh = new THREE.Mesh( new THREE.LatheGeometry (points,50,0,Math.PI* 2),this.puertaMaterial)
 		pomoMesh.rotateX(Math.PI/2)
 		pomoMesh.position.set(Sala.AnchoPuerta()/2+Sala.AnchoPuerta()/4,Sala.AltoPuerta()/2,Sala.GrosorPared()/2)
 		pomo.add(pomoMesh)
 
-		return pomo;
+		return pomo
 	}
 
 }
@@ -66,12 +68,7 @@ class MarcoPasillo extends THREE.Object3D
 		//this.add(new THREE.Mesh(geoPuerta,this.marcoMaterial))
 
 		this.add(new CSG().union([new THREE.Mesh(this.geoMarco, this.marcoMaterial)]).subtract([new THREE.Mesh(geoPuerta, null)]).toMesh())
-
-
-
-
 	}
-
 }
 
 class MarcoPuerta extends MarcoPasillo

@@ -11,15 +11,13 @@ class Cuadro extends THREE.Object3D
 		baseX: 5,
 		baseY: 6,
 		baseZ: 0.3,
-
 		borde: 0.5,
 
-		huecoX: 1,
-		huecoY: 1,
 		huecoZ: 0.1
-
-
-	}, pathCuadro, pathPoster)
+	},
+		pathCuadro = "../../resources/textures/models/PinkMarble.jpg",
+		pathPoster = "../../resources/textures/models/gigachad_1.png"
+	)
 	{
 		super()
 
@@ -69,13 +67,12 @@ class Cuadro extends THREE.Object3D
 		cuadro.add(cuadroMesh)
 
 		let poster = new Poster(this.huecoX, this.huecoY, this.pathPoster)
-		poster.position.z = this.baseZ - this.huecoZ + 0.001
+		poster.position.z = this.baseZ - this.huecoZ/2
+
+		cuadro.translateX(this.baseX/2)
+		cuadro.translateY(this.baseY/2)
 
 		cuadro.add(poster)
-
-		// TODO: Rotar cuadro
-		//cuadro.rotateY(Math.PI/2)
-		//cuadro.position.x = -this.baseX/2
 
 		this.add(cuadro)
 	}

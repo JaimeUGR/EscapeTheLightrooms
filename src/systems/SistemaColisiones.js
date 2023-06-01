@@ -78,16 +78,9 @@ class SistemaColisiones
 		this.debugPlayerBB = new THREE.LineSegments(new THREE.WireframeGeometry(geoPlano), new THREE.LineBasicMaterial({
 			color: 0xffde2b
 		}))
-		this.debugNode.add(this.debugPlayerBB)
+		//this.debugNode.add(this.debugPlayerBB)
 
-		// Para hacer debug
-		/*this.aniadeRectColliders("test", [
-			new Rect(new THREE.Vector2(10, 0), new THREE.Vector2(50, 20)),
-			new Rect(new THREE.Vector2(15, 20), new THREE.Vector2(10, 30))
-		])*/
-
-		this.debugTimerStart = 0
-		this.debugTimerEnd = 0
+		GameState.debug.O3Player.add(this.debugPlayerBB)
 	}
 
 	aniadeRectColliders(uuid, rects)
@@ -231,7 +224,7 @@ class SistemaColisiones
 		let colRes = null
 
 		// TODO: Temporal
-		if (GameState.tmp.colsEnabled)
+		if (GameState.gameData.colsEnabled)
 		{
 			// Obtener el rectángulo que contiene al jugador y al objetivo
 			let searchRect = this.cached.rect
@@ -264,7 +257,7 @@ class SistemaColisiones
 		playerRect.pos.y = playerPos.z - playerRect.size.y/2
 
 		// DEBUG: Actualizar la posición de la BB del jugador
-		this.debugPlayerBB.position.set(playerPos.x, 0,
+		GameState.debug.O3Player.position.set(playerPos.x, -50,
 			playerPos.z)
 	}
 }

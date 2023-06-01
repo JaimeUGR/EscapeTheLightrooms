@@ -138,7 +138,7 @@ class GestorCamaras
 				if (this.activeCameraID !== ID_CAMARA_PRINCIPAL)
 					return
 
-				if (GameState.tmp.cameraLock)
+				if (GameState.gameData.cameraLock)
 				{
 					// TODO: TEMPORAL, NO FUNCIONARA CON OTROS CONTROLADORES
 					// Desbloqueamos la cámara
@@ -152,11 +152,11 @@ class GestorCamaras
 					this.activeController.disable()
 				}
 
-				GameState.tmp.cameraLock = !GameState.tmp.cameraLock
+				GameState.gameData.cameraLock = !GameState.gameData.cameraLock
 				return
 				break
 			case "KeyX":
-				GameState.tmp.colsEnabled = !GameState.tmp.colsEnabled
+				GameState.gameData.colsEnabled = !GameState.gameData.colsEnabled
 				return
 				break
 			case "KeyZ":

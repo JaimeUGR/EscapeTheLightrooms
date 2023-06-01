@@ -1,5 +1,5 @@
 
-import {Vector2, Vector3, TextureLoader} from "../libs/three.module.js"
+import {Vector2, Vector3, TextureLoader, Object3D} from "../libs/three.module.js"
 import {Rect} from "./structures/Rect.js"
 
 import {Tarjeta} from "./models/items/Tarjeta.js"
@@ -43,12 +43,27 @@ class GameState
 			salaPrincipal: null
 		}
 
-		// Temporal
-		this.tmp = {
+		this.debug = {
+			O3Player: new Object3D(),
+			controlesVuelo: true // TODO: A FALSE
+		}
+
+		this.gameData = {
+			interactionRangeEnabled: false, // TODO: A TRUE
+			interactionRange: 50,
 			cameraLock: false,
 			colsEnabled: true,
 			gameStarted: false,
-			keypadCode: "1234"
+			keypadCode: "6969"
+		}
+
+		this.luces = {
+			luzAmbiente: null,
+			luzSimon: null,
+			luzSalaPrincipal: null,
+			luzSalaIzquierda: null,
+			luzSalaDerecha: null,
+			luzSalaSuperior: null
 		}
 
 		this.systems = {

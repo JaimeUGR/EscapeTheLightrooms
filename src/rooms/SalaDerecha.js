@@ -1,18 +1,18 @@
 
+import * as THREE from "../../libs/three.module.js"
+
 import {Sala} from "./Sala.js"
-
 import {Cajonera} from "../models/Cajonera.js"
-
 import {Reloj, ManecillaHora, ManecillaMinuto} from "../models/Reloj.js"
-
-import {GameState} from "../GameState.js"
 import {Taquilla} from "../models/Taquilla.js"
+import {Cuadro} from "../models/Cuadro.js"
 
 import {Laser} from "../models/Laser.js"
 import {PalancaPared} from "../models/PalancaPared.js"
+import {Lampara} from "../models/Lampara.js"
 
+import {GameState} from "../GameState.js"
 import {RandomInt} from "../Utils.js"
-
 
 class SalaDerecha extends Sala
 {
@@ -35,11 +35,11 @@ class SalaDerecha extends Sala
 		// Añadir las luces
 		this.colocarLuces()
 
-		// Añadir los modelos
-		this.colocarModelos()
-
 		// Añadir los puzles
 		this.colocarPuzles()
+
+		// Añadir los modelos
+		this.colocarModelos()
 
 		// Añadir los items
 		this.colocarItems()
@@ -52,7 +52,38 @@ class SalaDerecha extends Sala
 
 	colocarLuces()
 	{
+		// TODO: Hacer spot?
+		this.pointLight = new THREE.PointLight(0xeeffee,
+			0.4, Math.max(this.largoParedZ, this.largoParedX)*0.7, 0.5)
+		GameState.luces.luzSalaDerecha = this.pointLight
 
+		// Crear la lámpara
+		{
+			let lampara = new Lampara()
+			lampara.rotateX(Math.PI)
+			lampara.translateY(-this.alturaPared)
+			lampara.translateX(this.largoParedX/2)
+			lampara.translateZ(-this.largoParedZ/2)
+
+			this.add(lampara)
+			this.lampara = lampara
+		}
+
+		// NOTE: se engancharía a la lámpara
+		let targetTmp = new THREE.Object3D()
+		targetTmp.name = "TargetLuz"
+		targetTmp.position.set(this.largoParedX/2, 0, this.largoParedZ/2)
+
+		// Posicionarla con la lámpara del techo
+		const posicionBombillaLampara = this.lampara.altoBase + this.lampara.altoPilar + this.lampara.altoSoporteBombilla
+
+		this.pointLight.position.set(this.largoParedX/2, this.alturaPared - posicionBombillaLampara, this.largoParedZ/2);
+		this.pointLight.target = targetTmp
+
+		GameState.scene.add(new THREE.PointLightHelper(this.pointLight, 1, 0xffffff))
+
+		this.add(targetTmp)
+		this.add(this.pointLight)
 	}
 
 	colocarModelos()
@@ -113,6 +144,42 @@ class SalaDerecha extends Sala
 
 			this.cajoneraReloj = cajonera
 			GameState.systems.interaction.allInteractables.push(cajonera)
+		}
+
+		//
+		// Cuadros
+		//
+		{
+			let cuadroPaco = new Cuadro({
+				baseX: 28,
+				baseY: 30,
+				baseZ: 0.5,
+
+				borde: 2,
+				huecoZ: 0.3
+			})
+
+			cuadroPaco.translateX(this.largoParedX/4 - cuadroPaco.baseX/2
+				- (this.reloj.cajaX/2 + this.reloj.pilarX + this.reloj.trapSup.XSup)/2)
+			cuadroPaco.translateY(this.alturaPared/2)
+
+			this.add(cuadroPaco)
+
+
+			let cuadroJaime = new Cuadro({
+				baseX: 35,
+				baseY: 60,
+				baseZ: 0.5,
+
+				borde: 2,
+				huecoZ: 0.3
+			}, undefined, "../../resources/textures/models/gigachad_2.jpg")
+
+			cuadroJaime.translateX(this.largoParedX/2 + this.largoParedX/4 - cuadroJaime.baseX/2
+				+ (this.reloj.cajaX/2 + this.reloj.pilarX + this.reloj.trapSup.XSup)/2)
+			cuadroJaime.translateY(this.alturaPared/2 - cuadroJaime.baseY/2)
+
+			this.add(cuadroJaime)
 		}
 	}
 

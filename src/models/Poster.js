@@ -13,18 +13,15 @@ class Poster extends THREE.Object3D
 		this.altura = alto
 		this.path = path
 
-		//this.materialSofa = new THREE.MeshNormalMaterial({opacity: 0.5,transparent: true})
 
 		let loader = GameState.txLoader
-
 		let texturaPoster = loader.load(this.path)
+		this.materialPoster = new THREE.MeshLambertMaterial({map: texturaPoster})
 
-		let materialPoster = new THREE.MeshLambertMaterial({map: texturaPoster})
+		let planeGeometry = new THREE.PlaneGeometry(this.ancho, this.altura)
+		planeGeometry.translate(0,0, 0.01)
 
-		let planeGeometry = new THREE.PlaneGeometry(this.ancho, this.altura);
-		planeGeometry.translate(0,0, 0)
-
-		let planoMesh = new THREE.Mesh(planeGeometry, materialPoster)
+		let planoMesh = new THREE.Mesh(planeGeometry, this.materialPoster)
 
 		this.add(planoMesh)
 	}

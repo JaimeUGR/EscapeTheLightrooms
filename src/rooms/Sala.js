@@ -10,6 +10,7 @@ import {SistemaColisiones} from "../systems/SistemaColisiones.js"
 const Sala_PuertaAncho = 24
 const Sala_PuertaAlto = 38
 const Sala_GrosorPared = 2
+const Marcos_GrosorInterior = 1
 
 class Sala extends THREE.Object3D
 {
@@ -68,23 +69,35 @@ class Sala extends THREE.Object3D
 
 		let texturaParedX = GameState.txLoader.load(this.pathTexturas.pared)
 		let texturaParedZ = GameState.txLoader.load(this.pathTexturas.pared)
+		let texturaParedXGris = GameState.txLoader.load("../../resources/textures/rooms/gris_gotele.jpg")
+		let texturaParedZGris = GameState.txLoader.load("../../resources/textures/rooms/gris_gotele.jpg")
 
 		texturaParedX.wrapS = THREE.RepeatWrapping
 		texturaParedZ.wrapS = THREE.RepeatWrapping
+		texturaParedXGris.wrapS = THREE.RepeatWrapping
+		texturaParedZGris.wrapS = THREE.RepeatWrapping
 
 		texturaParedX.wrapT = THREE.MirroredRepeatWrapping
 		texturaParedZ.wrapT = THREE.MirroredRepeatWrapping
+		texturaParedXGris.wrapT = THREE.MirroredRepeatWrapping
+		texturaParedZGris.wrapT = THREE.MirroredRepeatWrapping
 
 		texturaParedX.repeat.set(this.largoParedX / 25, 2)
 		texturaParedZ.repeat.set(this.largoParedZ / 25, 2)
+		texturaParedXGris.repeat.set(this.largoParedX / 25, 2)
+		texturaParedZGris.repeat.set(this.largoParedZ / 25, 2)
 
 		this.materialParedX = new THREE.MeshLambertMaterial({
 			map: texturaParedX,
+			bumpMap: texturaParedXGris,
+			bumpScale: 0.2,
 			color: 0xffffff
 		})
 
 		this.materialParedZ = new THREE.MeshLambertMaterial({
 			map: texturaParedZ,
+			bumpMap: texturaParedZGris,
+			bumpScale: 0.2,
 			color: 0xffffff
 		})
 
@@ -118,16 +131,54 @@ class Sala extends THREE.Object3D
 
 		// Se debería añadir un marquito a la puerta, por la zona interna de la sala
 		if (puertas.down)
+		{
 			paredAbajoGeo = this.recortarPuerta(paredAbajoGeo, this.materialParedX, puerta)
 
+			// Añadir marco
+			let marco = new Marcos()
+			marco.translateX(this.largoParedX/2)
+
+			this.add(marco)
+		}
+
 		if (puertas.up)
+		{
 			paredArribaGeo = this.recortarPuerta(paredArribaGeo, this.materialParedX, puerta)
 
+			// Añadir marco
+			let marco = new Marcos()
+			marco.rotateY(Math.PI)
+			marco.translateX(-this.largoParedX/2)
+			marco.translateZ(-this.largoParedZ)
+
+			this.add(marco)
+		}
+
 		if (puertas.left)
+		{
 			paredIzdaGeo = this.recortarPuerta(paredIzdaGeo, this.materialParedZ, puerta)
 
+			// Añadir marco
+			let marco = new Marcos()
+			marco.rotateY(-Math.PI/2)
+			marco.translateX(this.largoParedZ/2)
+			marco.translateZ(-this.largoParedX)
+
+			this.add(marco)
+		}
+
+
 		if (puertas.right)
+		{
 			paredDchaGeo = this.recortarPuerta(paredDchaGeo, this.materialParedZ, puerta)
+
+			// Añadir marco
+			let marco = new Marcos()
+			marco.rotateY(Math.PI/2)
+			marco.translateX(-this.largoParedZ/2)
+
+			this.add(marco)
+		}
 
 		// Colocar las paredes en su posición final
 		paredIzdaGeo.rotateY(Math.PI/2)
@@ -324,7 +375,7 @@ class Pasillo extends THREE.Object3D
 		texturaSuelo.wrapT = THREE.RepeatWrapping
 		texturaSuelo.repeat.set(this.espacioInterno/15, this.largoPasillo/15)
 
-		this.materialSuelo = new THREE.MeshLambertMaterial({color: 0x852a3b, map: texturaSuelo})
+		this.materialSuelo = new THREE.MeshLambertMaterial({color: 0xffffff, map: texturaSuelo})
 
 		//
 		let texturaParedX = GameState.txLoader.load(this.pathTexturas.pared)
@@ -354,11 +405,29 @@ class Pasillo extends THREE.Object3D
 
 		texturaTecho.wrapS = THREE.RepeatWrapping
 		texturaTecho.wrapT = THREE.RepeatWrapping
-		texturaTecho.repeat.set(this.largoParedX / 32, this.largoParedZ / 32)
+		texturaTecho.repeat.set(this.espacioInterno / 32, this.largoPasillo / 32)
 
-		this.materialTecho = new THREE.MeshLambertMaterial({color: 0x35a78b})
+		this.materialTecho = new THREE.MeshLambertMaterial({
+			map: texturaTecho,
+			color: 0xffffff
+		})
 
-		this.materialCierre = new THREE.MeshLambertMaterial({color: 0x455382})
+		//
+
+		let texturaCierre = GameState.txLoader.load(this.pathTexturas.pared)
+
+		texturaCierre.wrapS = THREE.RepeatWrapping
+		texturaCierre.wrapT = THREE.MirroredRepeatWrapping
+		texturaCierre.repeat.set(1, 2)
+
+		this.materialCierre = new THREE.MeshLambertMaterial({
+			map: texturaCierre,
+			color: 0xffffff
+		})
+
+		//
+		// Modelado
+		//
 
 		// Puerta
 		let geoPuerta = new THREE.BoxGeometry(Sala_PuertaAncho, Sala_PuertaAlto, Sala_GrosorPared)
@@ -404,6 +473,18 @@ class Pasillo extends THREE.Object3D
 
 		this.cierre = new THREE.Mesh(geoCierre, this.materialCierre)
 		this.add(this.cierre)
+
+		// Marcos
+		let marcoTrasero = new Marcos()
+		marcoTrasero.translateZ(-this.largoPasillo/2)
+
+		this.add(marcoTrasero)
+
+		let marcoFrontal = new Marcos()
+		marcoFrontal.rotateY(Math.PI)
+		marcoFrontal.translateZ(-this.largoPasillo/2)
+
+		this.add(marcoFrontal)
 
 		//
 		// Colliders
@@ -537,4 +618,102 @@ class Pasillo extends THREE.Object3D
 	}
 }
 
-export {Sala, Pasillo}
+class Marcos extends THREE.Object3D
+{
+	static GrosorInterior()
+	{
+		return Marcos_GrosorInterior
+	}
+
+	constructor(dimensiones = {
+		xColumna: 2,
+		zColumna: 1
+	})
+	{
+		super()
+
+		this.marcoExteriorX = dimensiones.xColumna
+		this.marcoExteriorZ = dimensiones.zColumna
+
+		//
+		// Materiales
+		//
+
+		this.materialMarcosExteriores = new THREE.MeshNormalMaterial({opacity: 0.8, transparent: true})
+		this.materialMarcosInteriores = new THREE.MeshNormalMaterial({opacity: 0.8, transparent: true})
+		this.materialMarcoInteriorInferior = new THREE.MeshNormalMaterial({opacity: 0.8, transparent: true})
+
+		//
+		// Modelado
+		//
+
+		//
+		// Marcos Exteriores
+		//
+
+		// NOTE: El marco es lo único delante de los ejes XY (en Z+)
+
+		const altoPuerta = Sala.AltoPuerta()
+		const anchoPuerta = Sala.AnchoPuerta()
+
+		// Laterales
+		let geoMarcoLateralExterior = new THREE.BoxGeometry(this.marcoExteriorX, altoPuerta, this.marcoExteriorZ)
+		geoMarcoLateralExterior.translate(0, altoPuerta/2, this.marcoExteriorZ/2)
+
+		// Izquierdo
+		let geoMarcoLateralExteriorIzd = geoMarcoLateralExterior.clone()
+		geoMarcoLateralExteriorIzd.translate(-(this.marcoExteriorX/2 + anchoPuerta/2), 0, 0)
+
+		// Derecho
+		let geoMarcoLateralExteriorDcha = geoMarcoLateralExterior
+		geoMarcoLateralExteriorDcha.translate(this.marcoExteriorX/2 + anchoPuerta/2, 0, 0)
+
+		// Superior
+		let geoMarcoSuperiorExterior = new THREE.BoxGeometry(anchoPuerta + 2*this.marcoExteriorX, this.marcoExteriorX, this.marcoExteriorZ)
+		geoMarcoSuperiorExterior.translate(0, this.marcoExteriorX/2 + altoPuerta, this.marcoExteriorZ/2)
+
+		// Unir todos los materiales
+		let csg = new CSG().union([new THREE.Mesh(geoMarcoLateralExteriorIzd, this.materialMarcosExteriores),
+		new THREE.Mesh(geoMarcoSuperiorExterior, null), new THREE.Mesh(geoMarcoLateralExteriorDcha, null)])
+
+		this.meshMarcosExteriores = csg.toMesh()
+		this.add(this.meshMarcosExteriores)
+
+		//
+		// Marcos interiores
+		//
+
+		const grosorMarcoInterior = Marcos.GrosorInterior()
+		const grosorPared = Sala.GrosorPared()
+
+		// Lateral
+		let geoMarcoLateralInterior = new THREE.BoxGeometry(grosorMarcoInterior, altoPuerta, grosorPared)
+		geoMarcoLateralInterior.translate(0, altoPuerta/2, -grosorPared/2)
+
+		// Izquierda
+		let geoMarcoLateralInteriorIzda = geoMarcoLateralInterior.clone()
+		geoMarcoLateralInteriorIzda.translate(grosorMarcoInterior/2 - anchoPuerta/2, 0, 0)
+
+		// Derecha
+		let geoMarcoLateralInteriorDcha = geoMarcoLateralInterior
+		geoMarcoLateralInteriorDcha.translate(anchoPuerta/2 - grosorMarcoInterior/2, 0, 0)
+
+		// Superior
+		let geoMarcoSuperiorInterior = new THREE.BoxGeometry(anchoPuerta, grosorMarcoInterior, grosorPared)
+		geoMarcoSuperiorInterior.translate(0, altoPuerta - grosorMarcoInterior/2, -grosorPared/2)
+
+		csg = new CSG().union([new THREE.Mesh(geoMarcoLateralInteriorIzda, this.materialMarcosInteriores),
+		new THREE.Mesh(geoMarcoSuperiorInterior, null), new THREE.Mesh(geoMarcoLateralInteriorDcha, null)])
+
+		this.meshMarcosInteriores = csg.toMesh()
+		this.add(this.meshMarcosInteriores)
+
+		// Inferior
+		let geoMarcoInferiorInterior = new THREE.BoxGeometry(anchoPuerta, 1, grosorPared)
+		geoMarcoInferiorInterior.translate(0, -0.5, -grosorPared/2)
+
+		this.add(new THREE.Mesh(geoMarcoInferiorInterior, this.materialMarcoInteriorInferior))
+	}
+}
+
+export {Sala, Pasillo, Marcos}
