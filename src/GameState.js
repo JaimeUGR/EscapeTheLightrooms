@@ -35,9 +35,9 @@ class GameState
 			tieneManecillaHora: false,
 			tieneManecillaMinuto: false,
 			tieneTarjeta: false,
-			tienePrisma: true, // TODO: TMP
-			tienePila: false,
-			robotConPila: true // TODO: TMP
+			tienePrisma: false, // TODO: TMP
+			tienePila: false, // TODO: TMP
+			robotConPila: false
 		}
 
 		this.salas = {

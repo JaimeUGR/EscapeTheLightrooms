@@ -16,6 +16,8 @@ import {Lampara} from "../models/Lampara.js"
 import {Taquilla} from "../models/Taquilla.js"
 import {Cuadro} from "../models/Cuadro.js"
 
+import {Config} from "../Config.js"
+
 class SalaSuperior extends Sala
 {
 	constructor(largoParedX, largoParedZ, alturaPared, puertas = {
@@ -51,10 +53,6 @@ class SalaSuperior extends Sala
 
 	colocarLuces()
 	{
-		this.pointLight = new THREE.PointLight(0xffeeee,
-			0.2, Math.max(this.largoParedZ, this.largoParedX)*0.8, 0.5)
-		GameState.luces.luzSalaSuperior = this.pointLight
-
 		// Crear la lámpara
 		{
 			let lampara = new Lampara()
@@ -66,6 +64,13 @@ class SalaSuperior extends Sala
 			this.add(lampara)
 			this.lampara = lampara
 		}
+
+		if (!Config.LIGHTS_ENABLED)
+			return
+
+		this.pointLight = new THREE.PointLight(0xffeeee,
+			0.2, Math.max(this.largoParedZ, this.largoParedX)*0.8, 0.5)
+		GameState.luces.luzSalaSuperior = this.pointLight
 
 		// NOTE: se engancharía a la lámpara
 		let targetTmp = new THREE.Object3D()

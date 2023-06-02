@@ -190,10 +190,25 @@ class Robot extends THREE.Object3D
 		// Animación
 		this.animaciones = {}
 
-		this.materialPrincipal = new THREE.MeshBasicMaterial({color: 0x555555})
-		this.materialSecundario = new THREE.MeshBasicMaterial({color: 0x232323})
-		this.materialOjos = this.materialSecundario
-		this.materialBoca = this.materialSecundario
+		//
+		// Materiales
+		//
+
+		const txLoader = GameState.txLoader
+
+		let texturaPrincipal = txLoader.load("../../resources/textures/models/metal-gris.jpg")
+		this.materialPrincipal = new THREE.MeshLambertMaterial({map: texturaPrincipal})
+
+		let texturaSecundaria = txLoader.load("../../resources/textures/models/metal-negro.jpg")
+		this.materialSecundario = new THREE.MeshLambertMaterial({map: texturaSecundaria})
+
+		let texturaOjos = txLoader.load("../../resources/textures/models/plastico.jpg")
+		this.materialOjos = new THREE.MeshLambertMaterial({map: texturaOjos, color: 0xe8583f})
+		this.materialBoca = new THREE.MeshLambertMaterial({map: texturaSecundaria})
+
+		//
+		// Modelado
+		//
 
 		//
 		// TRONCO INFERIOR
@@ -418,7 +433,7 @@ class Robot extends THREE.Object3D
 
 		// Cabeza
 		{
-			let geoCuello = new THREE.CylinderGeometry(this.dimCabeza.radioCuello, this.dimCabeza.radioCuello, 2*this.dimCabeza.alturaCuello)
+			let geoCuello = new THREE.CylinderGeometry(this.dimCabeza.radioCuello, this.dimCabeza.radioCuello, 2*this.dimCabeza.alturaCuello, 20)
 			geoCuello.translate(0, 0, 0)
 
 			let geoCabeza = new THREE.BoxGeometry(this.dimCabeza.cabezaX, this.dimCabeza.cabezaY, this.dimCabeza.cabezaZ)
@@ -507,7 +522,15 @@ class Robot extends THREE.Object3D
 			if (!GameState.flags.tienePila)
 				return
 
+			if (this.enAnimacionContinua)
+				return
+
+			// Mecanismo de seguridad
+			this.animaciones.animacionContinua.stop()
+			this.animacionContinuaActivada = false
+
 			GameState.flags.tienePila = false
+
 			this.O3Pila.add(GameState.items.pila)
 			this.animaciones.colocarPila.start()
 		}
@@ -546,12 +569,68 @@ class Robot extends THREE.Object3D
 				GameState.items.pila.position.z = framePilaGirada.tZ
 			})
 			.onComplete(() => {
-				GameState.flags.robotConPila = true
-				// TODO: hacer una animación de que está feliz o algo
+				this.materialOjos.color.setHex(0x33aa33)
 				console.log("El robot está feliz porque tiene la pila")
 			})
 
+		//
+		// Animación indicación
+		//
+
+		let frameTroncoInf_I = {rY: 0}
+		let frameTroncoInf_F = {rY: -Math.PI/2 + 0.02}
+
+		let frameTroncoSup_I = {rY: 0}
+		let frameTroncoSup_F = {rY: -Math.PI/2 + 0.02}
+
+		let animacionGirarTroncoInf = new TWEEN.Tween(frameTroncoInf_I).to(frameTroncoInf_F, 1000)
+			.onUpdate(() => {
+				this.troncoInferior.rotation.y = frameTroncoInf_I.rY
+			})
+
+		let animacionGirarTroncoSup = new TWEEN.Tween(frameTroncoSup_I).to(frameTroncoSup_F, 1000)
+			.onUpdate(() => {
+				this.troncoSuperior.rotation.y = frameTroncoSup_I.rY
+			})
+
+		let frameBrazoAbajo = {rX: 0}
+		let frameBrazoArriba = {rX: -76 / 180 * Math.PI}
+
+		let animacionGirarBrazo = new TWEEN.Tween(frameBrazoAbajo).to(frameBrazoArriba, 1000)
+			.onUpdate(() => {
+				this.brazoDerecho.rotation.x = frameBrazoAbajo.rX
+			})
+
+		let frameBrazoAlargar_I = {sY: 1}
+		let frameBrazoAlargar_F = {sY: 9.5}
+
+		let animacionDesalargarBrazo = new TWEEN.Tween(frameBrazoAlargar_F).to(frameBrazoAlargar_I, 1000)
+			.onUpdate(() => {
+				this.elementos.brazoDerecho.MBS.scale.y = frameBrazoAlargar_F.sY
+				this.elementos.brazoDerecho.MU.position.y = -this.dimBrazos.brazoSupY*frameBrazoAlargar_F.sY
+			})
+
+		let animacionAlargarBrazo = new TWEEN.Tween(frameBrazoAlargar_I).to(frameBrazoAlargar_F, 1000)
+			.onUpdate(() => {
+				this.elementos.brazoDerecho.MBS.scale.y = frameBrazoAlargar_I.sY
+				this.elementos.brazoDerecho.MU.position.y = -this.dimBrazos.brazoSupY*frameBrazoAlargar_I.sY
+			})
+			.onComplete(() => {
+				frameBrazoAlargar_I.sY = 1
+
+				setTimeout(() => {
+					animacionDesalargarBrazo.start()
+				}, 1000)
+
+				// NOTE: Desbloquear la puerta
+				GameState.flags.robotConPila = true
+			})
+
 		animacionGirarPila.chain(animacionMeterPila)
+		animacionMeterPila.chain(animacionGirarTroncoInf)
+		animacionGirarTroncoInf.chain(animacionGirarTroncoSup)
+		animacionGirarTroncoSup.chain(animacionGirarBrazo)
+		animacionGirarBrazo.chain(animacionAlargarBrazo)
 
 		this.animaciones.colocarPila = animacionGirarPila
 	}

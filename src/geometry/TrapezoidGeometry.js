@@ -104,52 +104,52 @@ class TrapezoidGeometry extends THREE.BufferGeometry
 			])
 
 			const uvs = new Float32Array([
-				// Base inferior
+				// Cara inferior
 				0, 1,
-				1, 1, //
-				0, 0,
 				1, 1,
-				1, 0, //
+				1, 0,
+				0, 1,
+				1, 0,
 				0, 0,
 
-				// Frontal
+				// Cara frontal
 				0, 1,
-				1, 1, //
-				0, 0,
 				1, 1,
-				1, 0, //
+				1, 0,
+				1, 0,
+				0, 0,
+				0, 1,
+
+				// Cara derecha
+				0, 1,
+				1, 1,
+				1, 0,
+				0, 1,
+				1, 0,
 				0, 0,
 
-				// Lateral Dcha
+				// Cara Trasera
 				0, 1,
-				1, 1, //
-				0, 0,
 				1, 1,
-				1, 0, //
+				1, 0,
+				0, 1,
+				1, 0,
 				0, 0,
 
-				// Trasera
+				// Cara izquierda
 				0, 1,
-				1, 1, //
-				0, 0,
 				1, 1,
-				1, 0, //
+				1, 0,
+				0, 1,
+				1, 0,
 				0, 0,
 
-				// Lateral Izda
+				// Cara superior
 				0, 1,
-				1, 1, //
-				0, 0,
 				1, 1,
-				1, 0, //
-				0, 0,
-
-				// Base superior
+				1, 0,
 				0, 1,
-				1, 1, //
-				0, 0,
-				1, 1,
-				1, 0, //
+				1, 0,
 				0, 0,
 			])
 

@@ -25,14 +25,11 @@ import {SalaPrincipal} from "./rooms/SalaPrincipal.js"
 import {SalaIzquierda} from "./rooms/SalaIzquierda.js"
 import {SalaDerecha} from "./rooms/SalaDerecha.js"
 import {SalaSuperior} from "./rooms/SalaSuperior.js"
-import {QuadTreeContainer} from "./structures/QuadTree.js"
-import {Rect} from "./structures/Rect.js"
 
-import {Cajonera} from "./models/Cajonera.js"
-import {Taquilla} from "./models/Taquilla.js"
-import {GameState} from "./GameState.js";
-import {SistemaColisiones} from "./systems/SistemaColisiones.js";
-import {SistemaInteraccion} from "./systems/SistemaInteraccion.js";
+import {GameState} from "./GameState.js"
+import {SistemaColisiones} from "./systems/SistemaColisiones.js"
+import {SistemaInteraccion} from "./systems/SistemaInteraccion.js"
+import {Config} from "./Config.js"
 
 
 /**
@@ -307,7 +304,7 @@ class EscapeTheLightrooms extends THREE.Scene
 	createLights()
 	{
 		// Ambiental
-		const ambientLight = new THREE.AmbientLight(0xccddee, 0.45)
+		const ambientLight = new THREE.AmbientLight(0xccddee, (Config.LIGHTS_ENABLED) ? 0.45 : 0.95)
 		this.add(ambientLight)
 	}
 

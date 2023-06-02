@@ -14,6 +14,7 @@ import {Vitrina} from "../models/Vitrina.js"
 
 import {Lampara} from "../models/Lampara.js"
 import {ManecillaMinuto} from "../models/Reloj.js"
+import {Config} from "../Config.js"
 import {RandomInt} from "../Utils.js"
 
 
@@ -52,10 +53,6 @@ class SalaIzquierda extends Sala
 
 	colocarLuces()
 	{
-		this.pointLight = new THREE.PointLight(0xeeeeff,
-			0.5, Math.max(this.largoParedZ, this.largoParedX)*0.75, 0.5)
-		GameState.luces.luzSalaIzquierda = this.pointLight
-
 		// Crear la lámpara
 		{
 			let lampara = new Lampara()
@@ -67,6 +64,13 @@ class SalaIzquierda extends Sala
 			this.add(lampara)
 			this.lampara = lampara
 		}
+
+		if (!Config.LIGHTS_ENABLED)
+			return
+
+		this.pointLight = new THREE.PointLight(0xeeeeff,
+			0.5, Math.max(this.largoParedZ, this.largoParedX)*0.75, 0.5)
+		GameState.luces.luzSalaIzquierda = this.pointLight
 
 		// NOTE: se engancharía a la lámpara
 		let targetTmp = new THREE.Object3D()

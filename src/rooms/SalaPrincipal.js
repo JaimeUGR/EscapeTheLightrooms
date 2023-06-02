@@ -16,7 +16,7 @@ import {PuzleLaser} from "../puzles/PuzleLaser.js"
 import {Destornillador} from "../models/items/Destornillador.js"
 
 import {GameState} from "../GameState.js"
-import {Rect} from "../structures/Rect.js"
+import {Config} from "../Config.js"
 import {RandomInt} from "../Utils.js"
 
 class SalaPrincipal extends Sala
@@ -107,10 +107,6 @@ class SalaPrincipal extends Sala
 
 	colocarLuces()
 	{
-		// TODO: Hacer spot?
-		this.pointLight = new THREE.PointLight(0xffffff, 0.5, 110, 0.5);
-		GameState.luces.luzSalaPrincipal = this.pointLight
-
 		// Crear la lámpara
 		{
 			let lampara = new Lampara()
@@ -122,6 +118,12 @@ class SalaPrincipal extends Sala
 			this.add(lampara)
 			this.lampara = lampara
 		}
+
+		if (!Config.LIGHTS_ENABLED)
+			return
+
+		this.pointLight = new THREE.PointLight(0xffffff, 0.5, 110, 0.5);
+		GameState.luces.luzSalaPrincipal = this.pointLight
 
 		// NOTE: se engancharía a la lámpara
 		let targetTmp = new THREE.Object3D()
@@ -269,10 +271,9 @@ class SalaPrincipal extends Sala
 			this.robot = new Robot(GameState.scene.gui)
 			this.cajoneraRobot.cajoneraO3D.add(this.robot)
 
-			// TODO: TMP
 			setTimeout(() => {
 				this.robot.iniciaAnimacionContinua()
-			}, 5000)
+			}, 15000)
 		}
 	}
 

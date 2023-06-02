@@ -6,6 +6,7 @@ import {Cajonera} from "../models/Cajonera.js"
 import {Reloj, ManecillaHora, ManecillaMinuto} from "../models/Reloj.js"
 import {Taquilla} from "../models/Taquilla.js"
 import {Cuadro} from "../models/Cuadro.js"
+import {Poster} from "../models/Poster.js"
 
 import {Laser} from "../models/Laser.js"
 import {PalancaPared} from "../models/PalancaPared.js"
@@ -17,6 +18,7 @@ import {Sofa} from "../models/Sofa.js"
 import {MesaCristal} from "../models/Mesa.js"
 import {Silla} from "../models/Silla.js"
 import {Tarta} from "../models/Tarta.js"
+import {Config} from "../Config.js"
 
 class SalaDerecha extends Sala
 {
@@ -56,11 +58,6 @@ class SalaDerecha extends Sala
 
 	colocarLuces()
 	{
-		// TODO: Hacer spot?
-		this.pointLight = new THREE.PointLight(0xeeffee,
-			0.4, Math.max(this.largoParedZ, this.largoParedX)*0.7, 0.5)
-		GameState.luces.luzSalaDerecha = this.pointLight
-
 		// Crear la lámpara
 		{
 			let lampara = new Lampara()
@@ -72,6 +69,13 @@ class SalaDerecha extends Sala
 			this.add(lampara)
 			this.lampara = lampara
 		}
+
+		if (!Config.LIGHTS_ENABLED)
+			return
+
+		this.pointLight = new THREE.PointLight(0xeeffee,
+			0.4, Math.max(this.largoParedZ, this.largoParedX)*0.7, 0.5)
+		GameState.luces.luzSalaDerecha = this.pointLight
 
 		// NOTE: se engancharía a la lámpara
 		let targetTmp = new THREE.Object3D()
@@ -393,6 +397,14 @@ class SalaDerecha extends Sala
 		// TODO: Poner el póster con el código detrás
 		GameState.systems.interaction.allInteractables.push(reloj)
 		this.collidables.push(reloj)
+
+		// Poner el poster con el código detrás
+		let poster = new Poster(10, 5, "../../resources/textures/models/Keypad/textura_codigo.png")
+		poster.materialPoster.color.setHex(0x99e550)
+		poster.translateX(this.largoParedX/2)
+		poster.translateY(poster.altura/2 + reloj.cajaY)
+
+		this.add(poster)
 
 		//
 		// Laser
