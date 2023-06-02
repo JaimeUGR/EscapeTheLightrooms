@@ -13,6 +13,17 @@ class Robot extends THREE.Object3D
 			cabezaY: 4,
 			cabezaZ: 4,
 
+			deformacionOjoY: 1.2,
+			radioOjo: 0.65,
+			alturaOjo: 0.2,
+
+			bocaX: 3,
+			bocaY: 1,
+			bocaZ: 0.2,
+
+			separacionOjos: 0.75,
+			separacionBoca: 0.5, // Separación de la boca desde abajo y los ojos desde arriba
+
 			radioCuello: 1.15,
 			alturaCuello: 1.25
 		},
@@ -179,7 +190,10 @@ class Robot extends THREE.Object3D
 		// Animación
 		this.animaciones = {}
 
-		this.material = new THREE.MeshNormalMaterial({opacity: 0.5, transparent: true})
+		this.materialPrincipal = new THREE.MeshBasicMaterial({color: 0x555555})
+		this.materialSecundario = new THREE.MeshBasicMaterial({color: 0x232323})
+		this.materialOjos = this.materialSecundario
+		this.materialBoca = this.materialSecundario
 
 		//
 		// TRONCO INFERIOR
@@ -188,7 +202,7 @@ class Robot extends THREE.Object3D
 		let geoTroncoInferior = new THREE.BoxGeometry(this.dimTronco.troncoX, this.dimTronco.troncoInfY, this.dimTronco.troncoZ)
 		geoTroncoInferior.translate(0, -this.dimTronco.troncoInfY/2, 0)
 
-		this.troncoInferior = new THREE.Mesh(geoTroncoInferior, this.material)
+		this.troncoInferior = new THREE.Mesh(geoTroncoInferior, this.materialPrincipal)
 
 		// PIERNA
 		{
@@ -198,7 +212,7 @@ class Robot extends THREE.Object3D
 			let geoPiernaSup = new THREE.BoxGeometry(this.dimPiernas.piernaX, this.dimPiernas.piernaSupY, this.dimPiernas.piernaZ)
 			geoPiernaSup.translate(0, -this.dimPiernas.piernaSupY/2, 0)
 
-			let meshPiernaSup = new THREE.Mesh(geoPiernaSup, this.material)
+			let meshPiernaSup = new THREE.Mesh(geoPiernaSup, this.materialPrincipal)
 			meshPiernaSup.name = "MPS"
 			// Libertad -> Escalado pierna superior
 			// meshPiernaSup.scale.y = 1
@@ -206,7 +220,7 @@ class Robot extends THREE.Object3D
 			let geoUnion = new THREE.BoxGeometry(this.dimPiernas.unionX, this.dimPiernas.unionY, this.dimPiernas.unionZ)
 
 			// NOTE: Trasladar hacia abajo el escalado de la pierna
-			let meshUnion = new THREE.Mesh(geoUnion, this.material)
+			let meshUnion = new THREE.Mesh(geoUnion, this.materialSecundario)
 			meshUnion.name = "MU"
 			meshUnion.position.y = -meshPiernaSup.scale.y * this.dimPiernas.piernaSupY
 
@@ -219,7 +233,7 @@ class Robot extends THREE.Object3D
 			let geoPiernaInf = new THREE.BoxGeometry(this.dimPiernas.piernaX, this.dimPiernas.piernaInfY, this.dimPiernas.piernaZ)
 			geoPiernaInf.translate(0, -this.dimPiernas.piernaInfY/2, 0)
 
-			let meshPiernaInf = new THREE.Mesh(geoPiernaInf, this.material)
+			let meshPiernaInf = new THREE.Mesh(geoPiernaInf, this.materialPrincipal)
 			meshPiernaInf.name = "MPI"
 			// Libertad -> Escalado pierna inferior
 			// meshPiernaInf.scale.y = 1
@@ -229,7 +243,7 @@ class Robot extends THREE.Object3D
 			geoPie.translate(0, -this.dimPiernas.pieY/2, this.dimPiernas.pieZ/2 - this.dimPiernas.piernaZ/2)
 
 			// NOTE: Trasladar el escalado del pie inferior
-			let meshPie = new THREE.Mesh(geoPie, this.material)
+			let meshPie = new THREE.Mesh(geoPie, this.materialSecundario)
 			meshPie.name = "MP"
 
 			O3PiernaInf.add(meshPie)
@@ -299,13 +313,13 @@ class Robot extends THREE.Object3D
 		geoPilaRecorte.translate(0, alturaZonaPila, this.dimTronco.troncoZ/2 + this.dimTronco.levantamientoZonaPila/2 - this.dimTronco.alturaPila/2)
 
 		// TODO: Poner el material del robot aquí
-		let csg = new CSG().union([new THREE.Mesh(geoTroncoSuperior, this.material)])
+		let csg = new CSG().union([new THREE.Mesh(geoTroncoSuperior, this.materialPrincipal)])
 			.subtract([new THREE.Mesh(geoZonaPila, null), new THREE.Mesh(geoPilaRecorte, null)])
 
 		this.troncoSuperior = csg.toMesh()
 
 		// TODO: Poner el material de la zona interna de la pila
-		csg = new CSG().union([new THREE.Mesh(geoZonaPila, this.material)])
+		csg = new CSG().union([new THREE.Mesh(geoZonaPila, this.materialSecundario)])
 			.subtract([new THREE.Mesh(geoPilaRecorte, null)])
 
 		this.zonaPila = csg.toMesh()
@@ -330,7 +344,7 @@ class Robot extends THREE.Object3D
 		{
 			let geoHombro = new THREE.BoxGeometry(this.dimBrazos.hombroX, this.dimBrazos.hombroY, this.dimBrazos.hombroZ)
 
-			let O3Brazo = new THREE.Mesh(geoHombro, this.material)
+			let O3Brazo = new THREE.Mesh(geoHombro, this.materialSecundario)
 			O3Brazo.name = "O3B"
 			// Libertad -> Rotación codo
 			// O3Brazo.rotation.x = 0
@@ -338,7 +352,7 @@ class Robot extends THREE.Object3D
 			let geoBrazoSup = new THREE.BoxGeometry(this.dimBrazos.brazoX, this.dimBrazos.brazoSupY, this.dimBrazos.brazoZ)
 			geoBrazoSup.translate(0, -this.dimBrazos.brazoSupY/2, 0)
 
-			let meshBrazoSup = new THREE.Mesh(geoBrazoSup, this.material)
+			let meshBrazoSup = new THREE.Mesh(geoBrazoSup, this.materialPrincipal)
 			meshBrazoSup.name = "MBS"
 			// Libertad -> Escalado brazo sup
 			// meshBrazoSup.scale.y = 1
@@ -352,7 +366,7 @@ class Robot extends THREE.Object3D
 			O3BrazoSup.add(meshBrazoSup)
 
 			let geoUnion = new THREE.BoxGeometry(this.dimBrazos.unionX, this.dimBrazos.unionY, this.dimBrazos.unionZ)
-			let meshUnion = new THREE.Mesh(geoUnion, this.material)
+			let meshUnion = new THREE.Mesh(geoUnion, this.materialSecundario)
 			meshUnion.name = "MU"
 			// TODO: Libertad -> Traslación hacia abajo por el escalado
 			meshUnion.position.y = -this.dimBrazos.brazoSupY*meshBrazoSup.scale.y
@@ -362,7 +376,7 @@ class Robot extends THREE.Object3D
 			let geoBrazoInf = new THREE.BoxGeometry(this.dimBrazos.brazoX, this.dimBrazos.brazoInfY, this.dimBrazos.brazoZ)
 			geoBrazoInf.translate(0, -this.dimBrazos.brazoInfY/2, 0)
 
-			let meshBrazoInf = new THREE.Mesh(geoBrazoInf, this.material)
+			let meshBrazoInf = new THREE.Mesh(geoBrazoInf, this.materialPrincipal)
 			meshBrazoInf.name = "MBI"
 			// Libertad -> Rotación X
 			// meshBrazoInf.rotation.x = 0
@@ -410,8 +424,29 @@ class Robot extends THREE.Object3D
 			let geoCabeza = new THREE.BoxGeometry(this.dimCabeza.cabezaX, this.dimCabeza.cabezaY, this.dimCabeza.cabezaZ)
 			geoCabeza.translate(0, this.dimCabeza.cabezaY/2 + this.dimCabeza.alturaCuello, 0)
 
-			let meshCabeza = new THREE.Mesh(geoCabeza, this.material)
-			let meshCuello = new THREE.Mesh(geoCuello, this.material)
+			let geoBoca = new THREE.BoxGeometry(this.dimCabeza.bocaX, this.dimCabeza.bocaY, this.dimCabeza.bocaZ)
+			geoBoca.translate(0, this.dimCabeza.bocaY/2 + this.dimCabeza.separacionBoca + this.dimCabeza.alturaCuello, this.dimCabeza.cabezaZ/2 + this.dimCabeza.bocaZ/2)
+
+			let geoOjo = new THREE.CylinderGeometry(this.dimCabeza.radioOjo, this.dimCabeza.radioOjo, this.dimCabeza.alturaOjo, 25)
+			geoOjo.rotateX(Math.PI/2)
+			geoOjo.scale(1, this.dimCabeza.deformacionOjoY, 1)
+			geoOjo.translate(0,
+				-this.dimCabeza.radioOjo/2 - this.dimCabeza.separacionOjos + this.dimCabeza.alturaCuello
+				+ this.dimCabeza.cabezaY,
+				this.dimCabeza.cabezaZ/2 + this.dimCabeza.alturaOjo/2)
+
+			let geoOjoIzda = geoOjo.clone()
+			geoOjoIzda.translate(-this.dimCabeza.cabezaX/4, 0, 0)
+
+			let geoOjoDcha = geoOjo.clone()
+			geoOjoDcha.translate(this.dimCabeza.cabezaX/4, 0, 0)
+
+			let meshCabeza = new THREE.Mesh(geoCabeza, this.materialPrincipal)
+			meshCabeza.add(new THREE.Mesh(geoBoca, this.materialBoca))
+			meshCabeza.add(new THREE.Mesh(geoOjoIzda, this.materialOjos))
+			meshCabeza.add(new THREE.Mesh(geoOjoDcha, this.materialOjos))
+
+			let meshCuello = new THREE.Mesh(geoCuello, this.materialSecundario)
 
 			let O3Cabeza = new THREE.Object3D()
 			// Libertad -> Rotación en Y X Z
