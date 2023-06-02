@@ -116,7 +116,6 @@ class Silla extends THREE.Object3D
 
 		//Creación esferas para union
 		let geoUnionInfIzq = new THREE.SphereGeometry(this.radioBarra, 20, 20)
-		console.log(this.separacionUniones * (this.respaldoX/2 - this.radioBarra ))
 		geoUnionInfIzq.translate( this.separacionUniones * (this.respaldoX/2 - this.radioBarra ), this.pataY + this.tableroY/2,-this.tableroZ/2 - this.radioBarra - this.respaldoZ)
 
 		barraRespaldo1.union([new THREE.Mesh(geoUnionInfIzq.clone(), this.materialMetal)])

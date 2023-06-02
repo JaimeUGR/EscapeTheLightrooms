@@ -109,7 +109,6 @@ class Sofa extends THREE.Object3D
 
 		}).toGeometry()
 
-		console.log(-this.lateralX/2 - this.baseX/2)
 		geoLateralIzq.translate(-this.lateralX/2 - this.baseX/2, this.lateralY/2, 0)
 		let lateralMesh = new THREE.Mesh(geoLateralIzq, this.materialSofa)
 
@@ -139,8 +138,6 @@ class Sofa extends THREE.Object3D
 		geoBase.translate(0, this.baseY/2 , 0)
 
 		let baseMesh = new THREE.Mesh(geoBase, this.materialSofa)
-
-		console.log(this.cojinX)
 
 		//Creacion de D
 		let geoCojin = new SoftBoxGeometry({
@@ -194,7 +191,6 @@ class Sofa extends THREE.Object3D
 
 		}).toGeometry()
 
-		console.log(this.respaldoY)
 		geoRespaldo.translate(-this.respaldoX/2 - (this.baseX/2 - this.respaldoX), this.respaldoY/2 + this.baseY, -this.baseZ/2 + this.respaldoZ/2)
 
 		for(let i = 0; i < this.numCojines; i++){

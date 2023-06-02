@@ -13,6 +13,8 @@ import {Lampara} from "../models/Lampara.js"
 
 import {GameState} from "../GameState.js"
 import {RandomInt} from "../Utils.js"
+import {Sofa} from "../models/Sofa.js"
+import {MesaCristal} from "../models/Mesa.js"
 
 class SalaDerecha extends Sala
 {
@@ -151,7 +153,7 @@ class SalaDerecha extends Sala
 		//
 		{
 			let cuadroPaco = new Cuadro({
-				baseX: 28,
+				baseX: 35,
 				baseY: 30,
 				baseZ: 0.5,
 
@@ -180,6 +182,107 @@ class SalaDerecha extends Sala
 			cuadroJaime.translateY(this.alturaPared/2 - cuadroJaime.baseY/2)
 
 			this.add(cuadroJaime)
+		}
+
+		// Sofa, mesa y lámparita
+		{
+			let sofaSup = new Sofa()
+			sofaSup.rotateY(Math.PI)
+
+			sofaSup.translateZ(sofaSup.baseZ/2 + sofaSup.parteTraseraZ - this.largoParedZ)
+			sofaSup.translateX(sofaSup.baseX/2 + sofaSup.lateralX -(this.largoParedX)
+			+ sofaSup.baseZ + sofaSup.parteTraseraZ) // Este último sería la Z del sofa inferior
+
+			this.add(sofaSup)
+			this.collidables.push(sofaSup)
+
+			let sofaInf = new Sofa()
+			sofaInf.rotateY(-Math.PI/2)
+
+			sofaInf.translateZ(sofaInf.baseZ/2 + sofaInf.parteTraseraZ - this.largoParedX)
+			sofaInf.translateX(this.largoParedZ -
+				(sofaInf.baseX/2 + sofaInf.lateralX + sofaSup.baseZ + sofaSup.parteTraseraZ))
+
+			this.add(sofaInf)
+			this.collidables.push(sofaInf)
+
+			//
+			// Lámpara
+			//
+
+			let lampara = new Lampara({
+				radioBase: 3.5,
+				altoBase: 1.25,
+
+				radioPilar: 0.5,
+				altoPilar: 30,
+
+				radioEnvoltura: 3.5,
+				altoEnvoltura: 8,
+
+				radioHueco: 3.25,
+
+				posicionEnvoltura: 1,
+				posicionBarras: 0.5,
+
+				radioSoporteBombilla: 0.1,
+				altoSoporteBombilla: 0.5,
+
+				radioBarra: 0.2,
+			})
+
+			lampara.translateZ(this.largoParedZ + this.lampara.radioBase/2 - (sofaSup.lateralZ/2 + sofaSup.parteTraseraZ))
+			lampara.translateX(this.largoParedX + this.lampara.radioBase/2 - (sofaInf.lateralZ/2 + sofaInf.parteTraseraZ))
+
+			this.add(lampara)
+
+			// Mesa cristal
+
+			let mesa = new MesaCristal({
+				// Tablero
+				tableroX: 30,
+				tableroY: 0.5,
+				tableroZ: 20,
+
+				// Patas
+				pataX: 3,
+				pataY: 13,
+				pataZ: 3,
+
+				separacionPatasX: 15, // Separación desde la esquina de la pata (la que se vería) hasta el centro
+				separacionPatasZ: 10, // Separación desde la esquina de la pata (la que se vería) hasta el centro
+
+				cristalX: 30 - 6,
+				cristalZ: 20 - 6,
+				cristalY: 1
+			})
+
+			mesa.translateZ(this.largoParedZ -
+				(sofaSup.lateralZ + sofaSup.parteTraseraZ + sofaInf.parteTraseraX/2))
+			mesa.translateX(this.largoParedX -
+				(sofaInf.lateralZ + sofaInf.parteTraseraZ + sofaSup.parteTraseraX/2))
+
+			this.add(mesa)
+			this.collidables.push(mesa)
+		}
+
+		{
+			let cuadroGrande = new Cuadro({
+				baseX: 70,
+				baseY: 35,
+				baseZ: 0.5,
+
+				borde: 1.5,
+				huecoZ: 0.3
+			}, undefined, "../../resources/textures/models/CreacionAdan.jpg")
+
+			cuadroGrande.rotateY(Math.PI)
+
+			cuadroGrande.translateX(-(this.largoParedX/2 + cuadroGrande.baseX/2))
+			cuadroGrande.translateZ(-this.largoParedZ)
+			cuadroGrande.translateY(this.alturaPared/2 - 5)
+
+			this.add(cuadroGrande)
 		}
 	}
 
