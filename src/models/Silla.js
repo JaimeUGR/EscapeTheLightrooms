@@ -14,9 +14,9 @@ class Silla extends THREE.Object3D
 		tableroZ: 10,
 
 		// Patas
-		pataX: 3,
-		pataY: 10,
-		pataZ: 3,
+		pataX: 2,
+		pataY: 9,
+		pataZ: 2,
 
 		separacionPatasX: 6, // Separación desde la esquina de la pata (la que se vería) hasta el centro
 		separacionPatasZ: 5, // Separación desde la esquina de la pata (la que se vería) hasta el centro

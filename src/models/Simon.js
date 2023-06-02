@@ -2,6 +2,8 @@
 import * as THREE from "../../libs/three.module.js"
 import {TrapezoidGeometry} from "../geometry/TrapezoidGeometry.js"
 
+import {GameState} from "../GameState.js"
+
 class Simon extends THREE.Object3D
 {
 	constructor(dimensiones = {
@@ -15,7 +17,7 @@ class Simon extends THREE.Object3D
 		radioIndicador: 2,
 		alturaIndicador: 0.5,
 		altoBotonInicial: 0.75,
-		profundidadBotonInicial: 2,
+		profundidadBotonInicial: 1,
 		anchoBotonSuperior: 0.5,
 		profBotonSuperior: 0.5
 	})
@@ -50,7 +52,20 @@ class Simon extends THREE.Object3D
 		this.botones = []
 		this.indicadores = [] // 0 1 2
 
+		//
+		// Materiales
+		//
+
 		let simonMaterial = new THREE.MeshNormalMaterial({color: 0Xf1f1f1, opacity: 0.5, transparent: true})
+
+		const txLoader = GameState.txLoader
+
+		let texturaStart = txLoader.load("../../resources/textures/models/texto_start.jpeg")
+		this.materialStart = new THREE.MeshBasicMaterial({map: texturaStart, color: 0x55ff55})
+
+		//
+		// Modelado
+		//
 
 		// Crear panel de soporte
 		let geoPanel = new THREE.BoxGeometry(this.panelX,this.panelY,this.panelZ)
@@ -62,7 +77,7 @@ class Simon extends THREE.Object3D
 		geoBotonInicial.rotateX(Math.PI/2)
 		geoBotonInicial.translate(0, this.borde + this.profundidadBotonInicial/2, this.altoBotonInicial/2)
 
-		this.botonInicialMesh = new THREE.Mesh(geoBotonInicial, new THREE.MeshBasicMaterial({color: 0x556655}))
+		this.botonInicialMesh = new THREE.Mesh(geoBotonInicial, this.materialStart)
 
 		this.add(this.botonInicialMesh)
 

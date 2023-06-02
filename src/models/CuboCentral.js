@@ -119,20 +119,36 @@ class CuboCentral extends THREE.Object3D
 		// TODO: Este material será una textura que se cambiará por los * cada vez que se pulse
 		this.materialKeypadPant = new THREE.MeshBasicMaterial({color: 0x111111})
 
+		const pathTexturasKeyPad = "../../resources/textures/models/Keypad/"
 		// Diferente por cada tecla
+		let texturasTeclas = [
+			txLoader.load(pathTexturasKeyPad + "textura_ok.png"),
+			txLoader.load(pathTexturasKeyPad + "textura_numero_0.png"),
+			txLoader.load(pathTexturasKeyPad + "textura_c.png"),
+			txLoader.load(pathTexturasKeyPad + "textura_numero_1.png"),
+			txLoader.load(pathTexturasKeyPad + "textura_numero_2.png"),
+			txLoader.load(pathTexturasKeyPad + "textura_numero_3.png"),
+			txLoader.load(pathTexturasKeyPad + "textura_numero_4.png"),
+			txLoader.load(pathTexturasKeyPad + "textura_numero_5.png"),
+			txLoader.load(pathTexturasKeyPad + "textura_numero_6.png"),
+			txLoader.load(pathTexturasKeyPad + "textura_numero_7.png"),
+			txLoader.load(pathTexturasKeyPad + "textura_numero_8.png"),
+			txLoader.load(pathTexturasKeyPad + "textura_numero_9.png")
+		]
+
 		this.materialKeypadTeclas = [
-			new THREE.MeshBasicMaterial({color: 0x55ff55}),
-			new THREE.MeshBasicMaterial({color: 0x55ff55}),
-			new THREE.MeshBasicMaterial({color: 0x55ff55}),
-			new THREE.MeshBasicMaterial({color: 0x55ff55}),
-			new THREE.MeshBasicMaterial({color: 0x55ff55}),
-			new THREE.MeshBasicMaterial({color: 0x55ff55}),
-			new THREE.MeshBasicMaterial({color: 0x55ff55}),
-			new THREE.MeshBasicMaterial({color: 0x55ff55}),
-			new THREE.MeshBasicMaterial({color: 0x55ff55}),
-			new THREE.MeshBasicMaterial({color: 0x55ff55}),
-			new THREE.MeshBasicMaterial({color: 0x55ff55}),
-			new THREE.MeshBasicMaterial({color: 0x55ff55})
+			new THREE.MeshBasicMaterial({map: texturasTeclas[0], color: 0x55ff55}),
+			new THREE.MeshBasicMaterial({map: texturasTeclas[1], color: 0x55ff55}),
+			new THREE.MeshBasicMaterial({map: texturasTeclas[2], color: 0x55ff55}),
+			new THREE.MeshBasicMaterial({map: texturasTeclas[3], color: 0x55ff55}),
+			new THREE.MeshBasicMaterial({map: texturasTeclas[4], color: 0x55ff55}),
+			new THREE.MeshBasicMaterial({map: texturasTeclas[5], color: 0x55ff55}),
+			new THREE.MeshBasicMaterial({map: texturasTeclas[6], color: 0x55ff55}),
+			new THREE.MeshBasicMaterial({map: texturasTeclas[7], color: 0x55ff55}),
+			new THREE.MeshBasicMaterial({map: texturasTeclas[8], color: 0x55ff55}),
+			new THREE.MeshBasicMaterial({map: texturasTeclas[9], color: 0x55ff55}),
+			new THREE.MeshBasicMaterial({map: texturasTeclas[10], color: 0x55ff55}),
+			new THREE.MeshBasicMaterial({map: texturasTeclas[11], color: 0x55ff55})
 		]
 
 		this.materialFondoPrisma = new THREE.MeshBasicMaterial({color: 0x222222})

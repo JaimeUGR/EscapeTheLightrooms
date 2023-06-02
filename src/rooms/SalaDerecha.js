@@ -15,6 +15,8 @@ import {GameState} from "../GameState.js"
 import {RandomInt} from "../Utils.js"
 import {Sofa} from "../models/Sofa.js"
 import {MesaCristal} from "../models/Mesa.js"
+import {Silla} from "../models/Silla.js"
+import {Tarta} from "../models/Tarta.js"
 
 class SalaDerecha extends Sala
 {
@@ -146,6 +148,20 @@ class SalaDerecha extends Sala
 
 			this.cajoneraReloj = cajonera
 			GameState.systems.interaction.allInteractables.push(cajonera)
+
+			// Silla y tarta
+			let silla = new Silla()
+			silla.rotateY(Math.PI)
+
+			silla.translateZ(silla.tableroZ/2 + silla.respaldoZ + 2*silla.radioBarra - this.largoParedZ)
+			silla.translateX(-(this.largoParedX/4 + cajonera.cajoneraX))
+
+			this.add(silla)
+
+			let tarta = new Tarta(4, 5)
+			silla.tableroO3D.add(tarta)
+
+			this.collidables.push(silla)
 		}
 
 		//
@@ -323,8 +339,7 @@ class SalaDerecha extends Sala
 			GameState.systems.interaction.allInteractables.push(manecillaHora)
 		}
 
-		{
-			// TODO: Esto va en otra sala
+		/*{
 			//
 			// Manecilla Minuto
 			//
@@ -357,7 +372,7 @@ class SalaDerecha extends Sala
 
 			GameState.items.manecillaMinuto = manecillaMinuto
 			GameState.systems.interaction.allInteractables.push(manecillaMinuto)
-		}
+		}*/
 	}
 
 	colocarPuzles()

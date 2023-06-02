@@ -6,10 +6,15 @@ import {PuzleFormas} from "../puzles/PuzleFormas.js"
 import {Laser} from "../models/Laser.js"
 import {GameState} from "../GameState.js"
 
+import {Taquilla} from "../models/Taquilla.js"
+import {Cajonera} from "../models/Cajonera.js"
+
 import {PalancaPared} from "../models/PalancaPared.js"
 import {Vitrina} from "../models/Vitrina.js"
 
 import {Lampara} from "../models/Lampara.js"
+import {ManecillaMinuto} from "../models/Reloj.js"
+import {RandomInt} from "../Utils.js"
 
 
 class SalaIzquierda extends Sala
@@ -118,6 +123,93 @@ class SalaIzquierda extends Sala
 			this.collidables.push(vitrina)
 
 			GameState.systems.interaction.allInteractables.push(tarjeta)
+		}
+
+		// Taquillero
+		{
+			const numTaquillas = 15
+			const espacioPorTaquilla = this.largoParedX/numTaquillas
+
+			let taquillas = []
+
+			let taq = new Taquilla({
+				taquillaX: espacioPorTaquilla - 2*0.75, // x interna
+				taquillaY: 35, // y interna
+				taquillaZ: 10, // z interna
+				taquillaBorde: 0.75,
+				puertaZ: 0.5, // <= borde
+				numEstantes: 5,
+				estanteY: 1,
+				separacionInferiorEstantes: 2,
+				rejillaX: 8, // <= x interna
+				rejillaY: 1.5,
+				separacionRejillas: 1.5,
+				separacionSuperiorRejillas: 4
+			})
+
+			taq.position.set(taq.taquillaX/2 + taq.taquillaBorde, 0, taq.taquillaZ/2 + taq.taquillaBorde)
+
+			for (let i = 0; i < numTaquillas; i++)
+			{
+				taquillas.push(taq)
+				this.add(taq)
+				this.collidables.push(taq)
+				GameState.systems.interaction.allInteractables.push(taq)
+
+				let taqNueva = new Taquilla({
+					taquillaX: espacioPorTaquilla - 2*0.75, // x interna
+					taquillaY: 35, // y interna
+					taquillaZ: 10, // z interna
+					taquillaBorde: 0.75,
+					puertaZ: 0.5, // <= borde
+					numEstantes: 5,
+					estanteY: 1,
+					separacionInferiorEstantes: 2,
+					rejillaX: 8, // <= x interna
+					rejillaY: 1.5,
+					separacionRejillas: 1.5,
+					separacionSuperiorRejillas: 4
+				})
+
+				taqNueva.position.set(taq.position.x, 0, taq.position.z)
+				taqNueva.position.x += taq.taquillaX + 2*taq.taquillaBorde
+				taq = taqNueva
+			}
+
+			// Colocar la aguja del reloj en una
+			{
+				//
+				// Manecilla Minuto
+				//
+				let taquillaSeleccionada = taquillas[RandomInt(taquillas.length - 1)]
+
+				let manecillaMinuto = new ManecillaMinuto({
+					separacion: 7,
+					grosor: 0.5,
+					escalado: 1.2,
+					alturaCilindroContenedor: 0.75,
+					radioCilindroRecortado: 0.1,
+				})
+
+				taquillaSeleccionada.estantes[1].add(manecillaMinuto)
+
+				//manecillaMinuto.position.y = manecillaMinuto.grosor/2
+
+				manecillaMinuto.children[0].userData.interaction = {
+					interact: (event) => {
+						GameState.flags.tieneManecillaMinuto = true
+						manecillaMinuto.rotation.x = 0
+						manecillaMinuto.position.y = 0
+
+						taquillaSeleccionada.estantes[1].remove(manecillaMinuto)
+
+						manecillaMinuto.children[0].userData = {}
+					}
+				}
+
+				GameState.items.manecillaMinuto = manecillaMinuto
+				GameState.systems.interaction.allInteractables.push(manecillaMinuto)
+			}
 		}
 	}
 
