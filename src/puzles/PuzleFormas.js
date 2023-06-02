@@ -157,8 +157,8 @@ class PuzleFormas extends THREE.Object3D
 		this.formaObjetivo.position.x = offsetInicial
 
 		// DEBUG
-		this.axis = new THREE.AxesHelper (10);
-		this.add (this.axis)
+		//this.axis = new THREE.AxesHelper (10);
+		//this.add (this.axis)
 	}
 
 	// NOTE: si cambiamos el número de railes hay que cambiar esto

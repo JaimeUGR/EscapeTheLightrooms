@@ -35,8 +35,8 @@ class GameState
 			tieneManecillaHora: false,
 			tieneManecillaMinuto: false,
 			tieneTarjeta: false,
-			tienePrisma: false, // TODO: TMP
-			tienePila: false, // TODO: TMP
+			tienePrisma: false,
+			tienePila: false,
 			robotConPila: false
 		}
 
@@ -46,11 +46,11 @@ class GameState
 
 		this.debug = {
 			O3Player: new Object3D(),
-			controlesVuelo: true // TODO: A FALSE
+			controlesVuelo: false
 		}
 
 		this.gameData = {
-			interactionRangeEnabled: false, // TODO: A TRUE
+			interactionRangeEnabled: true,
 			interactionRange: 50,
 			cameraLock: false,
 			colsEnabled: true,

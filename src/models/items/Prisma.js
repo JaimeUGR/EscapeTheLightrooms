@@ -17,11 +17,11 @@ class Prisma extends THREE.Object3D
 		this.materialPrisma = new THREE.MeshPhysicalMaterial({
 			color: 0xffffff, // Color cristal
 			transparent: true,
-			opacity: 0.6, // Opacidad
+			opacity: 0.7, // Opacidad
 			roughness: 0, // Rugosidad
 			metalness: 0, // Metalicidad
 			clearcoat: 0.4, // Capa de recubrimiento clara
-			clearcoatRoughness: 0, // Rugosidad de la capa de recubrimiento clara
+			clearcoatRoughness: 0.1, // Rugosidad de la capa de recubrimiento clara
 		})
 
 		let geoPrisma = new TriangularPrismGeometry(this.ladoPrisma, this.altoPrisma)

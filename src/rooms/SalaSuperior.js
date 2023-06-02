@@ -199,7 +199,7 @@ class SalaSuperior extends Sala
 		let puzleSimon = new PuzleSimon()
 		puzleSimon.rotateY(-Math.PI/2)
 		puzleSimon.position.set(this.largoParedX - puzleSimon.simon.panelZ,
-			this.alturaPared/2 - puzleSimon.simon.panelY, this.largoParedZ/4)
+			this.alturaPared/2 - puzleSimon.simon.panelY + puzleSimon.simon.panelY/4, this.largoParedZ/4)
 
 		this.add(puzleSimon)
 

@@ -8,7 +8,7 @@ class Simon extends THREE.Object3D
 {
 	constructor(dimensiones = {
 		panelX: 16,
-		panelY: 24,
+		panelY: 27,
 		panelZ: 1,
 
 		alturaBotonJuego : 0.75,
@@ -16,8 +16,8 @@ class Simon extends THREE.Object3D
 		borde: 1,
 		radioIndicador: 2,
 		alturaIndicador: 0.5,
-		altoBotonInicial: 0.75,
-		profundidadBotonInicial: 1,
+		altoBotonInicial: 0.5,
+		profundidadBotonInicial: 3,
 		anchoBotonSuperior: 0.5,
 		profBotonSuperior: 0.5
 	})
@@ -56,12 +56,22 @@ class Simon extends THREE.Object3D
 		// Materiales
 		//
 
-		let simonMaterial = new THREE.MeshNormalMaterial({color: 0Xf1f1f1, opacity: 0.5, transparent: true})
+		let simonMaterial = new THREE.MeshNormalMaterial({opacity: 0.8, transparent: true})
 
 		const txLoader = GameState.txLoader
 
 		let texturaStart = txLoader.load("../../resources/textures/models/texto_start.jpeg")
-		this.materialStart = new THREE.MeshBasicMaterial({map: texturaStart, color: 0x55ff55})
+
+		let materialBase = new THREE.MeshBasicMaterial({color: 0xae46eb})
+
+		this.materialStart = [
+			materialBase,
+			materialBase,
+			new THREE.MeshLambertMaterial({map: texturaStart, color: 0xae46eb}),
+			materialBase,
+			materialBase,
+			materialBase
+		]
 
 		//
 		// Modelado
@@ -73,7 +83,7 @@ class Simon extends THREE.Object3D
 		this.add(new THREE.Mesh(geoPanel, simonMaterial))
 
 		//Crear boton inicial
-		let geoBotonInicial = new TrapezoidGeometry(this.anchoBotonInicial, this.profundidadBotonInicial, this.anchoBotonInicial, this.profundidadBotonInicial, this.altoBotonInicial)
+		let geoBotonInicial = new THREE.BoxGeometry(this.anchoBotonInicial, this.altoBotonInicial, this.profundidadBotonInicial)
 		geoBotonInicial.rotateX(Math.PI/2)
 		geoBotonInicial.translate(0, this.borde + this.profundidadBotonInicial/2, this.altoBotonInicial/2)
 

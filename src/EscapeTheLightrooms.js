@@ -36,7 +36,7 @@ import {Config} from "./Config.js"
  * Clase que hereda de THREE.Scene, con la que se gestionará todo el juego
  */
 
-let FPSLimit = true
+let FPSLimit = false
 let isWindowFocused = true
 let myDeltaTime = 1/25.0
 let myDelta = 0
@@ -63,14 +63,14 @@ class EscapeTheLightrooms extends THREE.Scene
 
 		// Todo elemento que se desee sea tenido en cuenta en el renderizado de la escena debe pertenecer a esta. Bien como hijo de la escena (this en esta clase) o como hijo de un elemento que ya esté en la escena.
 		// Tras crear cada elemento se añadirá a la escena con   this.add(variable)
-		this.createLights ();
+		this.createLights ()
 
 		// Tendremos una cámara con un control de movimiento con el ratón
-		this.createCamera ();
+		this.createCamera ()
 
 		// Y unos ejes. Imprescindibles para orientarnos sobre dónde están las cosas
-		this.axis = new THREE.AxesHelper (50);
-		this.add (this.axis);
+		//this.axis = new THREE.AxesHelper (50)
+		//this.add (this.axis)
 
 		// Por último creamos el modelo.
 		// El modelo puede incluir su parte de la interfaz gráfica de usuario. Le pasamos la referencia a
@@ -192,13 +192,13 @@ class EscapeTheLightrooms extends THREE.Scene
 	//
 	cambiarCamara(event)
 	{
-		console.log("Recibo click")
+		//console.log("Recibo click")
 
 		// TODO: Temporal
 		if (!GameState.gameData.gameStarted)
 		{
 			GameState.gameData.gameStarted = true
-			console.log("Iniciando...")
+			//console.log("Iniciando...")
 			this.gestorCamaras.cambiarAControladorPrincipal()
 		}
 		else
