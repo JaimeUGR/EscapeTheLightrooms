@@ -38,7 +38,7 @@ import {Config} from "./Config.js"
 
 let FPSLimit = false
 let isWindowFocused = true
-let myDeltaTime = 1/25.0
+let myDeltaTime = 1/30
 let myDelta = 0
 
 class EscapeTheLightrooms extends THREE.Scene
@@ -250,7 +250,7 @@ class EscapeTheLightrooms extends THREE.Scene
 
 		{
 			this.guiMenuOpciones = {
-				hayLimiteFPS: true,
+				hayLimiteFPS: false,
 				limiteFPS: 30
 			}
 

@@ -23,11 +23,6 @@ const COLOR_ROSA = 0xf19afc
 
 class PuzleLaser extends THREE.Object3D
 {
-	static Colores()
-	{
-
-	}
-
 	constructor()
 	{
 		super()
@@ -299,7 +294,7 @@ class PuzleLaser extends THREE.Object3D
 		}
 
 		// Empezar la animación de inicio
-		this.animaciones.animacionInicio.start()
+		setTimeout(() => this.animaciones.animacionInicio.start(), 2500)
 	}
 
 	// NOTE: Llamado cada vez que cambia el color de un laser
@@ -321,7 +316,7 @@ class PuzleLaser extends THREE.Object3D
 		this.laserVerde.desactivarLaser()
 		this.laserRojo.desactivarLaser()
 
-		this.animaciones.animacionCompletar.start()
+		setTimeout(() => this.animaciones.animacionCompletar.start(), 5000)
 	}
 
 	setLaser(laser, largoHaz)

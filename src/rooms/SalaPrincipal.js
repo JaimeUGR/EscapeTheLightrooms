@@ -62,6 +62,16 @@ class SalaPrincipal extends Sala
 
 		// Añadir los items
 		this.colocarItems()
+
+		//
+		// Añadir caja negra para el final
+		//
+		{
+			let geoCaja = new THREE.BoxGeometry(Sala.AnchoPuerta(), Sala.AltoPuerta(), Sala.GrosorPared())
+			geoCaja.translate(this.largoParedX/2, Sala.AltoPuerta()/2, -1.5*Sala.GrosorPared())
+
+			this.add(new THREE.Mesh(geoCaja, new THREE.MeshBasicMaterial({color: 0x222222})))
+		}
 	}
 
 	crearPasillos()

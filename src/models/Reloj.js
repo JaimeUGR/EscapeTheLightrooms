@@ -136,14 +136,15 @@ class Reloj extends THREE.Object3D
 		let extraBaseTrapeciosX = this.cajaX + 2*this.pilarX
 		let extraBaseTrapeciosZ = this.cajaZ + 2*this.pilarZ
 
+		// TODO: Se ha puesto en modo no indexada para solucionar un problema con las texturas
 		let geoTrapecioSuperior = new TrapezoidGeometry(this.trapSup.XInf + extraBaseTrapeciosX,
 			this.trapSup.ZInf + extraBaseTrapeciosZ, this.trapSup.XSup + extraBaseTrapeciosX,
-			this.trapSup.ZSup + extraBaseTrapeciosZ, this.trapSup.Y)
+			this.trapSup.ZSup + extraBaseTrapeciosZ, this.trapSup.Y, false)
 		geoTrapecioSuperior.translate(0, this.cajaY/2 + this.trapSup.Y/2, 0)
 
 		let geoTrapecioInferior = new TrapezoidGeometry(this.trapInf.XInf + extraBaseTrapeciosX,
 			this.trapInf.ZInf + extraBaseTrapeciosZ, this.trapInf.XSup + extraBaseTrapeciosX,
-			this.trapInf.ZSup + extraBaseTrapeciosZ, this.trapInf.Y)
+			this.trapInf.ZSup + extraBaseTrapeciosZ, this.trapInf.Y, false)
 		geoTrapecioInferior.translate(0, -(this.cajaY/2 + this.trapInf.Y/2), 0)
 
 		this.add(new THREE.Mesh(geoTrapecioSuperior, this.materialBases))
