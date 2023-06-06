@@ -1,3 +1,10 @@
+/*
+	Copyright (c) 2023 - Jaime Pérez García y Francisco Expósito Carmona
+
+	Todos los derechos reservados.
+
+	Los recursos externos utilizados han sido debidamente referenciados.
+*/
 
 import {Vector2, Vector3, TextureLoader, Object3D} from "../libs/three.module.js"
 import {Rect} from "./structures/Rect.js"

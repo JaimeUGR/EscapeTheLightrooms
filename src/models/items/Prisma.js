@@ -1,3 +1,10 @@
+/*
+	Copyright (c) 2023 - Jaime Pérez García y Francisco Expósito Carmona
+
+	Todos los derechos reservados.
+
+	Los recursos externos utilizados han sido debidamente referenciados.
+*/
 
 import * as THREE from '../../../libs/three.module.js'
 import {TriangularPrismGeometry} from "../../geometry/PrismGeometry.js"
