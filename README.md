@@ -53,4 +53,5 @@ Las referencias a los autores y páginas web utilizadas son las siguientes
 El modelo del destornillador pertecene a [Free3D - Destornillador](https://free3d.com/es/modelos-3d/destornillador).
 
 ## Licencia de uso
-Este software y el código (no perteneciente a las librerías) ha sido realizado por nosotros, por lo que nos reservamos todos los derechos de su autoría. Puede ser empleado en cualquier proyecto, siempre y cuando se haga referencia a sus autores y a este repositorio. Sin embargo, no se permite su uso para fines comerciales.
+Este software y el código (no perteneciente a las librerías ni recursos) ha sido realizado por nosotros, por lo que nos reservamos todos los derechos de su autoría. Puede ser empleado en cualquier proyecto, siempre y cuando se haga referencia a sus autores y a este repositorio. Sin embargo, no se permite su uso para fines comerciales.
+En caso de hacer uso de algún recurso externo, se deben hacer las comprobaciones de licencia y referencias de autoría pertinentes, no haciéndonos nosotros responsables de cualquier uso indebido.
