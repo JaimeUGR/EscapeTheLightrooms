@@ -36,6 +36,7 @@ Se han utilizado las siguientes librerías:
 - [Three JS](https://threejs.org/): encargado del rendering, escenografía, interacción con WebGL.
 - [Tween](https://createjs.com/tweenjs): para hacer las animaciones.
 - [PointerLockControls](https://threejs.org/docs/#examples/en/controls/PointerLockControls): para el control de usuario utilizando la API experimental de bloqueo de puntero.
+- CSG.V2: modificada por nuestro profesor a partir de la versión básica [CSG](https://github.com/looeee/threejs-csg)
 
 #### Texturas
 En lo que respecta a las texturas:
