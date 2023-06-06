@@ -1,7 +1,7 @@
 # EscapeTheLightrooms
 
 Escape The Lightrooms es un juego de navegador, que trata sobre resolver una serie de puzles y escapar de una habitación. 
-Ha sido realizado para la evaluación de la parte práctica de la asignatura, siendo los autores:
+Ha sido realizado para la evaluación de la parte práctica de la asignatura `Sistemas Gráficos` de la universidad de Granada (ETSIIT), siendo los autores:
 - ***Jaime Pérez García***
 - ***Francisco Expósito Carmona***
 
