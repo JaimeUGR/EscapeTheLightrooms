@@ -2,11 +2,11 @@
 
 Escape The Lightrooms es un juego de navegador, que trata sobre resolver una serie de puzles y escapar de una habitación. 
 Ha sido realizado para la evaluación de la parte práctica de la asignatura, siendo los autores:
-- Jaime Pérez García
-- Francisco Expósito Carmona
+- ***Jaime Pérez García***
+- ***Francisco Expósito Carmona***
 
 ## Motivación
-Hemos decidido hacer público este proyecto, tanto para demostrar nuestra experiencia y conocimientos como por apoyar el Software Libre.
+Hemos decidido hacer público este proyecto, tanto para demostrar nuestra experiencia y conocimientos, como para apoyar el Software Libre.
 
 ## Cómo jugar
 Para jugar, necesitarás un navegador web y, si quieres usar el script de lanzamiento, tener python 3 instalado. Este último no es necesario, pero necesitarás un servidor web alternativo capaz de resolver las referencias y cargar los distintos módulos y scripts.
@@ -23,6 +23,7 @@ Este proyecto se ha realizado en javascript, separando los modelos, escenas y si
 - **Puzles:** controladores de cada puzle. Se encargan de gestionar los cambios sobre el modelo y la lógica del propio puzle.
 - **Sistema de Colisiones:** encargado de las colisiones entre los modelos y el jugador. Define Rects, rectángulos AABB que almacenará en un QuadTree y realizará el test de colisiones con el jugador, según el algoritmo Swept Collision Detection.
 - **Sistema de interacción:** encargado de la interacción entre el jugador y los modelos. Utiliza raycast para invocar las interacciones sobre los objetos del mundo.
+- **Sistema de cámaras:** permite gestionar múltiples cámaras, definir múltiples controladores, eventos de las teclas, etc.
 
 Es importante la consideración de que este proyecto tiene fines académicos, por lo que ha sido diseñado y elaborado para cumplir ese propósito y demostrar nuestras habilidades.
 
@@ -51,4 +52,4 @@ Las referencias a los autores y páginas web utilizadas son las siguientes
 El modelo del destornillador pertecene a [Free3D - Destornillador](https://free3d.com/es/modelos-3d/destornillador).
 
 ## Licencia de uso
-Este software y el código (no perteneciente a las librerías) ha sido realizado por nosotros, por lo que nos reservamos todos los derechos de su autoría. Puede ser empleado en cualquier proyecto, siempre y cuando se haga referencia a sus autores y a este repositorio.
+Este software y el código (no perteneciente a las librerías) ha sido realizado por nosotros, por lo que nos reservamos todos los derechos de su autoría. Puede ser empleado en cualquier proyecto, siempre y cuando se haga referencia a sus autores y a este repositorio. Sin embargo, no se permite su uso para fines comerciales.
