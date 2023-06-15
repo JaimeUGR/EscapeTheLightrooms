@@ -44,7 +44,7 @@ import {Config} from "./Config.js"
  * Clase que hereda de THREE.Scene, con la que se gestionará todo el juego
  */
 
-let FPSLimit = false
+let FPSLimit = true
 let isWindowFocused = true
 let myDeltaTime = 1/30
 let myDelta = 0
@@ -217,14 +217,44 @@ class EscapeTheLightrooms extends THREE.Scene
 
 	createCamera()
 	{
-		// TODO: TEMPORAL
-		this.pantallaPausa = document.getElementById("pantalla")
-		//this.pantallaPausa.addEventListener('click', this.cambiarCamara.bind(this))
-		window.addEventListener('click', this.cambiarCamara.bind(this))
-
+		//window.addEventListener('click', this.cambiarCamara.bind(this))
 		document.addEventListener('keydown', this.gestorCamaras.onKeyDown.bind(this.gestorCamaras))
 		document.addEventListener('keyup', this.gestorCamaras.onKeyUp.bind(this.gestorCamaras) )
 		document.addEventListener('mousemove', this.gestorCamaras.onMouseMove.bind(this.gestorCamaras))
+	}
+
+	// Este método inicia una animación de 0.2 segundos que rota la cámara 360º para precargar objetos pesados
+	preloadCamera()
+	{
+		let camera = this.getCamera()
+		const rInicial = camera.rotation.y
+
+
+		let frameIni = {rY: rInicial}
+		let frameFin = {rY: rInicial + 2*Math.PI}
+
+		const aniPreCarga = new TWEEN.Tween(frameIni).to(frameFin, 3000)
+			.onUpdate(() => {
+				camera.rotation.y = frameIni.rY
+			})
+			.onComplete(() => {
+				camera.rotation.y = rInicial
+				console.log("Completed PreLoad")
+
+				// Permitir que empiece el juego
+				$("#boton-jugar")
+					.html("Play")
+					.addClass("ready")
+					.on("click", (event) => {
+						// Hacer el fade del menú al juego
+						$("#menuPrincipal").css("display", "none")
+
+						// Activar los clicks
+						window.addEventListener('click', this.cambiarCamara.bind(this))
+					})
+			})
+
+		aniPreCarga.start()
 	}
 
 
@@ -419,5 +449,8 @@ $(function () {
 	window.addEventListener ("resize", () => main_scene.onWindowResize());
 
 	// Que no se nos olvide, la primera visualización.
-	main_scene.update();
+	main_scene.update()
+	main_scene.preloadCamera()
+
+	console.log("Game Started")
 });

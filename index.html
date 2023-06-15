@@ -4,16 +4,27 @@
 	<meta charset="UTF-8">
 	<title>Escape The LightRooms</title>
 	<link rel="stylesheet" href="index.css">
-	<script type="text/javascript" src="./libs/jquery.js"></script>
 	<script type="importmap">
     	{ "imports": { "three": "./libs/three.module.js" } }
     </script>
+	<script type="text/javascript" src="./libs/jquery.js"></script>
 	<script type="module" src="./src/EscapeTheLightrooms.js"></script>
 </head>
 <body>
 	<div id="crosshair"></div>
 
-	<div id="pantalla">
+	<div id="menuPrincipal">
+		<div class="menuPrincipalContainer">
+			<h1 class="principal-titulo">Escape The Lightrooms</h1>
+			<div class="principal-botones">
+				<button id="boton-jugar">Loading...</button>
+			</div>
+			<span class="principal-version">Version 1.0</span>
+		</div>
+	</div>
+
+	<div id="menuJuego">
+
 	</div>
 
 	<!-- Div which will hold the Output -->
