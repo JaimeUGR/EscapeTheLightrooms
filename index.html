@@ -17,14 +17,137 @@
 		<div class="menuPrincipalContainer">
 			<h1 class="principal-titulo">Escape The Lightrooms</h1>
 			<div class="principal-botones">
-				<button id="boton-jugar">Loading...</button>
+				<button id="botonJugar">Loading...</button>
+				<button class="menu-boton-controles" id="abrirMenuControlesMP">Controls</button>
+				<button class="menu-boton-creditos" id="abrirMenuCreditosMP">Credits</button>
+			</div>
+			<div class="principal-autores">
+				<h2>A game by</h2>
+				<span class="principal-autor">Jaime</span>
+				<span class="principal-autor">Francisco</span>
 			</div>
 			<span class="principal-version">Version 1.0</span>
 		</div>
 	</div>
 
 	<div id="menuJuego">
+		<div class="menuJuegoContainer">
+			<h1 class="menu-juego-titulo">Escape The Lightrooms</h1>
+			<div class="menu-juego-botones">
+				<button class="menu-boton-controles" id="abrirMenuControlesMJ">Controls</button>
+				<button class="menu-boton-creditos" id="abrirMenuCreditosMJ">Credits</button>
+				<button class="menu-boton-volver" id="cerrarMenuJuego">Resume</button>
+			</div>
+		</div>
+	</div>
 
+	<div id="menuControles">
+		<div class="menu-controles-contenedor">
+			<h1 class="menu-juego-titulo">Game Controls</h1>
+			<div class="menu-controles-controles">
+				<div class="menu-controles-categoria">
+					<h2>Movement</h2>
+					<ul class="lista-controles">
+						<li><h3>W - ArrowUp:</h3> Forwards</li>
+						<li><h3>A - ArrowLeft:</h3> Left</li>
+						<li><h3>S - ArrowDown:</h3> Backwards</li>
+						<li><h3>D - ArrowRight:</h3> Right</li>
+					</ul>
+				</div>
+				<div class="menu-controles-categoria">
+					<h2>Interaction</h2>
+					<ul class="lista-controles">
+						<li><h3>Interact:</h3> Mouse click</li>
+						<li><h3>ESC:</h3> Open Menu</li>
+					</ul>
+				</div>
+				<div class="menu-controles-categoria">
+					<h2>Player Camera</h2>
+					<ul class="lista-controles">
+						<li><h3>Left Control:</h3> Toggle camera lock</li>
+						<li><h3>Mouse movement:</h3> Rotate camera</li>
+					</ul>
+				</div>
+				<div class="menu-controles-categoria">
+					<h2>Cube View</h2>
+					<ul class="lista-controles">
+						<li><h3>W:</h3> Rotate up</li>
+						<li><h3>A:</h3> Rotate left</li>
+						<li><h3>S:</h3> Rotate down</li>
+						<li><h3>D:</h3> Rotate right</li>
+						<li><h3>E:</h3> Exit</li>
+					</ul>
+				</div>
+			</div>
+			<button class="menu-boton-volver" id="cerrarMenuControles">Back</button>
+		</div>
+	</div>
+
+	<div id="menuCreditos">
+		<div class="menu-creditos-contenedor">
+			<h1 class="menu-juego-titulo">Credits</h1>
+			<div class="menu-creditos-categoria">
+				<h2>Authors</h2>
+				<ul class="lista-creditos">
+					<li>(<a href="https://github.com/JaimeUGR">Link</a>) Jaime</li>
+					<li>(<a href="https://github.com/francx11">Link</a>) Francisco</li>
+				</ul>
+			</div>
+			<div class="menu-creditos-creditos">
+				<div class="menu-creditos-categoria creditos-categoria-librerias">
+					<h2>Libraries</h2>
+					<ul class="lista-creditos">
+						<li>(<a href="https://threejs.org/">Link</a>) Three JS</li>
+						<li>(<a href="https://github.com/looeee/threejs-csg">Link</a>) CSG</li>
+						<li>(<a href="https://github.com/tweenjs/tween.js">Link</a>) Tween JS</li>
+					</ul>
+				</div>
+				<div class="menu-creditos-categoria">
+					<h2>Textures</h2>
+					<div class="creditos-subcategorias-texturas">
+						<div class="menu-creditos-subcategoria">
+							<h3>Metal</h3>
+							<ul class="lista-creditos">
+								<li>ASD</li>
+								<li>ASD</li>
+								<li>ASD</li>
+							</ul>
+						</div>
+						<div class="menu-creditos-subcategoria">
+							<h3>Wood</h3>
+							<ul class="lista-creditos">
+								<li>ASD</li>
+								<li>ASD</li>
+								<li>ASD</li>
+							</ul>
+						</div>
+						<div class="menu-creditos-subcategoria">
+							<h3>Paintings</h3>
+							<ul class="lista-creditos">
+								<li>ASD</li>
+								<li>ASD</li>
+								<li>ASD</li>
+							</ul>
+						</div>
+						<div class="menu-creditos-subcategoria">
+							<h3>Images</h3>
+							<ul class="lista-creditos">
+								<li>ASD</li>
+								<li>ASD</li>
+								<li>ASD</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+				<div class="menu-creditos-categoria creditos-categoria-modelos">
+					<h2>3D Models</h2>
+					<ul class="lista-creditos">
+						<li>(<a href="https://www.turbosquid.com/3d-models/free-3ds-mode-screwdriver/982192">Link</a>) Screwdriver</li>
+					</ul>
+				</div>
+			</div>
+			<button class="menu-boton-volver" id="cerrarMenuCreditos">Back</button>
+		</div>
 	</div>
 
 	<!-- Div which will hold the Output -->

@@ -5,6 +5,7 @@
 
 	--cute-green: #84e15a;
 	--cute-red: #e1584a;
+	--cute-yellow: #ebc622;
 }
 
 * {
@@ -51,27 +52,28 @@ h1 {
 	flex-direction: column;
 	align-items: center;
 	padding: 2rem;
+	row-gap: 2rem;
 }
 
-#boton-jugar {
+#botonJugar {
 	background: var(--main-menu-background);
 	font-size: 2rem;
 	font-weight: bold;
 	border-radius: 8px;
 	border: 4px solid var(--cute-red);
-	padding: 1.5rem 4rem;
+	padding: 1.5rem 0;
 	color: var(--cute-red);
 	width: 20rem;
 }
 
-#boton-jugar.ready {
+#botonJugar.ready {
 	animation: boton-jugar-transition 0.5s ease-in;
 	animation-fill-mode: forwards;
 	border: 4px solid var(--main-menu-background);
 	color: var(--main-menu-background);
 }
 
-#boton-jugar.ready:hover {
+#botonJugar.ready:hover {
 	background-color: var(--main-menu-background) !important;
 	color: var(--cute-green);
 	border: 4px solid var(--cute-green);
@@ -86,11 +88,40 @@ h1 {
 	}
 }
 
-/*
-#boton-jugar:hover {
-	background: var(--white-1);
-	color: var(--main-menu-background)
-}*/
+
+#abrirMenuControlesMP, #abrirMenuControlesMJ {
+	background: var(--cute-yellow);
+	font-size: 2rem;
+	font-weight: bold;
+	border-radius: 8px;
+	border: 4px solid var(--cute-yellow);
+	padding: 1.5rem 0;
+	color: var(--main-menu-background);
+	width: 16rem;
+	transition: 0.08s all ease-in;
+}
+
+#abrirMenuControlesMP:hover, #abrirMenuControlesMJ:hover {
+	background-color: var(--main-menu-background);
+	color: var(--cute-yellow);
+}
+
+#abrirMenuCreditosMP, #abrirMenuCreditosMJ {
+	background: var(--cute-yellow);
+	font-size: 2rem;
+	font-weight: bold;
+	border-radius: 8px;
+	border: 4px solid var(--cute-yellow);
+	padding: 1.5rem 0;
+	color: var(--main-menu-background);
+	width: 16rem;
+	transition: 0.08s all ease-in;
+}
+
+#abrirMenuCreditosMP:hover, #abrirMenuCreditosMJ:hover {
+	background-color: var(--main-menu-background);
+	color: var(--cute-yellow);
+}
 
 .principal-version {
 	font-weight: bold;
@@ -98,13 +129,163 @@ h1 {
 }
 
 #menuJuego {
-	display: block;
+	display: none;
+	align-items: center;
+	justify-content: center;
 	position: absolute;
 	width: 100%;
 	height: 100%;
-	opacity: 0;
-	background-color: rgba(0, 0, 0, 0.5);
-	z-index: 90;
+	background-color: rgba(20, 20, 20, 0.6);
+	z-index: 70;
+}
+
+.menuJuegoContainer {
+	row-gap: 5rem;
+	background-color: var(--main-menu-background);
+	padding: 5rem 8rem 5rem 8rem;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+	border-radius: 8px;
+	border: 4px solid black;
+}
+
+.menu-juego-titulo {
+	color: var(--white-1);
+}
+
+.menu-juego-botones {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	row-gap: 2rem;
+}
+
+.menu-boton-volver {
+	background: var(--cute-red);
+	font-size: 2rem;
+	font-weight: bold;
+	border-radius: 8px;
+	border: 4px solid var(--cute-red);
+	padding: 1.5rem 0;
+	color: var(--main-menu-background);
+	width: 20rem;
+	transition: 0.08s all ease-in;
+}
+
+.menu-boton-volver:hover {
+	background-color: var(--main-menu-background);
+	color: var(--cute-red);
+}
+
+#menuControles {
+	display: none;
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	z-index: 110;
+	background-color: var(--main-menu-background);
+}
+
+.menu-controles-contenedor {
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	row-gap: 3rem;
+}
+
+.menu-controles-controles {
+	display: flex;
+	justify-content: center;
+	gap: 3rem;
+}
+
+.menu-controles-categoria {
+	color: white;
+	padding: 2rem;
+}
+
+.menu-controles-categoria > h2 {
+	font-size: 2.8rem;
+	text-align: center;
+	margin-bottom: 1rem;
+	color: #22c3eb;
+}
+
+.lista-controles {
+	list-style: none;
+}
+
+.lista-controles > li {
+	font-size: 1.8rem;
+	margin-bottom: 0.5rem;
+}
+
+.lista-controles > li > h3 {
+	display: inline-block;
+	font-size: 1.8rem;
+	color: #8deb22;
+}
+
+#menuCreditos {
+	display: none;
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	z-index: 110;
+	background-color: var(--main-menu-background);
+}
+
+.menu-creditos-contenedor {
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	row-gap: 3rem;
+}
+
+.menu-creditos-creditos {
+	display: grid;
+	grid-template-columns: 1fr 3fr 1fr;
+	overflow-y: auto;
+	width: 100%;
+	padding: 0 4rem;
+	justify-content: space-evenly;
+	max-height: 75%;
+	grid-column-gap: 3rem;
+}
+
+.menu-creditos-categoria {
+	color: var(--white-1);
+	display: flex;
+	flex-direction: column;
+}
+
+.menu-creditos-categoria > h2 {
+	font-size: 3rem;
+	text-align: center;
+	color: #22c3eb;
+}
+
+.menu-creditos-subcategoria > h3 {
+	font-size: 2.5rem;
+	text-align: center;
+	color: #8deb22;
+}
+
+.lista-creditos {
+	list-style: none;
+	text-align: center;
+}
+
+.creditos-subcategorias-texturas {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
 }
 
 #crosshair

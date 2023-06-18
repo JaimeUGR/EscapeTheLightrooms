@@ -21,7 +21,9 @@ class ControladorCamaraPrincipal extends ControladorCamara
 		this.controlador = new PointerLockControls(camara, domElement)
 		this.controlador.disconnect()
 
+		// Mantenerlo bloqueado para tener control manual
 		this.controlador.isLocked = true
+		this.isEnabled = false
 
 		this.moveForward = false
 		this.moveBackward = false
@@ -32,11 +34,35 @@ class ControladorCamaraPrincipal extends ControladorCamara
 
 		this.velocity = new THREE.Vector3()
 		this.direction = new THREE.Vector3()
+
+		document.addEventListener('pointerlockchange', () => {
+			// Se ha deshabilitado
+			if (document.pointerLockElement === null)
+			{
+				if (this.isEnabled)
+				{
+					console.log("Has pulsado ESC en modo cámara libre")
+
+					// Desbloquear manualmente la cámara
+					this.disable()
+					GameState.gameData.cameraLock = true
+
+					// Lanzar el evento para que se capte
+					document.dispatchEvent(new KeyboardEvent('keydown', {
+						key: 'Escape',
+						code: 'Escape',
+						keyCode: 27,
+						which: 27,
+					}))
+				}
+			}
+		})
 	}
 
 	enable()
 	{
 		this.controlador.lock()
+		this.isEnabled = true
 	}
 
 	disable()
@@ -49,6 +75,7 @@ class ControladorCamaraPrincipal extends ControladorCamara
 		this.moveDown = false
 
 		this.controlador.unlock()
+		this.isEnabled = false
 	}
 
 	onMouseMove(event)

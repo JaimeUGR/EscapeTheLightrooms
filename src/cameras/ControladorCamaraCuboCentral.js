@@ -86,7 +86,7 @@ class ControladorCamaraCuboCentral extends ControladorCamara
 		switch (event.code)
 		{
 			// NOTE: lo hacemos aquí para que el up se lance aquí
-			case "Escape":
+			case "KeyE":
 				// Salir de este controlador y volver al principal
 				GameState.systems.cameras.cambiarAControladorPrincipal()
 				break

@@ -62,6 +62,7 @@ class GameState
 			cameraLock: false,
 			colsEnabled: true,
 			gameStarted: false,
+			inputEnabled: true,
 			keypadCode: "6969"
 		}
 

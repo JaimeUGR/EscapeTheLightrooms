@@ -837,6 +837,21 @@ class Robot extends THREE.Object3D
 		// Se crea una sección para los controles de la caja
 		const folder = gui.addFolder ("Robot")
 
+		//
+		// Control animación continua
+		//
+		folder.add(this.movilidad, 'animacionContinuaActivada').name('Animate: ').onChange((value) => {
+			this.animacionContinuaActivada = this.movilidad.animacionContinuaActivada
+		})
+
+		this.movilidad.iniciarAnimacionContinua = () => this.iniciaAnimacionContinua()
+		folder.add (this.movilidad, 'iniciarAnimacionContinua').name ('[ START ANIMATION ]')
+
+		//
+		// Control grados de libertad
+		//
+		folder.add(this.movilidad, 'guiControlsEnabled').name('Manual Control: ').listen()
+		folder.add (this.movilidad, 'reset').name ('[ RESET ]')
 		folder.add(this.movilidad, 'cabeza_rX', -Math.PI, Math.PI, 0.1).name('cabeza_rX: ').listen()
 		folder.add(this.movilidad, 'cabeza_rY', -Math.PI, Math.PI, 0.1).name('cabeza_rY: ').listen()
 		folder.add(this.movilidad, 'cabeza_rZ', -Math.PI, Math.PI, 0.1).name('cabeza_rZ: ').listen()
@@ -872,16 +887,6 @@ class Robot extends THREE.Object3D
 		folder.add(this.movilidad, 'piernaIzd_escInf', 0, 4, 0.1).name('piernaIzd_escInf: ').listen()
 		folder.add(this.movilidad, 'piernaIzd_rXInf', -Math.PI, Math.PI, 0.1).name('piernaIzd_rXInf: ').listen()
 		folder.add(this.movilidad, 'piernaIzd_rZInf', -Math.PI, Math.PI, 0.1).name('piernaIzd_rZInf: ').listen()
-
-		folder.add(this.movilidad, 'guiControlsEnabled').name('Control Manual: ').listen()
-		folder.add(this.movilidad, 'animacionContinuaActivada').name('Animación Continua Activada: ').onChange((value) => {
-			this.animacionContinuaActivada = this.movilidad.animacionContinuaActivada
-		})
-
-		folder.add (this.movilidad, 'reset').name ('[ Reset ]')
-
-		this.movilidad.iniciarAnimacionContinua = () => this.iniciaAnimacionContinua()
-		folder.add (this.movilidad, 'iniciarAnimacionContinua').name ('[ INICIAR ANIMACION CONTINUA ]')
 	}
 
 	update()

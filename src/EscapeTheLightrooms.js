@@ -57,6 +57,10 @@ class EscapeTheLightrooms extends THREE.Scene
 	{
 		super()
 
+		//
+		// Inicialización
+		//
+
 		this.clock = new THREE.Clock(false)
 
 		// Lo primero, crear el visualizador, pasándole el lienzo sobre el que realizar los renderizados.
@@ -65,25 +69,16 @@ class EscapeTheLightrooms extends THREE.Scene
 		// Se crea la interfaz gráfica de usuario
 		this.gui = this.createGUI()
 
+		this.inicializarMenus()
 		this.inicializarGameState()
 
-		// Construimos los distinos elementos que tendremos en la escena
 
-		// Todo elemento que se desee sea tenido en cuenta en el renderizado de la escena debe pertenecer a esta. Bien como hijo de la escena (this en esta clase) o como hijo de un elemento que ya esté en la escena.
-		// Tras crear cada elemento se añadirá a la escena con   this.add(variable)
+		//
+		// Crear las luces
+		//
+
 		this.createLights ()
 
-		// Tendremos una cámara con un control de movimiento con el ratón
-		this.createCamera ()
-
-		// Y unos ejes. Imprescindibles para orientarnos sobre dónde están las cosas
-		//this.axis = new THREE.AxesHelper (50)
-		//this.add (this.axis)
-
-		// Por último creamos el modelo.
-		// El modelo puede incluir su parte de la interfaz gráfica de usuario. Le pasamos la referencia a
-		// la gui y el texto bajo el que se agruparán los controles de la interfaz que añada el modelo.
-		//this.add(new THREE.Mesh(new THREE.BoxGeometry(5, 5, 5), new THREE.MeshBasicMaterial({color: 0xff00ff})))
 
 		//
 		// Crear las salas
@@ -92,27 +87,11 @@ class EscapeTheLightrooms extends THREE.Scene
 		this.crearSalas()
 
 		//
-		// Añadir las cámaras
+		// Eventos de focus
 		//
 
-		/*let aCaja = 15
-		let cajaGeo = new THREE.BoxGeometry(30, aCaja, 10)
-		cajaGeo.translate(15, aCaja/2, 5)
+		this.createEventHandlers()
 
-		this.add(new THREE.Mesh(cajaGeo, new THREE.MeshBasicMaterial({color: 0xf7fa2a})))*/
-
-		//
-		//this.gestorCamaras.cambiarControladorCamara(0)
-		//
-
-		// TODO: Temporal para el focus
-		document.addEventListener('focus', () => {
-			isWindowFocused = true
-		})
-
-		document.addEventListener('blur', () => {
-			isWindowFocused = false
-		})
 
 		this.clock.start()
 	}
@@ -198,6 +177,58 @@ class EscapeTheLightrooms extends THREE.Scene
 	}
 
 	//
+	inicializarMenus()
+	{
+		// Menú Juego
+		this.enMenuJuego = false
+
+		$("#cerrarMenuJuego")
+			.on("click", (event) => {
+				// Para que no se pueda interactuar al pulsar este botón
+				event.stopPropagation()
+
+				$("#menuJuego").css("display", "none")
+				this.enMenuJuego = false
+			})
+
+		// Menú Controles
+		$(".menu-boton-controles")
+			.on("click", () => {
+				// Abrir el menú de controles
+				$("#menuControles").css("display", "block")
+			})
+
+		$("#cerrarMenuControles")
+			.on("click", () => {
+				$("#menuControles").css("display", "none")
+			})
+
+		// Menú Créditos
+
+		$(".menu-boton-creditos")
+			.on("click", () => {
+				// Abrir el menú de créditos
+				$("#menuCreditos").css("display", "block")
+			})
+
+		$("#cerrarMenuCreditos")
+			.on("click", () => {
+				$("#menuCreditos").css("display", "none")
+			})
+	}
+
+	//
+	mostrarMenuJuego()
+	{
+		console.log("Muestro el menu")
+
+		this.enMenuJuego = true
+
+		$("#menuJuego")
+			.css("display", "flex")
+	}
+
+	//
 	cambiarCamara(event)
 	{
 		//console.log("Recibo click")
@@ -211,16 +242,54 @@ class EscapeTheLightrooms extends THREE.Scene
 		}
 		else
 		{
+			if (this.enMenuJuego)
+				return
+
 			this.interactionSystem.onMouseClick(event, this.gestorCamaras.getCamaraActiva())
 		}
 	}
 
-	createCamera()
+	createEventHandlers()
 	{
-		//window.addEventListener('click', this.cambiarCamara.bind(this))
-		document.addEventListener('keydown', this.gestorCamaras.onKeyDown.bind(this.gestorCamaras))
-		document.addEventListener('keyup', this.gestorCamaras.onKeyUp.bind(this.gestorCamaras) )
+		//
+		// Eventos de interacción
+		//
+
+		document.addEventListener('keydown', (event) => {
+			if (!GameState.gameData.gameStarted || !GameState.gameData.inputEnabled)
+				return
+
+			// Si hay algún menú mostrado, se ignoran las pulsaciones
+			if (this.enMenuJuego)
+				return
+
+			// Tecla ESC
+			if (event.code === "Escape")
+			{
+				// Mostrar el menú del juego
+				GameState.scene.mostrarMenuJuego()
+				return
+			}
+
+			// Eventos dirigidos al movimiento / cámaras
+			this.gestorCamaras.onKeyDown(event)
+		})
+
+		document.addEventListener('keyup', this.gestorCamaras.onKeyUp.bind(this.gestorCamaras))
 		document.addEventListener('mousemove', this.gestorCamaras.onMouseMove.bind(this.gestorCamaras))
+
+
+		//
+		// Focus
+		//
+
+		document.addEventListener('focus', () => {
+			isWindowFocused = true
+		})
+
+		document.addEventListener('blur', () => {
+			isWindowFocused = false
+		})
 	}
 
 	// Este método inicia una animación de 0.2 segundos que rota la cámara 360º para precargar objetos pesados
@@ -242,7 +311,7 @@ class EscapeTheLightrooms extends THREE.Scene
 				console.log("Completed PreLoad")
 
 				// Permitir que empiece el juego
-				$("#boton-jugar")
+				$("#botonJugar")
 					.html("Play")
 					.addClass("ready")
 					.on("click", (event) => {
@@ -292,14 +361,14 @@ class EscapeTheLightrooms extends THREE.Scene
 				limiteFPS: 30
 			}
 
-			const folder = gui.addFolder("Opciones")
+			const folder = gui.addFolder("Options")
 
 			folder.add(this.guiMenuOpciones, "hayLimiteFPS")
-				.name("Límite FPS Activado: ")
+				.name("Limit max FPS: ")
 				.onChange((value) => FPSLimit = value).listen()
 
 			folder.add(this.guiMenuOpciones, "limiteFPS", 15, 240, 5)
-				.name("Límite FPS: ")
+				.name("FPS Limit: ")
 				.onChange((value) => myDeltaTime = 1.0 / value).listen()
 		}
 
@@ -310,30 +379,44 @@ class EscapeTheLightrooms extends THREE.Scene
 		{
 			this.guiMenuDebug = {
 				controlesVuelo: false,
+				toggleColisiones: () => {
+					if (GameState.gameData.colsEnabled)
+						console.log("DEBUG: Collisions disabled")
+					else
+						console.log("DEBUG: Collisions enabled")
+
+					GameState.gameData.colsEnabled = !GameState.gameData.colsEnabled
+				},
 				toggleRangoInteraccion: () => {
 					if (GameState.gameData.interactionRangeEnabled)
-						console.log("DEBUG: Desactivado rango interacción")
+						console.log("DEBUG: Interaction range disabled")
 					else
-						console.log("DEBUG: Activado rango interacción")
+						console.log("DEBUG: Interaction range enabled")
 
 					GameState.gameData.interactionRangeEnabled = !GameState.gameData.interactionRangeEnabled
 				},
 				resetearPosicion: () => {
 					let iniPos = GameState.player.initialPosition
+
+					console.log("DEBUG: Player position reset")
+
 					GameState.player.position.set(iniPos.x, iniPos.y, iniPos.z)
 				}
 			}
 
-			const folder = gui.addFolder("Debug y Ayuda")
+			const folder = gui.addFolder("Debug")
 
 			folder.add(this.guiMenuDebug, "controlesVuelo")
-				.name("Controles Vuelo Activados: ").onChange((value) => GameState.debug.controlesVuelo = value)
+				.name("Fly (R - F): ").onChange((value) => GameState.debug.controlesVuelo = value)
+
+			folder.add(this.guiMenuDebug, "toggleColisiones")
+				.name("[ TOGGLE COLLISIONS ]")
 
 			folder.add(this.guiMenuDebug, "toggleRangoInteraccion")
-				.name("[ TOGGLE RANGO INTERACCIÓN ]")
+				.name("[ TOGGLE INTERACTION RANGE ]")
 
 			folder.add(this.guiMenuDebug, "resetearPosicion")
-				.name("[ RESETEAR POSICIÓN ]")
+				.name("[ RESET POSITION ]")
 		}
 
 		return gui
@@ -399,7 +482,14 @@ class EscapeTheLightrooms extends THREE.Scene
 
 	update()
 	{
+		const isGamePaused = !isWindowFocused || this.enMenuJuego
 		let currentDelta = this.clock.getDelta()
+
+		if (isGamePaused)
+		{
+			setTimeout(() => this.update(), FPSLimit ? myDeltaTime : 1 / 60.0)
+			return
+		}
 
 		if (FPSLimit)
 		{
@@ -418,18 +508,14 @@ class EscapeTheLightrooms extends THREE.Scene
 			this.renderer.render (this, this.getCamera())
 		}
 
-		// NOTE: Si el límite de fps está activo, puede haber problemas. No recomendado.
-		if (isWindowFocused)
-		{
-			// TODO: TMP para el contro manual
-			this.salaPrincipal.robot.update()
+		// Para permitir el control manual del robot
+		this.salaPrincipal.robot.update()
 
-			// Se actualiza la posición de la cámara según su controlador
-			this.gestorCamaras.update(currentDelta);
+		// Se actualiza la posición de la cámara según su controlador
+		this.gestorCamaras.update(currentDelta);
 
-			// Actualizar modelos
-			TWEEN.update()
-		}
+		// Actualizar modelos
+		TWEEN.update()
 
 		// Este método debe ser llamado cada vez que queramos visualizar la escena de nuevo.
 		// Literalmente le decimos al navegador: "La próxima vez que haya que refrescar la pantalla, llama al método que te indico".

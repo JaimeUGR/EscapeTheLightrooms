@@ -301,7 +301,7 @@ class SalaDerecha extends Sala
 
 				borde: 1.5,
 				huecoZ: 0.3
-			}, undefined, "../../resources/textures/models/CreacionAdan.jpg")
+			}, undefined, "../../resources/textures/models/CuadroLargo.png")
 
 			cuadroGrande.rotateY(Math.PI)
 

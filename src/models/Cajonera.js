@@ -75,7 +75,7 @@ class Cajonera extends THREE.Object3D
 		const txLoader = GameState.txLoader
 
 		let texturaCajonera = txLoader.load("../../resources/textures/models/textura_mesa_normal.png")
-		let texturaCajones = txLoader.load("../../resources/textures/models/textura_cajones.png")
+		let texturaCajones = txLoader.load("../../resources/textures/models/madera_clara_1.jpg")
 
 		this.cajoneraMaterial = new THREE.MeshLambertMaterial({map: texturaCajonera})
 		this.cajonFrontalMaterial =  new THREE.MeshLambertMaterial({map: texturaCajones})
