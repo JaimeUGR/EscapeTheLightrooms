@@ -9,11 +9,10 @@ Ha sido realizado para la evaluación de la parte práctica de la asignatura `Si
 Hemos decidido hacer público este proyecto, tanto para demostrar nuestra experiencia y conocimientos, como para apoyar el Software Libre.
 
 ## Cómo jugar
-Para jugar, necesitarás un navegador web y, si quieres usar el script de lanzamiento, tener python 3 instalado. Este último no es necesario, pero necesitarás un servidor web alternativo capaz de resolver las referencias y cargar los distintos módulos y scripts.
-
-Una vez tengas los requisitos anteriores, necesitas abrir el index.html. Si vas a utilizar el script de lanzamiento, ejecútalo previo a su uso en el directorio donde se encuentra el index.html. Posteriormente, navega a la url localhost:8000. 
-
+Puedes jugar al juego en este enlace [Escape The Lightrooms]().
 En navegadores como firefox, puede ser necesario habilitar una opción en about:config relacionada con la carga de scripts en paths relativos y la seguridad.
+
+Lo hemos publicado en la página [Itch.io](), donde los usuarios pueden jugar al juego así como donar para apoyar nuestros proyectos.
 
 ## Detalles del proyecto
 Este proyecto se ha realizado en javascript, separando los modelos, escenas y sistemas del juego en sus correspondientes módulos. Los módulos principales son:
@@ -42,15 +41,8 @@ Se han utilizado las siguientes librerías:
 En lo que respecta a las texturas:
 - Todas las texturas son propiedad de sus dueños originales, con su debida atribución al mérito de su creación y autoría.
 - Todas las texturas tienen licencia libre, siempre y cuando se haga mención a los autores.
-- Las texturas de las paredes han sido realizadas por nosotros.
 
-Las referencias a los autores y páginas web utilizadas son las siguientes
-- [Freepik](https://www.freepik.es/): las texturas son de los autores “rawpixel”, “pikisuperstar”, “kjpargeter”, “kbza”, “macrovector”, “freepik”.
-- [Texture Ninja](https://texture.ninja/)
-- Google Images
-
-#### Modelos
-El modelo del destornillador pertecene a [Free3D - Destornillador](https://free3d.com/es/modelos-3d/destornillador).
+Las referencias a los autores y páginas web se pueden leer ver en los créditos del juego. Las texturas del juego no están disponibles en este repositorio para la descarga, puesto que muchas de ellas son de otros autores.
 
 ## Licencia de uso
 Este software y el código (no perteneciente a las librerías ni recursos) ha sido realizado por nosotros, por lo que nos reservamos todos los derechos de su autoría. Puede ser empleado en cualquier proyecto, siempre y cuando se haga referencia a sus autores y a este repositorio. Sin embargo, no se permite su uso para fines comerciales.
