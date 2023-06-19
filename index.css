@@ -123,9 +123,23 @@ h1 {
 	color: var(--cute-yellow);
 }
 
+.principal-autores > h2 {
+	color: #84e15a;
+	font-size: 2rem;
+	display: inline-block;
+	margin-top: 3rem;
+	padding-bottom: 1rem;
+}
+
+.principal-autores > h2 > a {
+	cursor: pointer;
+	text-decoration: none;
+}
+
 .principal-version {
+	color: #22c3eb;
 	font-weight: bold;
-	font-size: 1.5rem;
+	font-size: 1.8rem;
 }
 
 #menuJuego {
@@ -246,7 +260,28 @@ h1 {
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
-	row-gap: 3rem;
+	row-gap: 2.5rem;
+}
+
+.creditos-autor-principal {
+	font-size: 2.2rem;
+	font-weight: bold;
+	background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet);
+	background-size: 1500% 1500%;
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	animation: autor-rainbow 10s linear infinite;
+}
+
+@keyframes autor-rainbow {
+	0% { background-position: 0 50%; }
+	50% { background-position: 100% 50%; }
+	100% { background-position: 0 50%; }
+}
+
+.creditos-autor-secundario {
+	font-size: 2rem;
+	color: #dd87f0;
 }
 
 .menu-creditos-creditos {
@@ -256,8 +291,9 @@ h1 {
 	width: 100%;
 	padding: 0 4rem;
 	justify-content: space-evenly;
-	max-height: 75%;
+	max-height: 55vh;
 	grid-column-gap: 3rem;
+	grid-row-gap: 2rem;
 }
 
 .menu-creditos-categoria {
@@ -283,9 +319,24 @@ h1 {
 	text-align: center;
 }
 
+.lista-creditos > li {
+	font-size: 1.8rem;
+}
+
+.lista-creditos > li > a {
+	color: #f4c294;
+}
+
+.creditos-autor {
+	font-weight: bold;
+	color: #dd87f0;
+}
+
 .creditos-subcategorias-texturas {
 	display: grid;
 	grid-template-columns: 1fr 1fr;
+	grid-row-gap: 2rem;
+	grid-column-gap: 2rem;
 }
 
 #crosshair
