@@ -39,7 +39,7 @@ import {SistemaColisiones} from "./systems/SistemaColisiones.js"
 import {SistemaInteraccion} from "./systems/SistemaInteraccion.js"
 import {SistemaMensajes} from "./systems/SistemaMensajes.js"
 import {Config} from "./Config.js"
-import {MSG_INICIO_JUEGO} from "./messages/messages.js"
+import {MSG_INICIO_CONTROLES, MSG_INICIO_JUEGO} from "./messages/messages.js"
 
 /**
  * Clase que hereda de THREE.Scene, con la que se gestionará todo el juego
@@ -241,7 +241,8 @@ class EscapeTheLightrooms extends THREE.Scene
 		{
 			GameState.gameData.gameStarted = true
 			//console.log("Iniciando...")
-			this.messageSystem.mostrarMensaje(MSG_INICIO_JUEGO, 25000)
+			this.messageSystem.mostrarMensaje(MSG_INICIO_JUEGO, 20000)
+			this.messageSystem.mostrarMensaje(MSG_INICIO_CONTROLES, 15000)
 			this.gestorCamaras.cambiarAControladorPrincipal()
 		}
 		else

@@ -25,27 +25,76 @@ class SistemaMensajes
 	constructor()
 	{
 		this.mensajes = []
-		this.enProceso = false
+		this.mensajeSeleccionado = 0
+
+		this.timeoutProceso = null
 
 		let divContenedorMensaje = document.getElementById("contenedorMensaje")
 		divContenedorMensaje.style.display = "none"
 
 		this.contenedorMensaje = {
 			divContenedor: divContenedorMensaje,
-			pTexto: document.getElementById("textoMensaje")
+			pTexto: document.getElementById("textoMensaje"),
+			botonBorrar: document.getElementById("borraMensaje"),
+			botonAvanzar: document.getElementById("avanzaMensaje"),
+			botonRetroceder: document.getElementById("retrocedeMensaje")
 		}
+
+		// Añadir los listeners a los botones
+
+		this.contenedorMensaje.botonBorrar.addEventListener("click", (event) => {
+			event.stopPropagation()
+			this._eliminarMensaje()
+		})
+
+		this.contenedorMensaje.botonRetroceder.addEventListener("click", (event) => {
+			event.stopPropagation()
+			this._pasarMensaje(true)
+		})
+
+		this.contenedorMensaje.botonAvanzar.addEventListener("click", (event) => {
+			event.stopPropagation()
+			this._pasarMensaje()
+		})
+	}
+
+	_pasarMensaje(retroceder = false)
+	{
+		if (retroceder && this.mensajeSeleccionado > 0)
+			this.mensajeSeleccionado--
+		else if (this.mensajeSeleccionado < this.mensajes.length - 1)
+			this.mensajeSeleccionado++
+
+		this._procesarMensajes()
+	}
+
+	_eliminarMensaje()
+	{
+		// El primer mensaje se elimina directamente
+		if (this.mensajeSeleccionado === 0)
+		{
+			if (this.timeoutProceso !== null)
+				clearTimeout(this.timeoutProceso)
+
+			this._rotarColaMensajes()
+			return
+		}
+
+		// Eliminar el mensaje si no es el primero
+		// TODO Optimización: Se podría cambiar con el último elemento. Provocaría desordenarlos
+		this.mensajes.splice(this.mensajeSeleccionado, 1)
+		this.mensajeSeleccionado--
+
+		this._procesarMensajes()
 	}
 
 	mostrarMensaje(mensaje, tiempoEnPantalla = 10000)
 	{
-		const idMensaje = SistemaMensajes._GetAndNextIDMensaje()
-
 		//
 		// Crear el objeto con la información del mensaje
 		//
 
 		this.mensajes.push({
-			id: idMensaje,
 			mensaje: mensaje,
 			tiempo: tiempoEnPantalla
 		})
@@ -56,24 +105,46 @@ class SistemaMensajes
 
 	_procesarMensajes()
 	{
-		if (this.enProceso)
+		//
+		// Actualización
+		//
+
+		// Actualizar el texto
+		this.contenedorMensaje.pTexto.innerHTML = this.mensajes[this.mensajeSeleccionado].mensaje
+
+		// Actualizar los botones
+		this.contenedorMensaje.botonRetroceder.style.visibility =
+			(this.mensajeSeleccionado === 0) ? "hidden" : "visible"
+		this.contenedorMensaje.botonAvanzar.style.visibility =
+			(this.mensajeSeleccionado === this.mensajes.length - 1) ? "hidden" : "visible"
+
+		//
+		// Procesamiento
+		//
+		if (this.timeoutProceso !== null)
 			return
 
-		this.enProceso = true
 		this.contenedorMensaje.divContenedor.style.display = "block"
-		this.contenedorMensaje.pTexto.innerHTML = this.mensajes[0].mensaje
 
-		setTimeout(() => {
-			// Rotar la cola de mensajes
-			this.mensajes.shift()
-
-			// Si quedan mensajes, repetimos
-			this.enProceso = false
-			this.contenedorMensaje.divContenedor.style.display = "none"
-
-			if (this.mensajes.length !== 0)
-				this._procesarMensajes()
+		this.timeoutProceso = setTimeout(() => {
+			this._rotarColaMensajes()
 		}, this.mensajes[0].tiempo)
+	}
+
+	_rotarColaMensajes()
+	{
+		// Rotar la cola de mensajes
+		this.mensajes.shift()
+
+		if (this.mensajeSeleccionado > 0)
+			this.mensajeSeleccionado--
+
+		// Si quedan mensajes, repetimos
+		this.timeoutProceso = null
+		this.contenedorMensaje.divContenedor.style.display = "none"
+
+		if (this.mensajes.length !== 0)
+			this._procesarMensajes()
 	}
 }
 

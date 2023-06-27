@@ -178,11 +178,11 @@ h1 {
 }
 
 .menu-boton-volver {
-	background: var(--cute-red);
+	background: var(--cute-green);
 	font-size: 2rem;
 	font-weight: bold;
 	border-radius: 8px;
-	border: 4px solid var(--cute-red);
+	border: 4px solid var(--cute-green);
 	padding: 1.5rem 0;
 	color: var(--main-menu-background);
 	width: 20rem;
@@ -191,7 +191,7 @@ h1 {
 
 .menu-boton-volver:hover {
 	background-color: var(--main-menu-background);
-	color: var(--cute-red);
+	color: var(--cute-green);
 }
 
 #menuControles {
@@ -419,6 +419,9 @@ h1 {
 	font-weight: bold;
 }
 
+.tmensaje-inicioJuegoControles {
+	margin-left: 3rem;
+}
 
 /*
 	Modificaciones a la salida de dat-gui.js

@@ -10,6 +10,7 @@ import * as TWEEN from '../../libs/tween.esm.js'
 import {Object3D} from "../../libs/three.module.js"
 import {ControladorCamara} from "./ControladorCamara.js"
 import {GameState} from "../GameState.js"
+import {MSG_CUBO_ENTRAR_VISTA} from "../messages/messages.js"
 
 class ControladorCamaraCuboCentral extends ControladorCamara
 {
@@ -33,7 +34,16 @@ class ControladorCamaraCuboCentral extends ControladorCamara
 		this.camara.position.set(0, 0, this.cuboCentral.ladoCubo + 2*this.cuboCentral.bordeCubo + 15)
 		this.camara.lookAt(0, 0, 0)
 
+		//
+		// Animaciones
+		//
 		this._crearAnimaciones()
+
+		//
+		// Mensajes
+		//
+
+		this.mostradoMensajeVista = false
 	}
 
 	enable()
@@ -49,7 +59,11 @@ class ControladorCamaraCuboCentral extends ControladorCamara
 
 		// TODO: Desactivar el rango de interacción
 
-		// TODO: mostrar mensaje que para salir se pulse ESC
+		if (!this.mostradoMensajeVista)
+		{
+			GameState.systems.messages.mostrarMensaje(MSG_CUBO_ENTRAR_VISTA, 8000)
+			this.mostradoMensajeVista = true
+		}
 	}
 
 	disable()
