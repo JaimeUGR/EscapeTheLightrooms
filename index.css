@@ -353,3 +353,76 @@ h1 {
 	pointer-events: none;
 	box-sizing: border-box;
 }
+
+#sistemaMensajes {
+	display: block;
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	z-index: 1;
+	overflow-y: hidden;
+}
+
+#contenedorMensaje {
+	position: absolute;
+	bottom: 3rem;
+	left: 0;
+	right: 0;
+	margin: 0 auto;
+	max-width: 60%;
+	padding: 1.6rem;
+	font-size: 2rem;
+	background-color: #7b5842;
+	border: 5px solid #0f0f0f;
+	border-radius: 6px;
+}
+
+#mensajeBotonesGestion {
+	display: flex;
+	flex-direction: row;
+	column-gap: 0.5rem;
+	padding-top: 1.2rem;
+}
+
+#mensajeBotonesGestion > button {
+	padding: 0.3rem 0.5rem;
+	font-weight: bold;
+	color: black;
+	border: 3px solid #0f0f0f;
+	border-radius: 3px;
+	text-align: center;
+}
+
+#avanzaMensaje, #retrocedeMensaje {
+	background-color: #4dbb4d;
+}
+
+#avanzaMensaje:hover, #retrocedeMensaje:hover {
+	background-color: #3c943c;
+}
+
+#borraMensaje {
+	background-color: #d73e3e;
+}
+
+#borraMensaje:hover {
+	background-color: #a93333;
+}
+
+/*
+ Mensajes
+ */
+.tmensaje-inicioJuego {
+	background: linear-gradient(to right, #e04f4f, #4dbb4d, #538ee9);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	font-weight: bold;
+}
+
+
+/*
+	Modificaciones a la salida de dat-gui.js
+ */
+.dg {
+	z-index: 10 !important;
+}

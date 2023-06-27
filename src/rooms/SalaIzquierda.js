@@ -21,6 +21,7 @@ import {Vitrina} from "../models/Vitrina.js"
 
 import {Lampara} from "../models/Lampara.js"
 import {ManecillaMinuto} from "../models/Reloj.js"
+import {MSG_COGER_TARJETA, MSG_COGER_MANECILLA_MINUTO} from "../messages/messages.js"
 import {Config} from "../Config.js"
 import {RandomInt} from "../Utils.js"
 
@@ -123,6 +124,8 @@ class SalaIzquierda extends Sala
 						return
 
 					GameState.flags.tieneTarjeta = true
+					GameState.systems.messages.mostrarMensaje(MSG_COGER_TARJETA, 10000)
+
 					tarjeta.position.y = 0
 					vitrina.O3Vitrina.remove(tarjeta)
 					tarjeta.meshTarjeta.userData = {}
@@ -209,6 +212,8 @@ class SalaIzquierda extends Sala
 				manecillaMinuto.children[0].userData.interaction = {
 					interact: (event) => {
 						GameState.flags.tieneManecillaMinuto = true
+						GameState.systems.messages.mostrarMensaje(MSG_COGER_MANECILLA_MINUTO, 10000)
+
 						manecillaMinuto.rotation.x = 0
 						manecillaMinuto.position.y = 0
 

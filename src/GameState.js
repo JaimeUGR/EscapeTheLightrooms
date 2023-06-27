@@ -78,7 +78,8 @@ class GameState
 		this.systems = {
 			collision: null,
 			interaction: null,
-			cameras: null
+			cameras: null,
+			messages: null
 		}
 	}
 }

@@ -22,6 +22,7 @@ import {Sofa} from "../models/Sofa.js"
 import {PuzleLaser} from "../puzles/PuzleLaser.js"
 import {Destornillador} from "../models/items/Destornillador.js"
 
+import {MSG_COGER_DESTORNILLADOR} from "../messages/messages.js"
 import {GameState} from "../GameState.js"
 import {Config} from "../Config.js"
 import {RandomInt} from "../Utils.js"
@@ -310,6 +311,9 @@ class SalaPrincipal extends Sala
 				// Preparar la interacción
 
 				let metodoInteraccion = () => {
+					GameState.flags.tieneDestornillador = true
+					GameState.systems.messages.mostrarMensaje(MSG_COGER_DESTORNILLADOR, 10000)
+
 					cajonSeleccionado.remove(destornillador)
 
 					destornillador.rotation.y = 0
@@ -319,8 +323,6 @@ class SalaPrincipal extends Sala
 					destornillador.traverse((anyNode) => {
 						anyNode.userData = {}
 					})
-
-					GameState.flags.tieneDestornillador = true
 				}
 
 				destornillador.traverse((anyNode) => {

@@ -37,8 +37,9 @@ import {SalaSuperior} from "./rooms/SalaSuperior.js"
 import {GameState} from "./GameState.js"
 import {SistemaColisiones} from "./systems/SistemaColisiones.js"
 import {SistemaInteraccion} from "./systems/SistemaInteraccion.js"
+import {SistemaMensajes} from "./systems/SistemaMensajes.js"
 import {Config} from "./Config.js"
-
+import {MSG_INICIO_JUEGO} from "./messages/messages.js"
 
 /**
  * Clase que hereda de THREE.Scene, con la que se gestionará todo el juego
@@ -108,6 +109,7 @@ class EscapeTheLightrooms extends THREE.Scene
 
 		this.interactionSystem = new SistemaInteraccion()
 		this.gestorCamaras = new GestorCamaras(this)
+		this.messageSystem = new SistemaMensajes()
 
 		// Debug
 		this.add(this.collisionSystem.debugNode)
@@ -116,6 +118,7 @@ class EscapeTheLightrooms extends THREE.Scene
 		GameState.systems.collision = this.collisionSystem
 		GameState.systems.interaction = this.interactionSystem
 		GameState.systems.cameras = this.gestorCamaras
+		GameState.systems.messages = this.messageSystem
 
 		this.add(GameState.debug.O3Player)
 	}
@@ -238,6 +241,7 @@ class EscapeTheLightrooms extends THREE.Scene
 		{
 			GameState.gameData.gameStarted = true
 			//console.log("Iniciando...")
+			this.messageSystem.mostrarMensaje(MSG_INICIO_JUEGO, 25000)
 			this.gestorCamaras.cambiarAControladorPrincipal()
 		}
 		else
@@ -310,11 +314,17 @@ class EscapeTheLightrooms extends THREE.Scene
 				camera.rotation.y = rInicial
 				console.log("Completed PreLoad")
 
+				// Estamos esperando en el menú principal
+				this.enMenuJuego = true
+
 				// Permitir que empiece el juego
 				$("#botonJugar")
 					.html("Play")
 					.addClass("ready")
 					.on("click", (event) => {
+						// Activar
+						this.enMenuJuego = false
+
 						// Hacer el fade del menú al juego
 						$("#menuPrincipal").css("display", "none")
 

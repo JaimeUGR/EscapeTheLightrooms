@@ -23,6 +23,7 @@ import {Lampara} from "../models/Lampara.js"
 import {Taquilla} from "../models/Taquilla.js"
 import {Cuadro} from "../models/Cuadro.js"
 
+import {MSG_COGER_PRISMA} from "../messages/messages.js"
 import {Config} from "../Config.js"
 
 class SalaSuperior extends Sala
@@ -124,10 +125,12 @@ class SalaSuperior extends Sala
 					if (!vitrina.puertaAbierta)
 						return
 
+					GameState.flags.tienePrisma = true
+					GameState.systems.messages.mostrarMensaje(MSG_COGER_PRISMA, 10000)
+
 					prisma.rotateX(Math.PI/2)
 					prisma.position.y = 0
 
-					GameState.flags.tienePrisma = true
 					vitrina.O3Vitrina.remove(prisma)
 					prisma.meshPrisma.userData = {}
 				}

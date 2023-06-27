@@ -14,7 +14,8 @@ import {AnilloCristal} from "../models/AnilloCristal.js"
 import {CristalContenedor} from "../models/CristalContenedor.js"
 import {Pila} from "../models/Pila.js"
 
-import {GameState} from "../GameState.js";
+import {GameState} from "../GameState.js"
+import {MSG_COGER_PILA} from "../messages/messages.js"
 import {SistemaColisiones} from "../systems/SistemaColisiones.js"
 
 import {ShuffleArray} from "../Utils.js"
@@ -93,8 +94,10 @@ class PuzleLaser extends THREE.Object3D
 			if (!cristal.estaRoto)
 				return
 
-			this.remove(pila)
 			GameState.flags.tienePila = true
+			GameState.systems.messages.mostrarMensaje(MSG_COGER_PILA, 10000)
+
+			this.remove(pila)
 
 			pila.traverse((anyNode) => {
 				anyNode.userData = {}

@@ -20,6 +20,7 @@ import {PalancaPared} from "../models/PalancaPared.js"
 import {Lampara} from "../models/Lampara.js"
 
 import {GameState} from "../GameState.js"
+import {MSG_COGER_MANECILLA_HORA} from "../messages/messages.js"
 import {RandomInt} from "../Utils.js"
 import {Sofa} from "../models/Sofa.js"
 import {MesaCristal} from "../models/Mesa.js"
@@ -337,11 +338,12 @@ class SalaDerecha extends Sala
 			manecillaHora.children[0].userData.interaction = {
 				interact: (event) => {
 					GameState.flags.tieneManecillaHora = true
-					manecillaHora.rotation.x = 0
-					manecillaHora.position.y = 0
+					GameState.systems.messages.mostrarMensaje(MSG_COGER_MANECILLA_HORA, 10000)
 
 					cajonSeleccionado.remove(manecillaHora)
 
+					manecillaHora.rotation.x = 0
+					manecillaHora.position.y = 0
 					manecillaHora.children[0].userData = {}
 				}
 			}
@@ -349,41 +351,6 @@ class SalaDerecha extends Sala
 			GameState.items.manecillaHora = manecillaHora
 			GameState.systems.interaction.allInteractables.push(manecillaHora)
 		}
-
-		/*{
-			//
-			// Manecilla Minuto
-			//
-			let cajonSeleccionado = this.cajoneraReloj.cajones[RandomInt(this.cajoneraReloj.cajones.length - 1)]
-
-			let manecillaMinuto = new ManecillaMinuto({
-				separacion: 7,
-				grosor: 0.5,
-				escalado: 1.2,
-				alturaCilindroContenedor: 0.75,
-				radioCilindroRecortado: 0.1,
-			})
-
-			cajonSeleccionado.add(manecillaMinuto)
-
-			manecillaMinuto.position.y = manecillaMinuto.grosor/2
-			manecillaMinuto.rotation.x = Math.PI/2
-
-			manecillaMinuto.children[0].userData.interaction = {
-				interact: (event) => {
-					GameState.flags.tieneManecillaMinuto = true
-					manecillaMinuto.rotation.x = 0
-					manecillaMinuto.position.y = 0
-
-					cajonSeleccionado.remove(manecillaMinuto)
-
-					manecillaMinuto.children[0].userData = {}
-				}
-			}
-
-			GameState.items.manecillaMinuto = manecillaMinuto
-			GameState.systems.interaction.allInteractables.push(manecillaMinuto)
-		}*/
 	}
 
 	colocarPuzles()
