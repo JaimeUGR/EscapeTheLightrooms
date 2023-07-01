@@ -55,7 +55,7 @@ class ControladorCamaraCuboCentral extends ControladorCamara
 		this.rotacionCubo = 0
 		this.rotacionCamara = 0
 
-		this.cuboCentral.animaciones.camara.activa = true
+		this.cuboCentral._animaciones.camara.activa = true
 
 		// TODO: Desactivar el rango de interacción
 
@@ -73,7 +73,7 @@ class ControladorCamaraCuboCentral extends ControladorCamara
 		this.cuboCentral.O3Cubo.rotation.y = 0
 		this.O3Camara.rotation.x = 0
 
-		this.cuboCentral.animaciones.camara.activa = false
+		this.cuboCentral._animaciones.camara.activa = false
 
 		// TODO: Reactivar el rango de interacción
 	}

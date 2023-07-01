@@ -82,14 +82,16 @@ class CuboCentral extends THREE.Object3D
 		this.elementosPI = {}
 		this.elementosPD = {}
 
-		this.animaciones = {}
+		this._animaciones = {}
 		this._animating = false
+
+		this._sonidos = {}
 
 		//
 		this.O3Cubo = new THREE.Object3D()
 
 		// Método de animación de acercamiento
-		this.animaciones.camara = {
+		this._animaciones.camara = {
 			metodoActivar: this._acercarCamara.bind(this),
 			idControlador: -1,
 			activa: false // Si está a true significa que estamos en la cámara del cubo
@@ -208,7 +210,7 @@ class CuboCentral extends THREE.Object3D
 		// NOTA: Este mesh se rotará siempre en Y y luego se trasladará (esta traslación tendrá que tener en cuenta
 		// a dónde se hizo la rotación)
 		let meshPanelBase = new THREE.Mesh(geoPanel, this.materialPanel)
-		meshPanelBase.name = "Panel" // TODO: Usar este nombre para eliminar el panel cuando se resuelva
+		meshPanelBase.name = "Panel"
 
 		let meshPanelRecorte = new THREE.Mesh(geoPanel, null)
 
@@ -365,10 +367,10 @@ class CuboCentral extends THREE.Object3D
 		// Cámara
 		//
 
-		this.animaciones.camara.idControlador = GameState.systems.cameras.aniadeControlador(new ControladorCamaraCuboCentral(
+		this._animaciones.camara.idControlador = GameState.systems.cameras.aniadeControlador(new ControladorCamaraCuboCentral(
 			new PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000),
 			this))
-		this.animaciones.camara.activa = false
+		this._animaciones.camara.activa = false
 
 		// Registrar el evento de interacción a todo el árbol (excepto a los que ya lo tienen definido)
 		this.traverse((anyNode) => {
@@ -377,7 +379,7 @@ class CuboCentral extends THREE.Object3D
 
 			if (anyNode.userData.interaction === undefined)
 				anyNode.userData.interaction = {
-					interact: this.animaciones.camara.metodoActivar
+					interact: this._animaciones.camara.metodoActivar
 				}
 		})
 	}
@@ -459,7 +461,7 @@ class CuboCentral extends THREE.Object3D
 		let frameInicio = {tZ: 15 - this.infoPanSup.alturaPrisma}
 		let frameFin = {tZ: -this.bordeCubo}
 
-		this.animaciones.prisma = new TWEEN.Tween(frameInicio).to(frameFin, 1000)
+		this._animaciones.prisma = new TWEEN.Tween(frameInicio).to(frameFin, 1000)
 			.onStart(() => {
 				this.elementosPS.prismaFondo.add(GameState.items.prisma)
 			})
@@ -509,6 +511,18 @@ class CuboCentral extends THREE.Object3D
 		this.elementosPD.tornillos = tornillos
 
 		//
+		// Sonido
+		//
+
+		// NOTE: Posicional no necesario porque se bloquea la interacción
+		GameState.systems.sound.loadGlobalSound("../../resources/sounds/unscrew.wav", (audio) => {
+			this._sonidos.tornillo = audio
+
+			audio.setVolume(0.25)
+			audio.offset = 1
+		})
+
+		//
 		// Animación
 		//
 		this._crearAnimacionPanelTornillos(meshPanelBase)
@@ -528,7 +542,7 @@ class CuboCentral extends THREE.Object3D
 
 	_crearAnimacionPanelTornillos(meshPanel)
 	{
-		this.animaciones.tornillos = {
+		this._animaciones.tornillos = {
 			animacion: null,
 			tornillo: null,
 			tornillosRestantes: this.elementosPD.tornillos.length
@@ -545,27 +559,28 @@ class CuboCentral extends THREE.Object3D
 			p: this.infoPanDer.alturaTornillo*2 // TODO: Esta cantidad debería ser el fondo del tornillo
 		}
 
-		this.animaciones.tornillos.animacion = new TWEEN.Tween(frameInicio).to(frameFin, 1000)
+		this._animaciones.tornillos.animacion = new TWEEN.Tween(frameInicio).to(frameFin, 1000)
 			.onStart(() => {
 				this._animating = true
-				frameInicio.zInicio = this.animaciones.tornillos.tornillo.position.z
+				frameInicio.zInicio = this._animaciones.tornillos.tornillo.position.z
 
-				this.animaciones.tornillos.tornillo.add(GameState.items.destornillador)
+				this._animaciones.tornillos.tornillo.add(GameState.items.destornillador)
+				this._sonidos.tornillo.play()
 			})
 			.onUpdate(() => {
-				this.animaciones.tornillos.tornillo.rotation.z = frameInicio.r
-				this.animaciones.tornillos.tornillo.position.z = frameInicio.zInicio + frameInicio.p
+				this._animaciones.tornillos.tornillo.rotation.z = frameInicio.r
+				this._animaciones.tornillos.tornillo.position.z = frameInicio.zInicio + frameInicio.p
 			})
 			.onComplete(() => {
 				frameInicio.r = 0
 				frameInicio.p = 0
 
-				this.animaciones.tornillos.tornillo.remove(GameState.items.destornillador)
+				this._animaciones.tornillos.tornillo.remove(GameState.items.destornillador)
 
-				meshPanel.remove(this.animaciones.tornillos.tornillo)
-				this.animaciones.tornillos.tornillosRestantes--
+				meshPanel.remove(this._animaciones.tornillos.tornillo)
+				this._animaciones.tornillos.tornillosRestantes--
 
-				if (this.animaciones.tornillos.tornillosRestantes <= 0)
+				if (this._animaciones.tornillos.tornillosRestantes <= 0)
 				{
 					console.log("Panel Tornillos Resuelto")
 					this._quitarPanel(0)
@@ -601,6 +616,19 @@ class CuboCentral extends THREE.Object3D
 		this._crearAnimacionPanelTarjeta(O3DTarjeta)
 
 		//
+		// Sonido
+		//
+
+		// NOTE: Posicional no necesario porque se bloquea la interacción
+		GameState.systems.sound.loadGlobalSound("../../resources/sounds/abrirPuertaConTarjeta.mp3", (audio) => {
+			this._sonidos.pasarTarjeta = audio
+
+			audio.setVolume(0.4)
+			audio.offset = 0.1
+			audio.duration = 1.7
+		})
+
+		//
 		// Interacción
 		//
 		let metodoInteraccion = this._pasarTarjeta.bind(this)
@@ -618,7 +646,7 @@ class CuboCentral extends THREE.Object3D
 
 	_crearAnimacionPanelTarjeta(O3DTarjeta)
 	{
-		this.animaciones.pasarTarjeta = {
+		this._animaciones.pasarTarjeta = {
 			animacion: null,
 			O3DTarjeta: O3DTarjeta
 		}
@@ -630,11 +658,13 @@ class CuboCentral extends THREE.Object3D
 		let frameInicio = {p: -this.infoPanIzd.anchoLector/2}
 		let frameFin = {p: this.infoPanIzd.anchoLector/2}
 
-		this.animaciones.pasarTarjeta.animacion = new TWEEN.Tween(frameInicio).to(frameFin, 1000)
+		this._animaciones.pasarTarjeta.animacion = new TWEEN.Tween(frameInicio).to(frameFin, 1000)
 			.easing(TWEEN.Easing.Cubic.In)
 			.onStart(() => {
 				// Añadir la tarjeta como hija
 				O3DTarjeta.add(tarjeta)
+
+				this._sonidos.pasarTarjeta.play()
 			})
 			.onUpdate(() => {
 				O3DTarjeta.position.x = frameInicio.p
@@ -713,6 +743,25 @@ class CuboCentral extends THREE.Object3D
 		meshPanelBase.add(meshPantalla)
 
 		//
+		// Sonido
+		//
+
+		// NOTE: Posicional no necesario porque se bloquea la interacción
+		GameState.systems.sound.loadGlobalSound("../../resources/sounds/beepTecla.wav", (audio) => {
+			this._sonidos.beepTecla = audio
+
+			audio.setVolume(1)
+		})
+
+		GameState.systems.sound.loadGlobalSound("../../resources/sounds/electronicDoorOpen.wav", (audio) => {
+			this._sonidos.keypadUnlock = audio
+
+			audio.setVolume(1)
+			audio.offset = 0.2
+			audio.duration = 0.5
+		})
+
+		//
 		// Animación
 		//
 		this._crearAnimacionPanelCodigo()
@@ -739,7 +788,7 @@ class CuboCentral extends THREE.Object3D
 
 	_crearAnimacionPanelCodigo()
 	{
-		this.animaciones.keypad = {
+		this._animaciones.keypad = {
 			boton: null,
 			codigoActual: "",
 			animacion: null
@@ -751,41 +800,51 @@ class CuboCentral extends THREE.Object3D
 		let animacionPulsar = new TWEEN.Tween(frameEmpiezaPulsar).to(framePulsado, 250)
 			.onStart(() => {
 				// Oscurecer el material
-				this.animaciones.keypad.boton.material.color.set(0x88ff88) // TODO: El original será blanco y este gris
+				this._animaciones.keypad.boton.material.color.set(0x77ff77) // TODO: El original será blanco y este gris
+				this._sonidos.beepTecla.play()
 			})
 			.onUpdate(() => {
-				this.animaciones.keypad.boton.scale.z = frameEmpiezaPulsar.sZ
+				this._animaciones.keypad.boton.scale.z = frameEmpiezaPulsar.sZ
 			})
 			.onComplete(() => {
 				frameEmpiezaPulsar.sZ = 1
 
 				// Comprobaciones sobre el botón pulsado
-				switch (this.animaciones.keypad.boton.name)
+				switch (this._animaciones.keypad.boton.name)
 				{
 					case "OK":
-						if (this.animaciones.keypad.codigoActual === GameState.gameData.keypadCode)
+						if (this._animaciones.keypad.codigoActual === GameState.gameData.keypadCode)
 						{
-							this._quitarPanel(2)
+							setTimeout(() => {
+								this._sonidos.beepTecla.play()
+							}, 200)
+
+							setTimeout(() => {
+								this._quitarPanel(2)
+
+								this._sonidos.beepTecla.play()
+								this._sonidos.keypadUnlock.play()
+							}, 200 + 200)
 						}
 						else
 						{
 							// Limpiar la pantalla y actualizar la textura haciendo una animación
-							this.animaciones.keypad.codigoActual = ""
+							this._animaciones.keypad.codigoActual = ""
 							console.log("Codigo erroneo")
 						}
 						break;
 					case "C":
 						// Limpiar la pantalla y actualizar la textura haciendo una animación
-						this.animaciones.keypad.codigoActual = ""
+						this._animaciones.keypad.codigoActual = ""
 						console.log("Limpio pantalla")
 						break;
 					default:
-						this.animaciones.keypad.codigoActual += this.animaciones.keypad.boton.name
+						this._animaciones.keypad.codigoActual += this._animaciones.keypad.boton.name
 
-						if (this.animaciones.keypad.codigoActual.length > GameState.gameData.keypadCode.length)
+						if (this._animaciones.keypad.codigoActual.length > GameState.gameData.keypadCode.length)
 						{
 							// Limpiar la pantalla y actualizar la textura haciendo una animación
-							this.animaciones.keypad.codigoActual = ""
+							this._animaciones.keypad.codigoActual = ""
 							console.log("Codigo erroneo")
 						}
 
@@ -798,10 +857,10 @@ class CuboCentral extends THREE.Object3D
 		let animacionDespulsar = new TWEEN.Tween(framePulsado).to(frameEmpiezaPulsar, 150)
 			.onStart(() => {
 				//console.log(this.animaciones.keypad.boton.material)
-				this.animaciones.keypad.boton.material.color.set(0x55ff55)
+				this._animaciones.keypad.boton.material.color.set(0x55ff55)
 			})
 			.onUpdate(() => {
-				this.animaciones.keypad.boton.scale.z = framePulsado.sZ
+				this._animaciones.keypad.boton.scale.z = framePulsado.sZ
 			})
 			.onComplete(() => {
 				framePulsado.sZ = 0.5
@@ -809,7 +868,7 @@ class CuboCentral extends THREE.Object3D
 			})
 
 		animacionPulsar.chain(animacionDespulsar)
-		this.animaciones.keypad.animacion = animacionPulsar
+		this._animaciones.keypad.animacion = animacionPulsar
 	}
 
 	crearPanelOrdenador(geoPanel)
@@ -827,7 +886,7 @@ class CuboCentral extends THREE.Object3D
 
 	_crearAnimacionQuitarPanel()
 	{
-		this.animaciones.quitarPanel = {
+		this._animaciones.quitarPanel = {
 			panel: null,
 			animacion: null
 		}
@@ -849,10 +908,10 @@ class CuboCentral extends THREE.Object3D
 
 		let animacionSacar = new TWEEN.Tween(frameInicio).to(frameFuera, 800)
 			.onStart(() => {
-				frameInicio.miPosZ = this.animaciones.quitarPanel.panel.position.z
+				frameInicio.miPosZ = this._animaciones.quitarPanel.panel.position.z
 			})
 			.onUpdate(() => {
-				this.animaciones.quitarPanel.panel.position.z = frameInicio.miPosZ + frameInicio.pZ
+				this._animaciones.quitarPanel.panel.position.z = frameInicio.miPosZ + frameInicio.pZ
 			})
 			.onComplete(() => {
 				frameInicio.pz = 0
@@ -860,14 +919,14 @@ class CuboCentral extends THREE.Object3D
 
 		let animacionMover = new TWEEN.Tween(frameFuera).to(frameMover, 800)
 			.onStart(() => {
-				frameFuera.miPosX = this.animaciones.quitarPanel.panel.position.x
+				frameFuera.miPosX = this._animaciones.quitarPanel.panel.position.x
 			})
 			.onUpdate(() => {
-				this.animaciones.quitarPanel.panel.position.x = frameFuera.miPosX + frameFuera.pX
+				this._animaciones.quitarPanel.panel.position.x = frameFuera.miPosX + frameFuera.pX
 			})
 			.onComplete(() => {
 				frameFuera.pX = 0
-				this.animaciones.quitarPanel.panel.parent.remove(this.animaciones.quitarPanel.panel)
+				this._animaciones.quitarPanel.panel.parent.remove(this._animaciones.quitarPanel.panel)
 
 				GameState.systems.cameras.enableInput()
 				this._animating = false
@@ -875,12 +934,12 @@ class CuboCentral extends THREE.Object3D
 
 		animacionSacar.chain(animacionMover)
 
-		this.animaciones.quitarPanel.animacion = animacionSacar
+		this._animaciones.quitarPanel.animacion = animacionSacar
 	}
 
 	_crearAnimacionTirarPalanca()
 	{
-		this.animaciones.palancas = {
+		this._animaciones.palancas = {
 			palanca: null,
 			pasillo: null,
 			animacion: null
@@ -892,7 +951,7 @@ class CuboCentral extends THREE.Object3D
 		let animacionTirar = new TWEEN.Tween(frameInicio).to(frameFin, 750)
 			.easing(TWEEN.Easing.Cubic.In)
 			.onUpdate(() => {
-				this.animaciones.palancas.palanca.rotation.y = frameInicio.r
+				this._animaciones.palancas.palanca.rotation.y = frameInicio.r
 			})
 			.onComplete(() => {
 				frameInicio.r = 0
@@ -900,21 +959,21 @@ class CuboCentral extends THREE.Object3D
 				GameState.systems.cameras.enableInput()
 
 				// Iniciar la animación de abrir la puerta
-				this.animaciones.palancas.pasillo.desbloquear()
+				this._animaciones.palancas.pasillo.desbloquear()
 			})
 
 		let animacionSoltar = new TWEEN.Tween(frameFin).to(frameInicio, 1500)
 			.easing(TWEEN.Easing.Cubic.In)
 			.onUpdate(() => {
-				this.animaciones.palancas.palanca.rotation.y = frameFin.r
+				this._animaciones.palancas.palanca.rotation.y = frameFin.r
 			})
 			.onComplete(() => {
 				frameFin.r = -Math.PI/2
 
 				// Sobreescribir la interacción para que no se pueda interactuar pero sí
 				// acercar
-				this.animaciones.palancas.palanca.userData.interaction = {
-					interact: this.animaciones.camara.metodoActivar
+				this._animaciones.palancas.palanca.userData.interaction = {
+					interact: this._animaciones.camara.metodoActivar
 				}
 
 				this._animating = false
@@ -922,7 +981,7 @@ class CuboCentral extends THREE.Object3D
 
 		animacionTirar.chain(animacionSoltar)
 
-		this.animaciones.palancas.animacion = animacionTirar
+		this._animaciones.palancas.animacion = animacionTirar
 
 		//
 		// Interacción de las palantas
@@ -946,7 +1005,7 @@ class CuboCentral extends THREE.Object3D
 	_desatornillar(event, numTornillo)
 	{
 		// Comprobar interacción cámara
-		if (!this.animaciones.camara.activa)
+		if (!this._animaciones.camara.activa)
 		{
 			this._acercarCamara()
 			return
@@ -960,14 +1019,14 @@ class CuboCentral extends THREE.Object3D
 
 		GameState.systems.cameras.disableInput()
 
-		this.animaciones.tornillos.tornillo = this.elementosPD.tornillos[numTornillo]
-		this.animaciones.tornillos.animacion.start()
+		this._animaciones.tornillos.tornillo = this.elementosPD.tornillos[numTornillo]
+		this._animaciones.tornillos.animacion.start()
 	}
 
 	_pasarTarjeta(event)
 	{
 		// Comprobar interacción cámara
-		if (!this.animaciones.camara.activa)
+		if (!this._animaciones.camara.activa)
 		{
 			this._acercarCamara()
 			return
@@ -982,13 +1041,13 @@ class CuboCentral extends THREE.Object3D
 		this._animating = true
 
 		GameState.systems.cameras.disableInput()
-		this.animaciones.pasarTarjeta.animacion.start()
+		this._animaciones.pasarTarjeta.animacion.start()
 	}
 
 	_ponerPrisma(event)
 	{
 		// Comprobar interacción cámara
-		if (!this.animaciones.camara.activa)
+		if (!this._animaciones.camara.activa)
 		{
 			this._acercarCamara()
 			return
@@ -1004,13 +1063,13 @@ class CuboCentral extends THREE.Object3D
 		GameState.flags.tienePrisma = false
 
 		GameState.systems.cameras.disableInput()
-		this.animaciones.prisma.start()
+		this._animaciones.prisma.start()
 	}
 
 	_pulsarTeclaKeypad(event, numBoton)
 	{
 		// Comprobar interacción cámara
-		if (!this.animaciones.camara.activa)
+		if (!this._animaciones.camara.activa)
 		{
 			this._acercarCamara()
 			return
@@ -1021,8 +1080,8 @@ class CuboCentral extends THREE.Object3D
 
 		this._animating = true
 
-		this.animaciones.keypad.boton = this.elementosPT.botones[numBoton]
-		this.animaciones.keypad.animacion.start()
+		this._animaciones.keypad.boton = this.elementosPT.botones[numBoton]
+		this._animaciones.keypad.animacion.start()
 	}
 
 	// PRE: Si se llama varias veces dará resultados inesperados
@@ -1047,14 +1106,14 @@ class CuboCentral extends THREE.Object3D
 				return
 		}
 
-		this.animaciones.quitarPanel.panel = meshPadre.getObjectByName("Panel")
-		this.animaciones.quitarPanel.animacion.start()
+		this._animaciones.quitarPanel.panel = meshPadre.getObjectByName("Panel")
+		this._animaciones.quitarPanel.animacion.start()
 	}
 
 	_tirarPalanca(meshPalanca, pasillo)
 	{
 		// Comprobar interacción cámara
-		if (!this.animaciones.camara.activa)
+		if (!this._animaciones.camara.activa)
 		{
 			this._acercarCamara()
 			return
@@ -1067,17 +1126,17 @@ class CuboCentral extends THREE.Object3D
 
 		GameState.systems.cameras.disableInput()
 
-		this.animaciones.palancas.palanca = meshPalanca
-		this.animaciones.palancas.pasillo = pasillo
-		this.animaciones.palancas.animacion.start()
+		this._animaciones.palancas.palanca = meshPalanca
+		this._animaciones.palancas.pasillo = pasillo
+		this._animaciones.palancas.animacion.start()
 	}
 
 	_acercarCamara()
 	{
-		if (this.animaciones.camara.activa)
+		if (this._animaciones.camara.activa)
 			return
 
-		GameState.systems.cameras.cambiarControladorCamara(this.animaciones.camara.idControlador)
+		GameState.systems.cameras.cambiarControladorCamara(this._animaciones.camara.idControlador)
 	}
 }
 
