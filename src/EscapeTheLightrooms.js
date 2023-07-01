@@ -10,25 +10,13 @@
 // Clases de las Bibliotecas
 
 import * as THREE from '../libs/three.module.js'
-import { GUI } from '../libs/dat.gui.module.js'
-import { TrackballControls } from '../libs/TrackballControls.js'
-import { FirstPersonControls } from "../libs/FirstPersonControls.js"
-import {
-	BufferGeometry,
-	MeshPhongMaterial,
-	LineBasicMaterial,
-	ExtrudeGeometry,
-	ObjectLoader, Vector3, Vector2
-} from "../libs/three.module.js"
-import {CSG} from '../libs/CSG-v2.js'
-import {MTLLoader} from "../libs/MTLLoader.js"
-import {OBJLoader} from "../libs/OBJLoader.js"
+import {GUI} from '../libs/dat.gui.module.js'
 import * as TWEEN from '../libs/tween.esm.js'
 
 // Clases del Proyecto
 
 import {GestorCamaras} from "./cameras/GestorCamaras.js"
-import {Sala, Pasillo} from "./rooms/Sala.js"
+import {Sala} from "./rooms/Sala.js"
 import {SalaPrincipal} from "./rooms/SalaPrincipal.js"
 import {SalaIzquierda} from "./rooms/SalaIzquierda.js"
 import {SalaDerecha} from "./rooms/SalaDerecha.js"
@@ -38,18 +26,27 @@ import {GameState} from "./GameState.js"
 import {SistemaColisiones} from "./systems/SistemaColisiones.js"
 import {SistemaInteraccion} from "./systems/SistemaInteraccion.js"
 import {SistemaMensajes} from "./systems/SistemaMensajes.js"
+import {SistemaSonidos} from "./systems/SistemaSonidos.js"
 import {Config} from "./Config.js"
 import {MSG_INICIO_CONTROLES, MSG_INICIO_JUEGO} from "./messages/messages.js"
+import {RandomIntInRange} from "./Utils.js"
 
-/**
- * Clase que hereda de THREE.Scene, con la que se gestionará todo el juego
- */
+//
+// Variables de control general
+//
 
 let FPSLimit = true
 let isWindowFocused = true
 let myDeltaTime = 1/30
 let myDelta = 0
 
+/*
+	// TODO: Separar los sistemas del juego y el propio juego de la escena
+	Escena principal y clase gestora de los sistemas principales.
+
+	Se establece en el GameState como game. Inicializa los sistemas, cámaras, renderizado y eventos.
+	Gestiona también los menús.
+ */
 class EscapeTheLightrooms extends THREE.Scene
 {
 	// Recibe el  div  que se ha creado en el  html  que va a ser el lienzo en el que mostrar
@@ -62,6 +59,8 @@ class EscapeTheLightrooms extends THREE.Scene
 		// Inicialización
 		//
 
+		this.sonidos = {}
+
 		this.clock = new THREE.Clock(false)
 
 		// Lo primero, crear el visualizador, pasándole el lienzo sobre el que realizar los renderizados.
@@ -72,7 +71,6 @@ class EscapeTheLightrooms extends THREE.Scene
 
 		this.inicializarMenus()
 		this.inicializarGameState()
-
 
 		//
 		// Crear las luces
@@ -93,7 +91,6 @@ class EscapeTheLightrooms extends THREE.Scene
 
 		this.createEventHandlers()
 
-
 		this.clock.start()
 	}
 
@@ -101,9 +98,12 @@ class EscapeTheLightrooms extends THREE.Scene
 	{
 		GameState.Initialize(this)
 
+		this.soundSystem = new SistemaSonidos()
+		GameState.systems.sound = this.soundSystem
+
 		this.collisionSystem = new SistemaColisiones({
-			startPos: new Vector2(-500, -100),
-			size: new Vector2(1000, 1000),
+			startPos: new THREE.Vector2(-500, -100),
+			size: new THREE.Vector2(1000, 1000),
 			maxDepth: 7
 		})
 
@@ -232,11 +232,37 @@ class EscapeTheLightrooms extends THREE.Scene
 	}
 
 	//
-	cambiarCamara(event)
+	inicializarSonidoAmbiente()
+	{
+		// Cargar el audio
+		this.soundSystem.loadGlobalSound("../resources/sounds/asteroid-atmosphere.wav", (audio) => {
+			this.sonidos.atmAmbiental = {
+				audio: audio,
+				duration: audio.buffer.duration*1000, // MS
+				enabled: true
+			}
+
+			audio.setVolume(0.1)
+
+			// Replay random
+			const playAudioRandom = () => {
+				if (!this.sonidos.atmAmbiental.enabled)
+					return
+
+				this.sonidos.atmAmbiental.audio.play()
+				setTimeout(playAudioRandom, RandomIntInRange(100 + this.sonidos.atmAmbiental.duration, 5000 + this.sonidos.atmAmbiental.duration))
+			}
+
+			playAudioRandom()
+		})
+	}
+
+	//
+	_procesarClick(event)
 	{
 		//console.log("Recibo click")
 
-		// TODO: Temporal
+		// Iniciar el juego
 		if (!GameState.gameData.gameStarted)
 		{
 			GameState.gameData.gameStarted = true
@@ -244,8 +270,11 @@ class EscapeTheLightrooms extends THREE.Scene
 			this.messageSystem.mostrarMensaje(MSG_INICIO_JUEGO, 20000)
 			this.messageSystem.mostrarMensaje(MSG_INICIO_CONTROLES, 15000)
 			this.gestorCamaras.cambiarAControladorPrincipal()
+
+			// Iniciar la música de ambiente
+			this.inicializarSonidoAmbiente()
 		}
-		else
+		else // Procesar el click
 		{
 			if (this.enMenuJuego)
 				return
@@ -330,7 +359,7 @@ class EscapeTheLightrooms extends THREE.Scene
 						$("#menuPrincipal").css("display", "none")
 
 						// Activar los clicks
-						window.addEventListener('click', this.cambiarCamara.bind(this))
+						window.addEventListener('click', this._procesarClick.bind(this))
 					})
 			})
 
@@ -511,12 +540,12 @@ class EscapeTheLightrooms extends THREE.Scene
 				myDelta -= myDeltaTime
 
 				// Le decimos al renderizador "visualiza la escena que te indico usando la cámara que te estoy pasando"
-				this.renderer.render (this, this.getCamera())
+				this.renderer.render(this, this.getCamera())
 			}
 		}
 		else
 		{
-			this.renderer.render (this, this.getCamera())
+			this.renderer.render(this, this.getCamera())
 		}
 
 		// Para permitir el control manual del robot

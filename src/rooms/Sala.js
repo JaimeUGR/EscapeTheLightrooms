@@ -514,6 +514,8 @@ class Pasillo extends THREE.Object3D
 
 		this.rotateY(orientacion)
 
+		this._crearSonidos()
+
 		this._crearAnimaciones()
 	}
 
@@ -562,13 +564,42 @@ class Pasillo extends THREE.Object3D
 		this.baseCierreCollider = new THREE.Box3().setFromObject(this.cierre)
 	}
 
+	_crearSonidos()
+	{
+		this._sonidos = {}
+
+		// Sonido de abrir la puerta
+		GameState.systems.sound.loadPositionalSound("../../resources/sounds/garageDoor.m4a", (audio) => {
+			this._sonidos.puerta = audio
+
+			// Configuración
+			audio.setVolume(0.2)
+
+			audio.setDistanceModel('linear')
+			audio.setRefDistance(20)
+			audio.setMaxDistance(190)
+			audio.setRolloffFactor(0.9)
+
+			// Posicionamiento en el cierre
+			audio.translateX(-this.espacioInterno/2)
+			audio.translateY(this.alturaPasillo/2)
+
+			// Añadirlo
+			this.cierre.add(audio)
+		})
+	}
+
 	_crearAnimaciones()
 	{
 		let frameCerrada = {pos: 0}
 		let frameAbierta = {pos: this.espacioInterno}
 
 		this._animacionApertura = new TWEEN.Tween(frameCerrada)
-			.to(frameAbierta, 6000)
+			.to(frameAbierta, 12500)
+			.onStart(() => {
+				if (this._sonidos.puerta)
+					this._sonidos.puerta.play()
+			})
 			.onUpdate(() => {
 				this.cierre.position.set(frameCerrada.pos, 0, 0)
 
@@ -580,7 +611,11 @@ class Pasillo extends THREE.Object3D
 			})
 
 		this._animacionCierre = new TWEEN.Tween(frameAbierta)
-			.to(frameCerrada, 2000)
+			.to(frameCerrada, 12500)
+			.onStart(() => {
+				if (this._sonidos.puerta)
+					this._sonidos.puerta.play()
+			})
 			.onUpdate(() => {
 				this.cierre.position.set(frameAbierta.pos, 0, 0)
 

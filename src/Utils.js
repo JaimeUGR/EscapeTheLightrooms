@@ -20,4 +20,11 @@ function RandomInt(maximo)
 	return Math.floor(Math.random() * (maximo + 1));
 }
 
-export {ShuffleArray, RandomInt}
+function RandomIntInRange(min, max) {
+	if (min > max)
+		[min, max] = [max, min]
+
+	return Math.floor(Math.random() * (max - min + 1)) + min
+}
+
+export {ShuffleArray, RandomInt, RandomIntInRange}

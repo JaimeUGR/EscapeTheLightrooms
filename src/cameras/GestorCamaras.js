@@ -98,16 +98,17 @@ class GestorCamaras
 
 		// Desactivar la cámara actual
 		if (this.activeController != null)
+		{
 			this.activeController.disable()
+			GameState.systems.sound.removeListenerFromCamera(this.activeController.camara)
+		}
 
 		// Activar la nueva
 		this.activeCameraID = id
 		this.activeController = this.controladoresCamaras[this.activeCameraID]
 
-		console.log(this.activeCameraID)
-		console.log(this.activeController)
-
 		this.activeController.enable()
+		GameState.systems.sound.addListenerToCamera(this.activeController.camara)
 
 		return true
 	}

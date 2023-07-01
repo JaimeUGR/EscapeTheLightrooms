@@ -37,11 +37,12 @@ class GameState
 		}
 
 		// Flags del juego
+		// TODO: ALGUNOS ON TMP
 		this.flags = {
-			tieneDestornillador: false,
+			tieneDestornillador: true,
 			tieneManecillaHora: false,
 			tieneManecillaMinuto: false,
-			tieneTarjeta: false,
+			tieneTarjeta: true,
 			tienePrisma: false,
 			tienePila: false,
 			robotConPila: false
@@ -79,7 +80,8 @@ class GameState
 			collision: null,
 			interaction: null,
 			cameras: null,
-			messages: null
+			messages: null,
+			sound: null
 		}
 	}
 }
