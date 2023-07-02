@@ -17,6 +17,15 @@ class SistemaSonidos
 		this._audioListener = new AudioListener()
 		this._audioListener.name = "AListener"
 		this._audioLoader = new AudioLoader()
+
+
+		//
+		// Carga de sonidos globales compartidos
+		//
+		this.loadGlobalSound("../resources/sounds/pickup.wav", (audio) => {
+			GameState.items.pickupSound = audio
+			audio.setVolume(0.2)
+		})
 	}
 
 	loadGlobalSound(path, loadCallback)

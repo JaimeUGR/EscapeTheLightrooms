@@ -13,7 +13,7 @@ import {CSG} from "../../libs/CSG-v2.js"
 import {GameState} from "../GameState.js"
 import {SistemaColisiones} from "../systems/SistemaColisiones.js"
 
-import {ShuffleArray} from "../Utils.js"
+import {RandomIntInRange, ShuffleArray} from "../Utils.js"
 
 class Laser extends THREE.Object3D
 {
@@ -105,6 +105,12 @@ class Laser extends THREE.Object3D
 		this.add(meshRecorteLaser)
 
 		//
+		// Sonidos
+		//
+
+		this._crearSonidos()
+
+		//
 		// Animaciones
 		//
 
@@ -117,6 +123,46 @@ class Laser extends THREE.Object3D
 		this._crearColliders()
 	}
 
+	_crearSonidos()
+	{
+		this._sonidos = {}
+
+		GameState.systems.sound.loadPositionalSound("../../resources/sounds/hydraulic.mp3", (audio) => {
+			this._sonidos.mover = audio
+
+			audio.setVolume(0.7)
+			audio.setPlaybackRate(1.7)
+
+			audio.setDistanceModel('linear')
+			audio.setRefDistance(10)
+			audio.setMaxDistance(130)
+			audio.setRolloffFactor(0.94)
+
+			// Posicionamiento en el cierre
+			audio.translateY(this.alturaSoporte + this.alturaLaser/2)
+			audio.translateZ(this.radioSoporte/2)
+
+			this.add(audio)
+		})
+
+		GameState.systems.sound.loadPositionalSound("../../resources/sounds/plasmaCannon.wav", (audio) => {
+			this._sonidos.disparar = audio
+
+			audio.setVolume(0.7)
+
+			audio.setDistanceModel('exponential')
+			audio.setRefDistance(10)
+			audio.setMaxDistance(100)
+			audio.setRolloffFactor(0.6)
+
+			// Posicionamiento en el cierre
+			audio.translateY(this.alturaSoporte + this.alturaLaser/2)
+			audio.translateZ(this.radioSoporte/2)
+
+			this.add(audio)
+		})
+	}
+
 	_crearAnimaciones()
 	{
 		this.animaciones = {}
@@ -125,6 +171,9 @@ class Laser extends THREE.Object3D
 		let frameActivado = { tY: this.alturaLaser }
 
 		this.animaciones.activacion = new TWEEN.Tween(frameDesactivado).to(frameActivado, this.tiempoActivacion)
+			.onStart(() => {
+				this._sonidos.mover.play()
+			})
 			.onUpdate(() => {
 				this.meshSoporteSuperior.position.y = frameDesactivado.tY
 			})
@@ -133,12 +182,15 @@ class Laser extends THREE.Object3D
 				this.activado = true
 
 				frameDesactivado.tY = 0
+
+				setTimeout(() => this._sonidos.disparar.play(), RandomIntInRange(15, 75))
 			})
 
 		this.animaciones.desactivacion = new TWEEN.Tween(frameActivado).to(frameDesactivado, this.tiempoActivacion)
 			.onStart(() => {
 				this.haz.visible = false
 				this.activado = false
+				this._sonidos.mover.play()
 			})
 			.onUpdate(() => {
 				this.meshSoporteSuperior.position.y = frameActivado.tY

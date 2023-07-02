@@ -323,6 +323,8 @@ class SalaPrincipal extends Sala
 					destornillador.traverse((anyNode) => {
 						anyNode.userData = {}
 					})
+
+					GameState.items.pickupSound.play()
 				}
 
 				destornillador.traverse((anyNode) => {

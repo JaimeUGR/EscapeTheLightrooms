@@ -345,6 +345,8 @@ class SalaDerecha extends Sala
 					manecillaHora.rotation.x = 0
 					manecillaHora.position.y = 0
 					manecillaHora.children[0].userData = {}
+
+					GameState.items.pickupSound.play()
 				}
 			}
 

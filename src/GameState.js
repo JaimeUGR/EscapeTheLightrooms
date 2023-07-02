@@ -33,18 +33,19 @@ class GameState
 			prisma: new Prisma(),
 			manecillaMinuto: null,
 			manecillaHora: null,
-			pila: new Pila(0.5, 1.5, 0.1, 0.075)
+			pila: new Pila(0.5, 1.5, 0.1, 0.075),
+			pickupSound: null
 		}
 
 		// Flags del juego
 		// TODO: ALGUNOS ON TMP
 		this.flags = {
 			tieneDestornillador: true,
-			tieneManecillaHora: false,
-			tieneManecillaMinuto: false,
+			tieneManecillaHora: true,
+			tieneManecillaMinuto: true,
 			tieneTarjeta: true,
-			tienePrisma: false,
-			tienePila: false,
+			tienePrisma: true,
+			tienePila: true,
 			robotConPila: false
 		}
 

@@ -129,6 +129,8 @@ class SalaIzquierda extends Sala
 					tarjeta.position.y = 0
 					vitrina.O3Vitrina.remove(tarjeta)
 					tarjeta.meshTarjeta.userData = {}
+
+					GameState.items.pickupSound.play()
 				}
 			}
 
@@ -218,8 +220,9 @@ class SalaIzquierda extends Sala
 						manecillaMinuto.position.y = 0
 
 						taquillaSeleccionada.estantes[1].remove(manecillaMinuto)
-
 						manecillaMinuto.children[0].userData = {}
+
+						GameState.items.pickupSound.play()
 					}
 				}
 

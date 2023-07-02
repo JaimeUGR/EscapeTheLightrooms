@@ -37,11 +37,6 @@ class PuzleSimon extends THREE.Object3D
 		this.luzBotones.position.set(0, 0, this.simon.alturaBotonJuego + 4)
 		this.luzBotones.name = "Luz"
 
-		//this.simon.add(this.luzBotones)
-		//this.luzBotones.target = this.simon.botones[0]
-
-		//this.simon.botones[0].add(this.luzBotones)
-
 		let targetLuz = new THREE.Object3D()
 		targetLuz.name = "TargetLuz"
 		targetLuz.position.set(0, 0, -(this.simon.alturaBotonJuego + 4))
@@ -49,10 +44,14 @@ class PuzleSimon extends THREE.Object3D
 		this.luzBotones.add(targetLuz)
 		this.luzBotones.target = targetLuz
 
-		/*let lightHelper = new THREE.SpotLightHelper(this.luzBotones, 0xffffff)
-		GameState.scene.add(lightHelper)*/
+		//
+		// Sonido
+		//
+		this._crearSonidos()
 
-		//this.simon.botones[0].add(this.luzBotones)
+		//
+		// Animación e interacción
+		//
 
 		// Creación de las animaciones y adición de interacciones
 		this._crearAnimacionInicio()
@@ -99,6 +98,44 @@ class PuzleSimon extends THREE.Object3D
 		setTimeout(() => this._iluminarSecuencia(), 500)
 	}
 
+	_crearSonidos()
+	{
+		this._sonidos = {}
+
+		// Iluminar botón
+		GameState.systems.sound.loadPositionalSound("../../resources/sounds/beepCountdown.wav", (audio) => {
+			this._sonidos.iluminar = audio
+
+			audio.setVolume(0.2)
+			audio.duration = 0.5
+
+			audio.setDistanceModel('linear')
+			audio.setRefDistance(15)
+			audio.setMaxDistance(80)
+			audio.setRolloffFactor(0.9)
+
+			audio.translateY(this.simon.panelY/2)
+			this.simon.add(audio)
+		})
+
+		// Pulsar botón
+		GameState.systems.sound.loadPositionalSound("../../resources/sounds/beepCountdown.wav", (audio) => {
+			this._sonidos.pulsar = audio
+
+			audio.setVolume(0.2)
+			audio.offset = 3
+			audio.duration = 0.5
+
+			audio.setDistanceModel('linear')
+			audio.setRefDistance(15)
+			audio.setMaxDistance(80)
+			audio.setRolloffFactor(0.9)
+
+			audio.translateY(this.simon.panelY/2)
+			this.simon.add(audio)
+		})
+	}
+
 	_crearAnimacionIluminacionBoton()
 	{
 		this.animaciones.iluminacionBoton = {
@@ -111,12 +148,12 @@ class PuzleSimon extends THREE.Object3D
 		let frameFinal  = {t: 1}
 
 		let animacionIluminarse = new TWEEN.Tween(frameInicio).to(frameFinal, 250)
-			.onStart(() =>{
+			.onStart(() => {
 				this.luzBotones.color = this.animaciones.iluminacionBoton.boton.material.color.clone()
 				this.animaciones.iluminacionBoton.boton.add(this.luzBotones)
-			})
-			.onUpdate(() => {
 
+				// Beep Pulsación
+				this._sonidos.iluminar.play()
 			})
 			.onComplete(() =>
 			{
@@ -170,10 +207,12 @@ class PuzleSimon extends THREE.Object3D
 			{
 				this.luzBotones.color = this.animaciones.pulsacionBoton.boton.material.color
 				this.animaciones.pulsacionBoton.boton.add(this.luzBotones)
+
+				this._sonidos.pulsar.play()
 			})
 			.onUpdate(() =>
 			{
-				// TODO: Hay que modificar la escala de un botón hijo
+				// TODO: Hay que modificar la escala de un botón hijo para no afectar a la luz
 				this.animaciones.pulsacionBoton.boton.scale.set(1, 1, frameInicio.z )
 			})
 			.onComplete(() =>

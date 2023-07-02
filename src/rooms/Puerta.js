@@ -60,6 +60,12 @@ class Puerta extends THREE.Object3D
 		this.meshPuerta.rotation.y = 0
 
 		//
+		// Crear sonidos
+		//
+
+		this._crearSonidos()
+
+		//
 		// Animación
 		//
 
@@ -79,6 +85,18 @@ class Puerta extends THREE.Object3D
 		pomo.userData.interaction = {
 			interact: this.abrirPuerta.bind(this)
 		}
+	}
+
+	_crearSonidos()
+	{
+		this._sonidos = {}
+
+		GameState.systems.sound.loadGlobalSound("../../resources/sounds/doorIsLocked.wav", (audio) => {
+			this._sonidos.bloqueada = audio
+
+			audio.setVolume(0.3)
+			audio.setPlaybackRate(0.8)
+		})
 	}
 
 	_crearAnimacion()
@@ -106,7 +124,13 @@ class Puerta extends THREE.Object3D
 	abrirPuerta()
 	{
 		if (!GameState.flags.robotConPila)
+		{
+			// Sonido puerta cerrada
+			if (!this._sonidos.bloqueada.isPlaying)
+				this._sonidos.bloqueada.play()
+
 			return
+		}
 
 		// NOTE: Por si acaso. Si no dejas la interacción manual no hace falta
 		GameState.flags.robotConPila = false

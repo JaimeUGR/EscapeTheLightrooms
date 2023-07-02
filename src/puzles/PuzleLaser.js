@@ -102,6 +102,8 @@ class PuzleLaser extends THREE.Object3D
 			pila.traverse((anyNode) => {
 				anyNode.userData = {}
 			})
+
+			GameState.items.pickupSound.play()
 		}
 
 		pila.traverse((anyNode) => {

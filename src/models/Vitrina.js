@@ -129,6 +129,12 @@ class Vitrina extends THREE.Object3D
 		this.add(this.O3Vitrina)
 
 		//
+		// Sonidos
+		//
+
+		this._crearSonidos()
+
+		//
 		// Animación
 		//
 
@@ -141,6 +147,28 @@ class Vitrina extends THREE.Object3D
 		this._crearColliders()
 	}
 
+	_crearSonidos()
+	{
+		this._sounds = {}
+
+		GameState.systems.sound.loadPositionalSound("../../resources/sounds/softGarageDoor.mp3", (audio) => {
+			this._sounds.open = audio
+
+			audio.setVolume(0.25)
+
+			audio.setDistanceModel('linear')
+			audio.setRefDistance(20)
+			audio.setMaxDistance(95)
+			audio.setRolloffFactor(0.75)
+
+			// Posicionamiento en el cierre
+			audio.translateZ(this.cajaZ)
+			audio.translateY(this.cajaY + this.bordeY)
+
+			this.add(audio)
+		})
+	}
+
 	_crearAnimacion()
 	{
 		this.animaciones = {}
@@ -148,7 +176,10 @@ class Vitrina extends THREE.Object3D
 		let frameCerrada = {sY: 1}
 		let frameAbierta = {sY: 0.3}
 
-		this.animaciones.abrirPuerta = new TWEEN.Tween(frameCerrada).to(frameAbierta, 2000)
+		this.animaciones.abrirPuerta = new TWEEN.Tween(frameCerrada).to(frameAbierta, 4000)
+			.onStart(() => {
+				this._sounds.open.play()
+			})
 			.onUpdate(() => {
 				this.meshPuerta.scale.y = frameCerrada.sY
 			})

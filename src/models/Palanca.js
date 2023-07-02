@@ -87,6 +87,12 @@ class Palanca extends THREE.Object3D
 		this.palo.rotation.x = this.rotacionDesactivada
 
 		//
+		// Sonidos
+		//
+
+		this._crearSonidos()
+
+		//
 		// Animación
 		//
 
@@ -100,6 +106,25 @@ class Palanca extends THREE.Object3D
 			anyNode.userData.interaction = {
 				interact: this.activar.bind(this)
 			}
+		})
+	}
+
+	_crearSonidos()
+	{
+		this._sonidos = {}
+
+		GameState.systems.sound.loadPositionalSound("../../resources/sounds/leverPull.mp3", (audio) => {
+			this._sonidos.tirar = audio
+
+			audio.setVolume(0.15)
+			audio.setPlaybackRate(0.8)
+
+			audio.setDistanceModel('linear')
+			audio.setRefDistance(20)
+			audio.setMaxDistance(55)
+			audio.setRolloffFactor(0.9)
+
+			this.add(audio)
 		})
 	}
 
@@ -130,8 +155,11 @@ class Palanca extends THREE.Object3D
 			animacionSoltar.start()
 		}
 
-		let animacionTirar = new TWEEN.Tween(frameInicio).to(frameFin, 800)
+		this.animaciones.tirarPalanca.animacion = new TWEEN.Tween(frameInicio).to(frameFin, 800)
 			.easing(TWEEN.Easing.Sinusoidal.Out)
+			.onStart(() => {
+				this._sonidos.tirar.play()
+			})
 			.onUpdate(() => {
 				this.palo.rotation.x = frameInicio.rX
 			})
@@ -143,8 +171,6 @@ class Palanca extends THREE.Object3D
 
 				setTimeout(handlerContinuar, 200)
 			})
-
-		this.animaciones.tirarPalanca.animacion = animacionTirar
 	}
 
 	activar()

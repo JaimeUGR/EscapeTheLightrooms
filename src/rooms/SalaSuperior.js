@@ -133,6 +133,8 @@ class SalaSuperior extends Sala
 
 					vitrina.O3Vitrina.remove(prisma)
 					prisma.meshPrisma.userData = {}
+
+					GameState.items.pickupSound.play()
 				}
 			}
 

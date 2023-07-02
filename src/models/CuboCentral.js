@@ -623,7 +623,7 @@ class CuboCentral extends THREE.Object3D
 		GameState.systems.sound.loadGlobalSound("../../resources/sounds/abrirPuertaConTarjeta.mp3", (audio) => {
 			this._sonidos.pasarTarjeta = audio
 
-			audio.setVolume(0.4)
+			audio.setVolume(0.15)
 			audio.offset = 0.1
 			audio.duration = 1.7
 		})
@@ -750,13 +750,13 @@ class CuboCentral extends THREE.Object3D
 		GameState.systems.sound.loadGlobalSound("../../resources/sounds/beepTecla.wav", (audio) => {
 			this._sonidos.beepTecla = audio
 
-			audio.setVolume(1)
+			audio.setVolume(0.2)
 		})
 
 		GameState.systems.sound.loadGlobalSound("../../resources/sounds/electronicDoorOpen.wav", (audio) => {
 			this._sonidos.keypadUnlock = audio
 
-			audio.setVolume(1)
+			audio.setVolume(0.2)
 			audio.offset = 0.2
 			audio.duration = 0.5
 		})

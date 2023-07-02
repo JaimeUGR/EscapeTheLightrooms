@@ -74,6 +74,12 @@ class CristalContenedor extends THREE.Object3D
 		this.scale.set(dimensiones.sX, dimensiones.sY, dimensiones.sZ)
 
 		//
+		// Sonidos
+		//
+
+		this._crearSonidos()
+
+		//
 		// Animaciones
 		//
 
@@ -82,8 +88,40 @@ class CristalContenedor extends THREE.Object3D
 
 	romper()
 	{
-		// TODO: Animación de rotura (cambiar la textura cada X segundos hasta disolverlo)
+		// TODO: Añadir a la animación una textura de rotura progresiva (ir cambiándola)
 		this.animaciones.disolver.start()
+	}
+
+	_crearSonidos()
+	{
+		this._sonidos = {}
+
+		GameState.systems.sound.loadPositionalSound("../../resources/sounds/vapor.mp3", (audio) => {
+			this._sonidos.disolver = audio
+
+			audio.setVolume(0.25)
+			audio.setPlaybackRate(1.65)
+
+			audio.setDistanceModel('linear')
+			audio.setRefDistance(10)
+			audio.setMaxDistance(90)
+			audio.setRolloffFactor(0.9)
+
+			this.add(audio)
+		})
+
+		GameState.systems.sound.loadPositionalSound("../../resources/sounds/glassBreak.mp3", (audio) => {
+			this._sonidos.romper = audio
+
+			audio.setVolume(0.3)
+
+			audio.setDistanceModel('linear')
+			audio.setRefDistance(20)
+			audio.setMaxDistance(90)
+			audio.setRolloffFactor(0)
+
+			this.add(audio)
+		})
 	}
 
 	_crearAnimaciones()
@@ -104,12 +142,16 @@ class CristalContenedor extends THREE.Object3D
 
 		this.animaciones.disolver = new TWEEN.Tween(frameInicio).to(frameFin, 2000)
 			.easing(TWEEN.Easing.Sinusoidal.In)
+			.onStart(() => {
+				this._sonidos.disolver.play()
+			})
 			.onUpdate(() => {
 				this.scale.set(frameInicio.sX, frameInicio.sY, frameInicio.sZ)
 			})
 			.onComplete(() => {
 				this.estaRoto = true
 				this.parent.remove(this)
+				this._sonidos.romper.play()
 			})
 	}
 }

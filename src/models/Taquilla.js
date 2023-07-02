@@ -138,6 +138,12 @@ class Taquilla extends THREE.Object3D
 		this._crearColliders()
 
 		//
+		// Sonido
+		//
+
+		this._crearSonidos()
+
+		//
 		// Animación
 		//
 
@@ -205,6 +211,51 @@ class Taquilla extends THREE.Object3D
 		this.baseColliders.push(new THREE.Box3(tmpMin, tmpMax))
 	}
 
+	_crearSonidos()
+	{
+		this._sonidos = {}
+
+		// Abrir Puerta
+		GameState.systems.sound.loadPositionalSound("../../resources/sounds/openMetalDoor.wav", (audio) => {
+			this._sonidos.abrir = audio
+
+			// Configuración
+			audio.setVolume(0.1)
+
+			audio.setDistanceModel('linear')
+			audio.setRefDistance(5)
+			audio.setMaxDistance(55)
+			audio.setRolloffFactor(1)
+
+			audio.setPlaybackRate(1.2)
+
+			// Posicionamiento en el cierre
+			audio.translateX(-this.taquillaX/2)
+			audio.translateY(this.taquillaY/2)
+
+			this.puerta.add(audio)
+		})
+
+		// Cerrar Puerta
+		GameState.systems.sound.loadPositionalSound("../../resources/sounds/closeMetalDoor.wav", (audio) => {
+			this._sonidos.cerrar = audio
+
+			// Configuración
+			audio.setVolume(0.075)
+
+			audio.setDistanceModel('linear')
+			audio.setRefDistance(5)
+			audio.setMaxDistance(55)
+			audio.setRolloffFactor(1)
+
+			// Posicionamiento en el cierre
+			audio.translateX(this.taquillaX/2)
+			audio.translateY(this.taquillaY/2)
+
+			this.puerta.add(audio)
+		})
+	}
+
 	_crearAnimacion()
 	{
 		this._animating = false
@@ -218,6 +269,7 @@ class Taquilla extends THREE.Object3D
 			.easing(TWEEN.Easing.Quartic.Out)
 			.onStart(() => {
 				this._animating = true
+				this._sonidos.abrir.play()
 			})
 			.onUpdate(() => {
 				this.puerta.rotation.y = frameCerrada.r
@@ -233,6 +285,7 @@ class Taquilla extends THREE.Object3D
 			.easing(TWEEN.Easing.Quartic.Out)
 			.onStart(() => {
 				this._animating = true
+				setTimeout(() => this._sonidos.cerrar.play(), 600)
 			})
 			.onUpdate(() => {
 				this.puerta.rotation.y = frameAbierta.r

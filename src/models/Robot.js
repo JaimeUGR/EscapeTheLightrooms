@@ -511,6 +511,12 @@ class Robot extends THREE.Object3D
 		this._movementUpdate()
 
 		//
+		// Sonidos
+		//
+
+		this._crearSonidos()
+
+		//
 		// Animación
 		//
 		this._crearAnimacionContinua()
@@ -551,6 +557,17 @@ class Robot extends THREE.Object3D
 		this.add (this.axis)*/
 
 		this.createGUI(gui)
+	}
+
+	_crearSonidos()
+	{
+		this._sonidos = {}
+
+		GameState.systems.sound.loadGlobalSound("../../resources/sounds/doorUnlock.wav", (audio) => {
+			this._sonidos.desbloquear = audio
+			audio.setPlaybackRate(1.1)
+			audio.setVolume(0.2)
+		})
 	}
 
 	_crearAnimacionPila()
@@ -627,10 +644,11 @@ class Robot extends THREE.Object3D
 
 				setTimeout(() => {
 					animacionDesalargarBrazo.start()
-				}, 1000)
+				}, 1500)
 
 				// NOTE: Desbloquear la puerta
 				GameState.flags.robotConPila = true
+				this._sonidos.desbloquear.play()
 			})
 
 		animacionGirarPila.chain(animacionMeterPila)

@@ -136,6 +136,12 @@ class PalancaPared extends THREE.Object3D
 		this.palanca = palanca
 
 		//
+		// Sonidos
+		//
+
+		this._crearSonidos()
+
+		//
 		// Animación
 		//
 
@@ -155,6 +161,26 @@ class PalancaPared extends THREE.Object3D
 			anyNode.userData.interaction = {
 				interact: this.activar.bind(this)
 			}
+		})
+	}
+
+	_crearSonidos()
+	{
+		this._sonidos = {}
+
+		GameState.systems.sound.loadPositionalSound("../../resources/sounds/leverPull.mp3", (audio) => {
+			this._sonidos.tirar = audio
+
+			audio.setVolume(0.15)
+			audio.setPlaybackRate(0.9)
+
+			audio.setDistanceModel('linear')
+			audio.setRefDistance(20)
+			audio.setMaxDistance(55)
+			audio.setRolloffFactor(0.9)
+
+			audio.translateY(this.soporteY/2)
+			this.add(audio)
 		})
 	}
 
@@ -185,8 +211,11 @@ class PalancaPared extends THREE.Object3D
 			animacionSoltar.start()
 		}
 
-		let animacionTirar = new TWEEN.Tween(frameInicio).to(frameFin, 600)
+		this.animaciones.tirarPalanca.animacion = new TWEEN.Tween(frameInicio).to(frameFin, 600)
 			.easing(TWEEN.Easing.Sinusoidal.Out)
+			.onStart(() => {
+				this._sonidos.tirar.play()
+			})
 			.onUpdate(() => {
 				this.palanca.position.y = frameInicio.tY
 			})
@@ -198,8 +227,6 @@ class PalancaPared extends THREE.Object3D
 
 				setTimeout(handlerContinuar, 200)
 			})
-
-		this.animaciones.tirarPalanca.animacion = animacionTirar
 	}
 
 	activar()

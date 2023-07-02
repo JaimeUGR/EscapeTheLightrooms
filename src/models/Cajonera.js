@@ -130,6 +130,12 @@ class Cajonera extends THREE.Object3D
 		this._crearColliders()
 
 		//
+		// Sonidos
+		//
+
+		this._crearSonidos()
+
+		//
 		// Animación
 		//
 
@@ -212,6 +218,43 @@ class Cajonera extends THREE.Object3D
 		this.baseColliders.push(new THREE.Box3(tmpMin, tmpMax))
 	}
 
+	_crearSonidos()
+	{
+		this._sonidos = {}
+
+		// Abrir cajón
+		GameState.systems.sound.loadPositionalSound("../../resources/sounds/drawerClose.wav", (audio) => {
+			this._sonidos.abrir = audio
+
+			audio.setVolume(0.05)
+
+			audio.setDistanceModel('linear')
+			audio.setRefDistance(5)
+			audio.setMaxDistance(40)
+			audio.setRolloffFactor(1)
+
+			audio.translateY(this.cajoneraY/2)
+
+			this.add(audio)
+		})
+
+		// Cerrar cajón
+		GameState.systems.sound.loadPositionalSound("../../resources/sounds/drawerClose.wav", (audio) => {
+			this._sonidos.cerrar = audio
+
+			audio.setVolume(0.075)
+
+			audio.setDistanceModel('linear')
+			audio.setRefDistance(5)
+			audio.setMaxDistance(40)
+			audio.setRolloffFactor(0.8)
+
+			audio.translateY(this.cajoneraY/2)
+
+			this.add(audio)
+		})
+	}
+
 	_crearAnimacion()
 	{
 		this.estadoAnimaciones = []
@@ -243,6 +286,9 @@ class Cajonera extends THREE.Object3D
 						frameCerrado.p = cajonPosCerrado
 						this.estadoAnimaciones[i].animando = false
 						this.estadoAnimaciones[i].cajonAbierto = true
+
+						if (!this._sonidos.abrir.isPlaying)
+							this._sonidos.abrir.play()
 					}),
 				cerrarCajon: new TWEEN.Tween(frameAbierto)
 					.to(frameCerrado, 1200)
@@ -257,6 +303,9 @@ class Cajonera extends THREE.Object3D
 						frameAbierto.p = this.cajonAperturaZ
 						this.estadoAnimaciones[i].animando = false
 						this.estadoAnimaciones[i].cajonAbierto = false
+
+						if (!this._sonidos.cerrar.isPlaying)
+							this._sonidos.cerrar.play()
 					})
 			})
 		}

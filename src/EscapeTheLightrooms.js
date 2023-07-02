@@ -238,11 +238,12 @@ class EscapeTheLightrooms extends THREE.Scene
 		this.soundSystem.loadGlobalSound("../resources/sounds/asteroid-atmosphere.wav", (audio) => {
 			this.sonidos.atmAmbiental = {
 				audio: audio,
+				baseVolume: 0.08,
 				duration: audio.buffer.duration*1000, // MS
 				enabled: true
 			}
 
-			audio.setVolume(0.1)
+			audio.setVolume(this.sonidos.atmAmbiental.baseVolume)
 
 			// Replay random
 			const playAudioRandom = () => {
@@ -397,18 +398,28 @@ class EscapeTheLightrooms extends THREE.Scene
 
 		{
 			this.guiMenuOpciones = {
+				volumenSonido: 1,
+				volumenSonidoAmbiental: 0.5,
 				hayLimiteFPS: false,
 				limiteFPS: 30
 			}
 
 			const folder = gui.addFolder("Options")
 
+			folder.add(this.guiMenuOpciones, "volumenSonido", 0, 1, 0.01)
+				.name("Master Volume:")
+				.onChange((value) => GameState.systems.sound.getAudioListener().setMasterVolume(value))
+
+			folder.add(this.guiMenuOpciones, "volumenSonidoAmbiental", 0, 1, 0.01)
+				.name("Ambiental Volume:")
+				.onChange((value) => this.sonidos.atmAmbiental.audio.setVolume(this.sonidos.atmAmbiental.baseVolume * value * 2))
+
 			folder.add(this.guiMenuOpciones, "hayLimiteFPS")
-				.name("Limit max FPS: ")
+				.name("Limit max FPS:")
 				.onChange((value) => FPSLimit = value).listen()
 
 			folder.add(this.guiMenuOpciones, "limiteFPS", 15, 240, 5)
-				.name("FPS Limit: ")
+				.name("FPS Limit:")
 				.onChange((value) => myDeltaTime = 1.0 / value).listen()
 		}
 
