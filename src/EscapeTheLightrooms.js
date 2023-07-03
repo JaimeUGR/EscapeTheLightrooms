@@ -337,7 +337,7 @@ class EscapeTheLightrooms extends THREE.Scene
 		let frameIni = {rY: rInicial}
 		let frameFin = {rY: rInicial + 2*Math.PI}
 
-		const aniPreCarga = new TWEEN.Tween(frameIni).to(frameFin, 3000)
+		const aniPreCarga = new TWEEN.Tween(frameIni).to(frameFin, 4000)
 			.onUpdate(() => {
 				camera.rotation.y = frameIni.rY
 			})
@@ -345,23 +345,37 @@ class EscapeTheLightrooms extends THREE.Scene
 				camera.rotation.y = rInicial
 				console.log("Completed PreLoad")
 
-				// Estamos esperando en el menú principal
-				this.enMenuJuego = true
+				// Esperar a que el audio esté cargado
+				const esperarCargasAdicionales = () => {
 
-				// Permitir que empiece el juego
-				$("#botonJugar")
-					.html("Play")
-					.addClass("ready")
-					.on("click", (event) => {
-						// Activar
-						this.enMenuJuego = false
+					// Audio Cargado
+					if (GameState.systems.sound.hasPendingLoads())
+					{
+						console.log("Esperando Carga Adicional")
+						setTimeout(esperarCargasAdicionales, 200)
+						return
+					}
 
-						// Hacer el fade del menú al juego
-						$("#menuPrincipal").css("display", "none")
+					// Estamos esperando en el menú principal
+					this.enMenuJuego = true
 
-						// Activar los clicks
-						window.addEventListener('click', this._procesarClick.bind(this))
-					})
+					// Permitir que empiece el juego
+					$("#botonJugar")
+						.html("Play")
+						.addClass("ready")
+						.on("click", (event) => {
+							// Activar
+							this.enMenuJuego = false
+
+							// Hacer el fade del menú al juego
+							$("#menuPrincipal").css("display", "none")
+
+							// Activar los clicks
+							window.addEventListener('click', this._procesarClick.bind(this))
+						})
+				}
+
+				esperarCargasAdicionales()
 			})
 
 		aniPreCarga.start()

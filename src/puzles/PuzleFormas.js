@@ -437,6 +437,12 @@ class Rail extends THREE.Object3D
 			this.setFormas(formasBase)
 
 		//
+		// Sonido
+		//
+
+		this._crearSonidos()
+
+		//
 		// Animación
 		//
 
@@ -499,6 +505,39 @@ class Rail extends THREE.Object3D
 		this.callbackRotacion = callback
 	}
 
+	_crearSonidos()
+	{
+		this._sonidos = {}
+
+		GameState.systems.sound.loadPositionalSound("../../resources/sounds/spin.mp3", (audio) => {
+			this._sonidos.rotar = audio
+
+			audio.duration = 1.5
+
+			audio.setVolume(0.2)
+
+			audio.setDistanceModel("linear")
+			audio.setRefDistance(15)
+			audio.setMaxDistance(80)
+			audio.setRolloffFactor(0.5)
+
+			this.add(audio)
+		})
+
+		GameState.systems.sound.loadPositionalSound("../../resources/sounds/strap.wav", (audio) => {
+			this._sonidos.parar = audio
+
+			audio.setVolume(0.2)
+
+			audio.setDistanceModel("linear")
+			audio.setRefDistance(15)
+			audio.setMaxDistance(80)
+			audio.setRolloffFactor(0.6)
+
+			this.add(audio)
+		})
+	}
+
 	_crearAnimacion()
 	{
 		this._animating = false
@@ -517,6 +556,8 @@ class Rail extends THREE.Object3D
 			.onStart(() => {
 				this.getFormaSeleccionada().children[0].material.color.setHex(COLOR_FORMA)
 				frameFin.p = 1.0 / this.formas.length
+
+				this._sonidos.rotar.play()
 			})
 			.onUpdate(() => {
 				for (let i = 0; i < this.formas.length; i++) {
@@ -547,6 +588,8 @@ class Rail extends THREE.Object3D
 					this.callbackRotacion()
 
 				this._animating = false
+
+				this._sonidos.parar.play()
 			})
 	}
 }

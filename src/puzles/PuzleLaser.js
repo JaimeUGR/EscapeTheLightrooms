@@ -55,6 +55,12 @@ class PuzleLaser extends THREE.Object3D
 		this._crearCristalContenedor()
 
 		//
+		// Sonidos
+		//
+
+		this._crearSonidos()
+
+		//
 		// Animación
 		//
 
@@ -167,6 +173,25 @@ class PuzleLaser extends THREE.Object3D
 		this.add(this.O3Anillos)
 	}
 
+	_crearSonidos()
+	{
+		this._sonidos = {}
+
+		GameState.systems.sound.loadPositionalSound("../../resources/sounds/space.mp3", (audio) => {
+			this._sonidos.espacio = audio
+
+			audio.setVolume(0.75)
+			audio.setPlaybackRate(0.55)
+
+			audio.setDistanceModel("linear")
+			audio.setRefDistance(20)
+			audio.setMaxDistance(100)
+			audio.setRolloffFactor(0.35)
+
+			this.O3Anillos.add(audio)
+		})
+	}
+
 	_crearAnimaciones()
 	{
 		this.animaciones = {}
@@ -225,6 +250,9 @@ class PuzleLaser extends THREE.Object3D
 
 		this.animaciones.animacionInicio = new TWEEN.Tween(frameInicio).to(frameActivado, 4000)
 			.easing(TWEEN.Easing.Sinusoidal.InOut)
+			.onStart(() => {
+				this._sonidos.espacio.play()
+			})
 			.onUpdate(() => {
 				aplicarRotacion(frameInicio)
 			})
@@ -241,6 +269,9 @@ class PuzleLaser extends THREE.Object3D
 
 		this.animaciones.animacionCompletar = new TWEEN.Tween(frameActivado).to(frameCompletado, 4000)
 			.easing(TWEEN.Easing.Sinusoidal.InOut)
+			.onStart(() => {
+				this._sonidos.espacio.play()
+			})
 			.onUpdate(() => {
 				aplicarRotacion(frameActivado)
 			})

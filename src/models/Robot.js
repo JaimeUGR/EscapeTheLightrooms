@@ -11,6 +11,7 @@ import * as TWEEN from '../../libs/tween.esm.js'
 import {CSG} from '../../libs/CSG-v2.js'
 
 import {GameState} from "../GameState.js"
+import {RandomIntInRange} from "../Utils.js"
 
 class Robot extends THREE.Object3D
 {
@@ -568,6 +569,35 @@ class Robot extends THREE.Object3D
 			audio.setPlaybackRate(1.1)
 			audio.setVolume(0.2)
 		})
+
+		GameState.systems.sound.loadPositionalSound("../../resources/sounds/nightVision.wav", (audio) => {
+			this._sonidos.activar = audio
+
+			audio.setVolume(0.12)
+			audio.setPlaybackRate(1.6)
+
+			audio.setDistanceModel("linear")
+			audio.setRefDistance(5)
+			audio.setMaxDistance(80)
+			audio.setRolloffFactor(1)
+
+			audio.translateY(this.dimTronco.troncoSupY/2)
+			this.troncoSuperior.add(audio)
+		})
+
+		GameState.systems.sound.loadPositionalSound("../../resources/sounds/censor.mp3", (audio) => {
+			this._sonidos.insultar = audio
+
+			audio.setVolume(0.12)
+
+			audio.setDistanceModel("linear")
+			audio.setRefDistance(5)
+			audio.setMaxDistance(80)
+			audio.setRolloffFactor(1)
+
+			audio.translateY(this.dimCabeza.alturaCuello + this.dimCabeza.separacionBoca)
+			this.elementos.cabeza.add(audio)
+		})
 	}
 
 	_crearAnimacionPila()
@@ -595,6 +625,8 @@ class Robot extends THREE.Object3D
 			.onComplete(() => {
 				this.materialOjos.color.setHex(0x33aa33)
 				console.log("El robot está feliz porque tiene la pila")
+
+				this._sonidos.activar.play()
 			})
 
 		//
@@ -747,6 +779,20 @@ class Robot extends THREE.Object3D
 			})
 
 		let animacionMenearBrazoIzquierdo = new TWEEN.Tween(frameBrazoIzquierdoAbajo).to(frameBrazoIzquierdoArriba, 400)
+			.onStart(() => {
+				this._sonidos.insultar.duration = RandomIntInRange(200, 250) / 1000.0
+				this._sonidos.insultar.play()
+
+				// 2 repeticiones a los 600ms
+				for(let i = 1; i < 4; i++)
+					setTimeout(() => {
+						if (!this._sonidos.insultar.isPlaying)
+						{
+							this._sonidos.insultar.duration = RandomIntInRange(200, 450) / 1000.0
+							this._sonidos.insultar.play()
+						}
+					}, i*500)
+			})
 			.onUpdate(() => {
 				this.elementos.brazoIzquierdo.O3B.rotation.x = frameBrazoIzquierdoAbajo.rXBrazo
 				this.elementos.piernaDerecha.O3P.rotation.x = frameBrazoIzquierdoAbajo.rXPierna

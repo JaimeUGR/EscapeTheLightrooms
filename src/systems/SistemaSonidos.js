@@ -18,6 +18,7 @@ class SistemaSonidos
 		this._audioListener.name = "AListener"
 		this._audioLoader = new AudioLoader()
 
+		this._pendingLoads = 0
 
 		//
 		// Carga de sonidos globales compartidos
@@ -40,10 +41,16 @@ class SistemaSonidos
 
 	_loadSound(path, loadCallback, audioObject)
 	{
+		this._pendingLoads++
+
 		this._audioLoader.load(path, (buffer) => {
+			this._pendingLoads--
 			audioObject.setBuffer(buffer)
 			loadCallback(audioObject)
-		}, null, () => console.error("Error cargando " + path))
+		}, null, () => {
+			this._pendingLoads--
+			console.error("Error cargando " + path)
+		})
 	}
 
 	addListenerToCamera(camera)
@@ -66,6 +73,11 @@ class SistemaSonidos
 	getAudioListener()
 	{
 		return this._audioListener
+	}
+
+	hasPendingLoads()
+	{
+		return this._pendingLoads > 0
 	}
 }
 

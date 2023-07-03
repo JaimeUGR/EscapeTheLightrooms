@@ -206,6 +206,12 @@ class Reloj extends THREE.Object3D
 
 
 		//
+		// Sonidos
+		//
+
+		this._crearSonidos()
+
+		//
 		// Animación
 		//
 
@@ -311,6 +317,25 @@ class Reloj extends THREE.Object3D
 		this.add(meshPuertaReloj)
 	}
 
+	_crearSonidos()
+	{
+		this._sonidos = {}
+
+		GameState.systems.sound.loadPositionalSound("../../resources/sounds/clockTick.mp3", (audio) => {
+			this._sonidos.tick = audio
+
+			audio.setVolume(0.5)
+			audio.duration = 0.2
+
+			audio.setDistanceModel('exponential')
+			audio.setRefDistance(25)
+			audio.setMaxDistance(100)
+			audio.setRolloffFactor(1.4)
+
+			this.O3Pendulo.add(audio)
+		})
+	}
+
 	_crearAnimacion()
 	{
 		this._animating = false
@@ -356,6 +381,12 @@ class Reloj extends THREE.Object3D
 				})
 				.onComplete(() => {
 					framePendulo_Izda.rZ = -this.rotacionPendulo
+
+					if (!this._sonidos.tick.isPlaying)
+					{
+						this._sonidos.tick.offset = 1.05
+						this._sonidos.tick.play()
+					}
 				})
 
 			let animacionDchaIzda = new TWEEN.Tween(framePendulo_Dcha).to(framePendulo_Izda, this.tiempoPendulo)
@@ -365,6 +396,12 @@ class Reloj extends THREE.Object3D
 				})
 				.onComplete(() => {
 					framePendulo_Dcha.rZ = this.rotacionPendulo
+
+					if (!this._sonidos.tick.isPlaying)
+					{
+						this._sonidos.tick.offset = 0.12
+						this._sonidos.tick.play()
+					}
 				})
 
 			animacionIzdaDcha.chain(animacionDchaIzda)

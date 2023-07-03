@@ -97,6 +97,23 @@ class Puerta extends THREE.Object3D
 			audio.setVolume(0.3)
 			audio.setPlaybackRate(0.8)
 		})
+
+		GameState.systems.sound.loadPositionalSound("../../resources/sounds/openWoodDoor.wav", (audio) => {
+			this._sonidos.abrir = audio
+
+			audio.setVolume(0.3)
+			audio.setPlaybackRate(1.38)
+
+			audio.setDistanceModel('linear')
+			audio.setRefDistance(25)
+			audio.setMaxDistance(100)
+			audio.setRolloffFactor(0.95)
+
+			audio.translateX(-this.puertaX/2)
+			audio.translateY(this.puertaY/2)
+
+			this.add(audio)
+		})
 	}
 
 	_crearAnimacion()
@@ -110,6 +127,8 @@ class Puerta extends THREE.Object3D
 			.easing(TWEEN.Easing.Sinusoidal.InOut)
 			.onStart(() => {
 				// NOTE: Iniciar cinemática y bloquear entrada
+
+				this._sonidos.abrir.play()
 			})
 			.onUpdate(() => {
 				this.meshPuerta.rotation.y = framePuertaCerrada.rY
