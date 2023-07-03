@@ -21,6 +21,8 @@ import {SalaPrincipal} from "./rooms/SalaPrincipal.js"
 import {SalaIzquierda} from "./rooms/SalaIzquierda.js"
 import {SalaDerecha} from "./rooms/SalaDerecha.js"
 import {SalaSuperior} from "./rooms/SalaSuperior.js"
+import {SalaFinal} from "./rooms/SalaFinal.js"
+
 
 import {GameState} from "./GameState.js"
 import {SistemaColisiones} from "./systems/SistemaColisiones.js"
@@ -147,12 +149,17 @@ class EscapeTheLightrooms extends THREE.Scene
 			down: true
 		})
 
+		this.salaFinal = new SalaFinal(Sala.AnchoPuerta() + 30, 50, 300, {
+			up: true
+		})
+
 		// Colocar las salas en su posición final
 		// Centrar las salas
 		this.salaPrincipal.translateX(-this.salaPrincipal.largoParedX/2)
 		this.salaIzquierda.translateX(-this.salaIzquierda.largoParedX/2)
 		this.salaDerecha.translateX(-this.salaDerecha.largoParedX/2)
 		this.salaSuperior.translateX(-this.salaSuperior.largoParedX/2)
+		this.salaFinal.translateX(-this.salaFinal.largoParedX/2)
 
 		// Posicionamos las salas adyacentes a la principal
 		this.salaIzquierda.translateX(this.salaIzquierda.largoParedX/2 +
@@ -166,17 +173,23 @@ class EscapeTheLightrooms extends THREE.Scene
 		this.salaSuperior.translateZ(this.salaPrincipal.largoParedZ
 			+ 4*Sala.GrosorPared() + this.salaPrincipal.pasilloSuperior.largoPasillo)
 
+		this.salaFinal.translateZ(-(this.salaFinal.largoParedZ + 2*Sala.GrosorPared()))
+
 		// Añadir los pasillos de conexión
 		this.add(this.salaPrincipal)
 		this.add(this.salaIzquierda)
 		this.add(this.salaDerecha)
 		this.add(this.salaSuperior)
 
-		// TODO: NOTE: Importante cuándo llamamos a este método (debe ser después de meter los objetos al grafo)
+		// NOTE: Se añade la sala final al árbol cuando se desbloquea la puerta
+		//this.add(this.salaFinal)
+
+		// NOTE: Importante cuándo llamamos a este método (debe ser después de meter los objetos al grafo)
 		this.salaPrincipal.updateColliders()
 		this.salaIzquierda.updateColliders()
 		this.salaDerecha.updateColliders()
 		this.salaSuperior.updateColliders()
+		this.salaFinal.updateColliders()
 	}
 
 	//
