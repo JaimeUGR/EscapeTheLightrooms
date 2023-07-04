@@ -7,6 +7,8 @@
 */
 
 import {Vector2, Vector3, TextureLoader, Object3D} from "../libs/three.module.js"
+import {FontLoader} from "../libs/FontLoader.js"
+
 import {Rect} from "./structures/Rect.js"
 
 import {Tarjeta} from "./models/items/Tarjeta.js"
@@ -20,6 +22,7 @@ class GameState
 	{
 		this.scene = scene
 		this.txLoader = new TextureLoader()
+		this.fontLoader = new FontLoader()
 
 		this.player = {
 			initialPosition: new Vector3(0, 25, 5),
@@ -48,7 +51,7 @@ class GameState
 			tienePrisma: true,
 			tienePila: true,
 			robotConPila: false,
-			salidaAbierta: false
+			salidaAbierta: true
 		}
 
 		this.salas = {
@@ -67,7 +70,7 @@ class GameState
 			colsEnabled: true,
 			gameStarted: false,
 			inputEnabled: true,
-			keypadCode: "6969"
+			keypadCode: "6969",
 		}
 
 		this.luces = {

@@ -20,6 +20,7 @@ class GestorCamaras
 	{
 		this.game = game
 		this.gameState = gameState
+		this._ignoreEvents = false
 
 		this.controladoresCamaras = []
 		this.activeController = null
@@ -131,7 +132,6 @@ class GestorCamaras
 		})
 	}
 
-	// Eventos
 	onKeyUp(event)
 	{
 		this.activeController.onKeyUp(event)

@@ -81,7 +81,7 @@ class ControladorCamaraPrincipal extends ControladorCamara
 	onMouseMove(event)
 	{
 		// Cuando se bloquea la cámara, se ignora el movimiento del ratón
-		if (GameState.gameData.cameraLock)
+		if (GameState.gameData.cameraLock || !GameState.gameData.inputEnabled)
 			return
 
 		this.controlador._onMouseMove(event)
@@ -90,7 +90,7 @@ class ControladorCamaraPrincipal extends ControladorCamara
 	onKeyDown(event)
 	{
 		// Cuando se bloquea la cámara, se ignora el movimiento del jugador
-		if (GameState.gameData.cameraLock)
+		if (GameState.gameData.cameraLock || !GameState.gameData.inputEnabled)
 			return
 
 		switch (event.code)

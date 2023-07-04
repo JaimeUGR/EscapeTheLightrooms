@@ -91,13 +91,15 @@ class SalaFinal extends Sala
 						tiempo: 3000,
 						color: colorFading,
 						callback: () => {
+							GameState.gameData.inputEnabled = false
 							console.log("Cargando location final")
 							GameState.locations.end.loadLocation()
 							console.log("Carga completada")
 
 							fadeOut({
-								tiempo: 2000,
-								color: colorFading
+								tiempo: 1500,
+								color: colorFading,
+								callback: () => GameState.locations.end.onLocationActive()
 							})
 						}
 					})
