@@ -122,6 +122,11 @@ class SistemaColisiones
 		this._debugUpdateRects(uuid, rects)
 	}
 
+	clearAllColliders()
+	{
+		this.colliderTree.clear()
+	}
+
 	_debugUpdateRects(uuid, newRects)
 	{
 		if (!this.debugObjectMap.has(uuid))

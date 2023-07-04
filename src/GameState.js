@@ -12,6 +12,7 @@ import {Rect} from "./structures/Rect.js"
 import {Tarjeta} from "./models/items/Tarjeta.js"
 import {Prisma} from "./models/items/Prisma.js"
 import {Pila} from "./models/Pila.js"
+import {EndLocation} from "./locations/EndLocation.js"
 
 class GameState
 {
@@ -46,7 +47,8 @@ class GameState
 			tieneTarjeta: true,
 			tienePrisma: true,
 			tienePila: true,
-			robotConPila: false
+			robotConPila: false,
+			salidaAbierta: false
 		}
 
 		this.salas = {
@@ -83,6 +85,10 @@ class GameState
 			cameras: null,
 			messages: null,
 			sound: null
+		}
+
+		this.locations = {
+			end: new EndLocation(scene)
 		}
 	}
 }

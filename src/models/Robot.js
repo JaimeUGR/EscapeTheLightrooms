@@ -675,11 +675,11 @@ class Robot extends THREE.Object3D
 				frameBrazoAlargar_I.sY = 1
 
 				setTimeout(() => {
+					GameState.flags.robotConPila = true
 					animacionDesalargarBrazo.start()
 				}, 1500)
 
 				// NOTE: Desbloquear la puerta
-				GameState.flags.robotConPila = true
 				this._sonidos.desbloquear.play()
 			})
 

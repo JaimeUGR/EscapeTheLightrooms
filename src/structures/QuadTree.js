@@ -114,6 +114,15 @@ class QuadTree
 				this.quads[i].getItems(resultList)
 		}
 	}
+
+	clear()
+	{
+		this.items.length = 0
+
+		for (let i = 0; i < 4; i++)
+			if (this.quads[i] != null)
+				this.quads[i].clear()
+	}
 }
 
 class QuadTreeContainer
@@ -217,6 +226,12 @@ class QuadTreeContainer
 		}
 
 		this.allObjects.pop()
+	}
+
+	clear()
+	{
+		this.allObjects.length = 0
+		this.root.clear()
 	}
 }
 

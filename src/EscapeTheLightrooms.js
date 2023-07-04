@@ -180,9 +180,7 @@ class EscapeTheLightrooms extends THREE.Scene
 		this.add(this.salaIzquierda)
 		this.add(this.salaDerecha)
 		this.add(this.salaSuperior)
-
-		// NOTE: Se añade la sala final al árbol cuando se desbloquea la puerta
-		//this.add(this.salaFinal)
+		this.add(this.salaFinal)
 
 		// NOTE: Importante cuándo llamamos a este método (debe ser después de meter los objetos al grafo)
 		this.salaPrincipal.updateColliders()

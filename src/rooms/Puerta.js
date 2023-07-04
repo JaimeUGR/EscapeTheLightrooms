@@ -126,6 +126,7 @@ class Puerta extends THREE.Object3D
 		this.animaciones.abrirPuerta = new TWEEN.Tween(framePuertaCerrada).to(framePuertaAbierta, 2000)
 			.easing(TWEEN.Easing.Sinusoidal.InOut)
 			.onStart(() => {
+				GameState.flags.salidaAbierta = true
 				// NOTE: Iniciar cinemática y bloquear entrada
 
 				this._sonidos.abrir.play()
