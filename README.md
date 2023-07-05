@@ -13,6 +13,21 @@ We have decided to release this project as an open source game because we are qu
 Right now, the game can be played for **FREE** (optionally you can donate) on [Itch.io](https://itch.io/) -> [Escape The Lightrooms]().
 We might release a steam version in the future.
 
+### Troubleshooting
+This small section showcases common problems that you may encounter in the playable web version.
+
+#### Game doesn't load
+If the game is stuck and doesnt load (or there is an error thrown) and you are using `Firefox`, go to "about:config", search "dom.importMaps.enabled" and make sure that this option has the value "true". 
+
+If you are using other browser (Chromium based ones dont have this problem), you must enable dom importMaps. Also, you could switch to another
+
+#### LeftControl doesnt lock the pointer
+For security reasons, the pointer lock api has some limitations which may cause behaviours like this. Consider the following:
+- Dont lock/unlock the pointer too fast
+- While the game is playing, dont switch windows or tabs without pressing either `Escape` or `Left Control`.
+
+If the pointer is not locking with `LeftControl`, click 2 times on the screen with your cursor and then it should work.
+
 ## Details
 Since Escape The Lightrooms is a web based game, we have mainly used javascript, where we have all the scenes, models and game systems in separate modules, so that they can be reused in any other project (although the game architecture is far from perfect, as this was just a small university project). The main modules are the following:
 - **EscapeTheLightrooms:** main game class. It manages the creation of the rooms, game state initialization and the game loop.
