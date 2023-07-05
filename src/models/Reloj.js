@@ -334,6 +334,20 @@ class Reloj extends THREE.Object3D
 
 			this.O3Pendulo.add(audio)
 		})
+
+		GameState.systems.sound.loadPositionalSound("../../resources/sounds/spin.mp3", (audio) => {
+			this._sonidos.resolver = audio
+
+			audio.setVolume(0.1)
+			audio.setPlaybackRate(0.4)
+
+			audio.setDistanceModel('linear')
+			audio.setRefDistance(10)
+			audio.setMaxDistance(150)
+			audio.setRolloffFactor(0.7)
+
+			this.O3Agujas.add(audio)
+		})
 	}
 
 	_crearAnimacion()
@@ -520,6 +534,7 @@ class Reloj extends THREE.Object3D
 
 			this.animaciones.resolver.animacion = new TWEEN.Tween(frameInicio).to(frameFin, 5000)
 				.onStart(() => {
+					this._sonidos.resolver.play()
 					this.animaciones.resolver.posicionXInicio = this.position.x
 				})
 				.onUpdate(() => {

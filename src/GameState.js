@@ -42,16 +42,15 @@ class GameState
 		}
 
 		// Flags del juego
-		// TODO: ALGUNOS ON TMP
 		this.flags = {
-			tieneDestornillador: true,
-			tieneManecillaHora: true,
-			tieneManecillaMinuto: true,
-			tieneTarjeta: true,
-			tienePrisma: true,
-			tienePila: true,
+			tieneDestornillador: false,
+			tieneManecillaHora: false,
+			tieneManecillaMinuto: false,
+			tieneTarjeta: false,
+			tienePrisma: false,
+			tienePila: false,
 			robotConPila: false,
-			salidaAbierta: true
+			salidaAbierta: false
 		}
 
 		this.salas = {
@@ -91,7 +90,7 @@ class GameState
 		}
 
 		this.locations = {
-			end: new EndLocation(scene)
+			end: null
 		}
 	}
 }

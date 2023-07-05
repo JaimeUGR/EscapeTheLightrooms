@@ -72,7 +72,22 @@ class Boton extends THREE.Object3D
 
 	_crearSonidos()
 	{
+		this._sonidos = {}
 
+		GameState.systems.sound.loadPositionalSound("../../resources/sounds/pressButton.mp3", (audio) => {
+			this._sonidos.pulsar = audio
+
+			audio.setVolume(0.5)
+
+			audio.setDistanceModel("linear")
+			audio.setRefDistance(15)
+			audio.setMaxDistance(60)
+			audio.setRolloffFactor(0.25)
+
+			audio.translateZ(this.alturaSoporte)
+
+			this.add(audio)
+		})
 	}
 
 	_crearAnimacion()
@@ -80,12 +95,13 @@ class Boton extends THREE.Object3D
 		this._animaciones = {}
 
 		let frameInicial = {z: 1}
-		let frameFinal = {z: 0.25}
+		let frameFinal = {z: 0.2}
 
-		let animacionPulsar = new TWEEN.Tween(frameInicial).to(frameFinal, 350)
+		let animacionPulsar = new TWEEN.Tween(frameInicial).to(frameFinal, 400)
 			.easing(TWEEN.Easing.Sinusoidal.In)
 			.onStart(() => {
 				// Sonido pulsar
+				this._sonidos.pulsar.play()
 			})
 			.onUpdate(() => {
 				this.meshPulsador.scale.z = frameInicial.z
@@ -98,7 +114,7 @@ class Boton extends THREE.Object3D
 					this.callbackAnimacion()
 			})
 
-		let animacionDepulsar = new TWEEN.Tween(frameFinal).to(frameInicial, 300)
+		let animacionDepulsar = new TWEEN.Tween(frameFinal).to(frameInicial, 325)
 			.easing(TWEEN.Easing.Sinusoidal.In)
 			.onStart(() => {
 				// Sonido soltar

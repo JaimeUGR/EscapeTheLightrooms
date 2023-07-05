@@ -35,6 +35,7 @@ class EndLocation
 		this._animaciones = {}
 
 		this._buildLocation()
+		this._cargarSonido()
 	}
 
 	loadLocation()
@@ -45,6 +46,10 @@ class EndLocation
 		this._mainGame.remove(this._mainGame.salaDerecha)
 		this._mainGame.remove(this._mainGame.salaSuperior)
 		this._mainGame.remove(this._mainGame.salaFinal)
+
+		// Parar la animación del reloj (para que deje de sonar)
+		// TODO: Fix temporal
+		this._mainGame.salaDerecha.reloj.animaciones.pendulo.animacion.stop()
 
 		// Añadir la nueva sala
 		this._mainGame.add(this._location)
@@ -90,11 +95,28 @@ class EndLocation
 			animacion.start()
 
 		this._animaciones.texto.colores.animacion.start()
+
+		//
+		// Iniciar play del sonido
+		//
+		this._sonidos.endingSong.play()
 	}
 
 	getLocation()
 	{
 		return this._location
+	}
+
+	_cargarSonido()
+	{
+		this._sonidos = {}
+
+		GameState.systems.sound.loadGlobalSound("../../resources/sounds/Hero_Infraction.mp3", (audio) => {
+			this._sonidos.endingSong = audio
+
+			audio.setVolume(0.12)
+			audio.setLoop(true)
+		})
 	}
 
 	_buildLocation()
@@ -150,6 +172,19 @@ class EndLocation
 		}
 
 		this._location.add(O3Contenedor)
+
+		//
+		// Animaciones cubos
+		//
+
+		let frameIni = {rY: 0}
+		let frameFin = {rY: 2*Math.PI}
+
+		this._animaciones.espacio = new TWEEN.Tween(frameIni).to(frameFin, 1800000)
+			.onUpdate(() => {
+				O3Contenedor.rotation.y = frameIni.rY
+			})
+			.repeat(Infinity)
 	}
 
 	_crearTexto()
@@ -369,9 +404,11 @@ class EndLocation
 			this._animaciones.texto.letras.push(animacion)
 		}
 
-		// Restaurar el input cuando se complete la animación
+		// Restaurar el input cuando se complete esta animación
+		this._animaciones.texto.letras[0].to(frameFin, 6500)
 		this._animaciones.texto.letras[0].onComplete(() => {
 			GameState.gameData.inputEnabled = true
+			this._animaciones.espacio.start()
 		})
 
 		//

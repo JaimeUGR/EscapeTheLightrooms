@@ -32,6 +32,7 @@ import {SistemaSonidos} from "./systems/SistemaSonidos.js"
 import {Config} from "./Config.js"
 import {MSG_INICIO_CONTROLES, MSG_INICIO_JUEGO} from "./messages/messages.js"
 import {RandomIntInRange} from "./Utils.js"
+import {EndLocation} from "./locations/EndLocation.js"
 
 //
 // Variables de control general
@@ -123,6 +124,11 @@ class EscapeTheLightrooms extends THREE.Scene
 		GameState.systems.messages = this.messageSystem
 
 		this.add(GameState.debug.O3Player)
+
+		//
+		// Localizaciones
+		//
+		GameState.locations.end = new EndLocation(this)
 	}
 
 	// Crear las salas, unirlas y colocarlas
@@ -426,7 +432,14 @@ class EscapeTheLightrooms extends THREE.Scene
 				volumenSonido: 1,
 				volumenSonidoAmbiental: 0.5,
 				hayLimiteFPS: false,
-				limiteFPS: 30
+				limiteFPS: 30,
+				resetearPosicion: () => {
+					let iniPos = GameState.player.initialPosition
+
+					console.log("DEBUG: Player position reset")
+
+					GameState.player.position.set(iniPos.x, iniPos.y, iniPos.z)
+				}
 			}
 
 			const folder = gui.addFolder("Options")
@@ -446,6 +459,9 @@ class EscapeTheLightrooms extends THREE.Scene
 			folder.add(this.guiMenuOpciones, "limiteFPS", 15, 240, 5)
 				.name("FPS Limit:")
 				.onChange((value) => myDeltaTime = 1.0 / value).listen()
+
+			folder.add(this.guiMenuOpciones, "resetearPosicion")
+				.name("[ RESET POSITION ]")
 		}
 
 		//
@@ -470,13 +486,6 @@ class EscapeTheLightrooms extends THREE.Scene
 						console.log("DEBUG: Interaction range enabled")
 
 					GameState.gameData.interactionRangeEnabled = !GameState.gameData.interactionRangeEnabled
-				},
-				resetearPosicion: () => {
-					let iniPos = GameState.player.initialPosition
-
-					console.log("DEBUG: Player position reset")
-
-					GameState.player.position.set(iniPos.x, iniPos.y, iniPos.z)
 				}
 			}
 
@@ -490,9 +499,6 @@ class EscapeTheLightrooms extends THREE.Scene
 
 			folder.add(this.guiMenuDebug, "toggleRangoInteraccion")
 				.name("[ TOGGLE INTERACTION RANGE ]")
-
-			folder.add(this.guiMenuDebug, "resetearPosicion")
-				.name("[ RESET POSITION ]")
 		}
 
 		return gui

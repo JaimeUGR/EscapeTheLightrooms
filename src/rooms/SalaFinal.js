@@ -49,11 +49,34 @@ class SalaFinal extends Sala
 		this.materialSuelo.needsUpdate = true
 		this.materialSuelo.needsUpdate = true
 
+		// Cargar sonidos
+		this._cargarSonidos()
+
 		// Añadir modelos
-		this.crearModelos()
+		this._crearModelos()
 	}
 
-	crearModelos()
+	_cargarSonidos()
+	{
+		this._sonidos = {}
+
+		GameState.systems.sound.loadGlobalSound("../../resources/sounds/charge.ogg", (audio) => {
+			this._sonidos.cargaTeleport = audio
+
+			audio.setVolume(0.2)
+			audio.setPlaybackRate(0.85)
+			audio.duration = 4.860
+		})
+
+		GameState.systems.sound.loadGlobalSound("../../resources/sounds/warp.wav", (audio) => {
+			this._sonidos.teleport = audio
+
+			audio.setVolume(0.5)
+			audio.setPlaybackRate(0.5)
+		})
+	}
+
+	_crearModelos()
 	{
 		// Botón final
 		{
@@ -75,17 +98,24 @@ class SalaFinal extends Sala
 					return
 				}
 
+				// Preconfiguración
 				GameState.gameData.interactionRangeEnabled = true
 				GameState.gameData.interactionRange = -1000
-
 				boton.userData = {}
 
+				// Parar el sonido ambiental
+				GameState.scene.sonidos.atmAmbiental.enabled = false
+
+				//
+				//
+				//
+
 				// Play sonido cargar teletransportar
-				console.log("PLAY CARGAR")
+				this._sonidos.cargaTeleport.play()
 
 				setTimeout(() => {
 					// Play sonido teletransportar
-					console.log("PLAY TP")
+					this._sonidos.teleport.play()
 
 					fadeIn({
 						tiempo: 3000,
@@ -97,13 +127,13 @@ class SalaFinal extends Sala
 							console.log("Carga completada")
 
 							fadeOut({
-								tiempo: 1500,
+								tiempo: 2500,
 								color: colorFading,
 								callback: () => GameState.locations.end.onLocationActive()
 							})
 						}
 					})
-				}, 2000) // TODO: DURACION DE LA CARGA
+				}, this._sonidos.cargaTeleport.duration*1000)
 			})
 
 			this.add(boton)
