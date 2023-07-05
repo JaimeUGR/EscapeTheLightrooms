@@ -25,7 +25,7 @@ Since Escape The Lightrooms is a web based game, we have mainly used javascript,
 - **Sound System:** this system manages sounds, by handling load requests for different types of audio. It also controlls the main audio listener.
 - **Message System:** this system handles any type of communication directed to the player. For example, it allows us to create temporal messages that are shown on screen. 
 
-Finally, we would like to remember that this project has an academic purpose, which means that its design could be greatly improved by changing the game architecture. However, we are quite proud about the end result, as making an entire game with a few libraries from scratch is quite hard.
+Finally, we would like to recall that this project has an academic purpose, which means that its design could be greatly improved by changing the game architecture. However, we are quite proud about the end result, as making an entire game with a few libraries from scratch is quite hard.
 Furthermore, we would have preferred using Typescript, but for time and academic requirements we opted for staying with js.
 
 ### Custom Libraries (sort of)
