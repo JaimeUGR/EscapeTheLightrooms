@@ -1,10 +1,10 @@
 /*
-	Copyright (c) 2023 - Jaime Pérez García y Francisco Expósito Carmona
-
-	Todos los derechos reservados.
-
-	Los recursos externos utilizados han sido debidamente referenciados.
-*/
+ * Copyright (c) 2023. Jaime Pérez y Francisco Expósito.
+ *
+ * All rights reserved.
+ *
+ * Repository: https://github.com/JaimeUGR/EscapeTheLightrooms
+ */
 
 import * as THREE from "../../libs/three.module.js"
 import {CSG} from "../../libs/CSG-v2.js"
@@ -87,7 +87,7 @@ class Sofa extends THREE.Object3D
 		this.baseCollider = null
 
 		let loader = GameState.txLoader
-		let texturaSofa = loader.load("../../resources/textures/models/textura_sofa.png")
+		let texturaSofa = loader.load("./resources/textures/models/textura_sofa.png")
 		texturaSofa.wrapS = THREE.RepeatWrapping
 		texturaSofa.wrapT = THREE.RepeatWrapping
 

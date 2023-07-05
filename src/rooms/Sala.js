@@ -1,10 +1,10 @@
 /*
-	Copyright (c) 2023 - Jaime Pérez García y Francisco Expósito Carmona
-
-	Todos los derechos reservados.
-
-	Los recursos externos utilizados han sido debidamente referenciados.
-*/
+ * Copyright (c) 2023. Jaime Pérez y Francisco Expósito.
+ *
+ * All rights reserved.
+ *
+ * Repository: https://github.com/JaimeUGR/EscapeTheLightrooms
+ */
 
 import * as THREE from '../../libs/three.module.js'
 import * as TWEEN from '../../libs/tween.esm.js'
@@ -43,9 +43,9 @@ class Sala extends THREE.Object3D
 		left: false,
 		right: false
 	}, pathTexturas = {
-		suelo: "../../resources/textures/rooms/Madera.jpg",
-		pared: "../../resources/textures/rooms/Papel.png",
-		techo: "../../resources/textures/rooms/AluminioTecho.jpg"
+		suelo: "./resources/textures/rooms/Madera.jpg",
+		pared: "./resources/textures/rooms/Papel.png",
+		techo: "./resources/textures/rooms/AluminioTecho.jpg"
 	})
 	{
 		super()
@@ -76,8 +76,8 @@ class Sala extends THREE.Object3D
 
 		let texturaParedX = GameState.txLoader.load(this.pathTexturas.pared)
 		let texturaParedZ = GameState.txLoader.load(this.pathTexturas.pared)
-		let texturaParedXGris = GameState.txLoader.load("../../resources/textures/rooms/gris_gotele.jpg")
-		let texturaParedZGris = GameState.txLoader.load("../../resources/textures/rooms/gris_gotele.jpg")
+		let texturaParedXGris = GameState.txLoader.load("./resources/textures/rooms/gris_gotele.jpg")
+		let texturaParedZGris = GameState.txLoader.load("./resources/textures/rooms/gris_gotele.jpg")
 
 		texturaParedX.wrapS = THREE.RepeatWrapping
 		texturaParedZ.wrapS = THREE.RepeatWrapping
@@ -357,9 +357,9 @@ class Pasillo extends THREE.Object3D
 {
 	constructor(largoPasillo, alturaPasillo, espacioInterno, orientacion = 0
 	, pathTexturas = {
-		suelo: "../../resources/textures/rooms/Madera.jpg",
-		pared: "../../resources/textures/rooms/PapelMorado.png",
-		techo: "../../resources/textures/rooms/AluminioTecho.jpg"
+		suelo: "./resources/textures/rooms/Madera.jpg",
+		pared: "./resources/textures/rooms/PapelMorado.png",
+		techo: "./resources/textures/rooms/AluminioTecho.jpg"
 	})
 	{
 		super()
@@ -569,7 +569,7 @@ class Pasillo extends THREE.Object3D
 		this._sonidos = {}
 
 		// Sonido de abrir la puerta
-		GameState.systems.sound.loadPositionalSound("../../resources/sounds/garageDoor.m4a", (audio) => {
+		GameState.systems.sound.loadPositionalSound("./resources/sounds/garageDoor.m4a", (audio) => {
 			this._sonidos.puerta = audio
 
 			// Configuración

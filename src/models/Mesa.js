@@ -1,10 +1,10 @@
 /*
-	Copyright (c) 2023 - Jaime Pérez García y Francisco Expósito Carmona
-
-	Todos los derechos reservados.
-
-	Los recursos externos utilizados han sido debidamente referenciados.
-*/
+ * Copyright (c) 2023. Jaime Pérez y Francisco Expósito.
+ *
+ * All rights reserved.
+ *
+ * Repository: https://github.com/JaimeUGR/EscapeTheLightrooms
+ */
 
 import * as THREE from "../../libs/three.module.js"
 import {CSG} from "../../libs/CSG-v2.js"
@@ -50,7 +50,7 @@ class Mesa extends THREE.Object3D
 
 		const txLoader = GameState.txLoader
 
-		let texturaMesa = txLoader.load("../../resources/textures/models/textura_mesa_normal.png")
+		let texturaMesa = txLoader.load("./resources/textures/models/textura_mesa_normal.png")
 
 		this.materialTablero = new THREE.MeshLambertMaterial({map: texturaMesa})
 		this.materialPatas = new THREE.MeshLambertMaterial({map: texturaMesa})
@@ -157,7 +157,7 @@ class MesaCristal extends THREE.Object3D
 
 		const txLoader = GameState.txLoader
 
-		let texturaMesa = txLoader.load("../../resources/textures/models/textura_mesa_cristal.png")
+		let texturaMesa = txLoader.load("./resources/textures/models/textura_mesa_cristal.png")
 
 		this.materialTablero = new THREE.MeshLambertMaterial({map: texturaMesa})
 		this.materialPatas = new THREE.MeshLambertMaterial({map: texturaMesa})

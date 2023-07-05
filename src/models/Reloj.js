@@ -1,10 +1,10 @@
 /*
-	Copyright (c) 2023 - Jaime Pérez García y Francisco Expósito Carmona
-
-	Todos los derechos reservados.
-
-	Los recursos externos utilizados han sido debidamente referenciados.
-*/
+ * Copyright (c) 2023. Jaime Pérez y Francisco Expósito.
+ *
+ * All rights reserved.
+ *
+ * Repository: https://github.com/JaimeUGR/EscapeTheLightrooms
+ */
 
 import * as THREE from "../../libs/three.module.js"
 import * as TWEEN from '../../libs/tween.esm.js'
@@ -104,14 +104,14 @@ class Reloj extends THREE.Object3D
 		// Materiales
 		//
 
-		let texturaBases = GameState.txLoader.load("../../resources/textures/models/textura_bases_reloj.jpg")
-		let texturaPilares = GameState.txLoader.load("../../resources/textures/models/textura_pilares_reloj.jpg")
-		let texturaCajaInterior = GameState.txLoader.load("../../resources/textures/models/textura_caja_reloj.jpg")
-		let texturaCajaExterior = GameState.txLoader.load("../../resources/textures/models/textura_bases_reloj.jpg")
+		let texturaBases = GameState.txLoader.load("./resources/textures/models/textura_bases_reloj.jpg")
+		let texturaPilares = GameState.txLoader.load("./resources/textures/models/textura_pilares_reloj.jpg")
+		let texturaCajaInterior = GameState.txLoader.load("./resources/textures/models/textura_caja_reloj.jpg")
+		let texturaCajaExterior = GameState.txLoader.load("./resources/textures/models/textura_bases_reloj.jpg")
 
-		let texturaPendulo = GameState.txLoader.load("../../resources/textures/models/oro1.jpeg")
+		let texturaPendulo = GameState.txLoader.load("./resources/textures/models/oro1.jpeg")
 
-		let texturaReloj = GameState.txLoader.load("../../resources/textures/models/textura_reloj_circulo.png")
+		let texturaReloj = GameState.txLoader.load("./resources/textures/models/textura_reloj_circulo.png")
 		texturaReloj.center.set(0.5, 0.5)
 		texturaReloj.rotation = Math.PI/2
 
@@ -321,7 +321,7 @@ class Reloj extends THREE.Object3D
 	{
 		this._sonidos = {}
 
-		GameState.systems.sound.loadPositionalSound("../../resources/sounds/clockTick.mp3", (audio) => {
+		GameState.systems.sound.loadPositionalSound("./resources/sounds/clockTick.mp3", (audio) => {
 			this._sonidos.tick = audio
 
 			audio.setVolume(0.5)
@@ -335,7 +335,7 @@ class Reloj extends THREE.Object3D
 			this.O3Pendulo.add(audio)
 		})
 
-		GameState.systems.sound.loadPositionalSound("../../resources/sounds/spin.mp3", (audio) => {
+		GameState.systems.sound.loadPositionalSound("./resources/sounds/spin.mp3", (audio) => {
 			this._sonidos.resolver = audio
 
 			audio.setVolume(0.1)
@@ -469,8 +469,6 @@ class Reloj extends THREE.Object3D
 			this.animaciones.manecillas.animacionPonerManecillaHora = new TWEEN.Tween(frameMH_I).to(frameMH_F, 1000)
 				.onStart(() => {
 					GameState.flags.tieneManecillaHora = false
-
-					console.log("PONGO LA MANECILLA DE HOARAS")
 
 					// Añadir la manecilla al reloj
 					this.O3Agujas.add(GameState.items.manecillaHora)

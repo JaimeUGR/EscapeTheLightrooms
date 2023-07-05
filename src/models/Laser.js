@@ -1,10 +1,10 @@
 /*
-	Copyright (c) 2023 - Jaime Pérez García y Francisco Expósito Carmona
-
-	Todos los derechos reservados.
-
-	Los recursos externos utilizados han sido debidamente referenciados.
-*/
+ * Copyright (c) 2023. Jaime Pérez y Francisco Expósito.
+ *
+ * All rights reserved.
+ *
+ * Repository: https://github.com/JaimeUGR/EscapeTheLightrooms
+ */
 
 import * as THREE from "../../libs/three.module.js"
 import * as TWEEN from '../../libs/tween.esm.js'
@@ -51,7 +51,7 @@ class Laser extends THREE.Object3D
 
 		const txLoader = GameState.txLoader
 
-		let texturaSoporte = txLoader.load("../../resources/textures/models/metal-negro.jpg")
+		let texturaSoporte = txLoader.load("./resources/textures/models/metal-negro.jpg")
 		texturaSoporte.wrapS = THREE.MirroredRepeatWrapping
 		texturaSoporte.repeat.set(2, 1)
 
@@ -59,7 +59,7 @@ class Laser extends THREE.Object3D
 			map: texturaSoporte
 		})
 
-		let texturaLaser = txLoader.load("../../resources/textures/models/metal-peligro.jpg")
+		let texturaLaser = txLoader.load("./resources/textures/models/metal-peligro.jpg")
 		texturaLaser.wrapS = THREE.RepeatWrapping
 		texturaLaser.repeat.set(2, 1)
 
@@ -127,7 +127,7 @@ class Laser extends THREE.Object3D
 	{
 		this._sonidos = {}
 
-		GameState.systems.sound.loadPositionalSound("../../resources/sounds/hydraulic.mp3", (audio) => {
+		GameState.systems.sound.loadPositionalSound("./resources/sounds/hydraulic.mp3", (audio) => {
 			this._sonidos.mover = audio
 
 			audio.setVolume(0.7)
@@ -145,7 +145,7 @@ class Laser extends THREE.Object3D
 			this.add(audio)
 		})
 
-		GameState.systems.sound.loadPositionalSound("../../resources/sounds/plasmaCannon.wav", (audio) => {
+		GameState.systems.sound.loadPositionalSound("./resources/sounds/plasmaCannon.wav", (audio) => {
 			this._sonidos.disparar = audio
 
 			audio.setVolume(0.7)

@@ -1,10 +1,10 @@
 /*
-	Copyright (c) 2023 - Jaime Pérez García y Francisco Expósito Carmona
-
-	Todos los derechos reservados.
-
-	Los recursos externos utilizados han sido debidamente referenciados.
-*/
+ * Copyright (c) 2023. Jaime Pérez y Francisco Expósito.
+ *
+ * All rights reserved.
+ *
+ * Repository: https://github.com/JaimeUGR/EscapeTheLightrooms
+ */
 
 import * as THREE from "../../libs/three.module.js"
 import * as TWEEN from '../../libs/tween.esm.js'
@@ -52,8 +52,8 @@ class Vitrina extends THREE.Object3D
 		//
 
 		let loader = GameState.txLoader
-		let texturaParedes = loader.load("../../resources/textures/models/textura_pared.png")
-		let texturaPuerta = loader.load("../../resources/textures/models/puerta_persiana.png")
+		let texturaParedes = loader.load("./resources/textures/models/textura_pared.png")
+		let texturaPuerta = loader.load("./resources/textures/models/puerta_persiana.png")
 
 		this.materialVitrina = new THREE.MeshLambertMaterial({map: texturaParedes})
 		this.materialCristal = new THREE.MeshPhysicalMaterial({
@@ -151,7 +151,7 @@ class Vitrina extends THREE.Object3D
 	{
 		this._sounds = {}
 
-		GameState.systems.sound.loadPositionalSound("../../resources/sounds/softGarageDoor.mp3", (audio) => {
+		GameState.systems.sound.loadPositionalSound("./resources/sounds/softGarageDoor.mp3", (audio) => {
 			this._sounds.open = audio
 
 			audio.setVolume(0.25)

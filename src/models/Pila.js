@@ -1,10 +1,10 @@
 /*
-	Copyright (c) 2023 - Jaime Pérez García y Francisco Expósito Carmona
-
-	Todos los derechos reservados.
-
-	Los recursos externos utilizados han sido debidamente referenciados.
-*/
+ * Copyright (c) 2023. Jaime Pérez y Francisco Expósito.
+ *
+ * All rights reserved.
+ *
+ * Repository: https://github.com/JaimeUGR/EscapeTheLightrooms
+ */
 
 import * as THREE from "../../libs/three.module.js"
 import {CSG} from "../../libs/CSG-v2.js"
@@ -24,8 +24,8 @@ class Pila extends THREE.Object3D
 
 		let loader = GameState.txLoader
 
-		let texturaBase = loader.load("../../resources/textures/models/base_pila.png")
-		let texturaLateral = loader.load("../../resources/textures/models/lateral_pila.png")
+		let texturaBase = loader.load("./resources/textures/models/base_pila.png")
+		let texturaLateral = loader.load("./resources/textures/models/lateral_pila.png")
 
 		let baseMaterial = new THREE.MeshLambertMaterial({map: texturaBase})
 		let lateralMaterial = new THREE.MeshLambertMaterial({ map: texturaLateral})

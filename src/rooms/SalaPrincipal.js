@@ -1,10 +1,10 @@
 /*
-	Copyright (c) 2023 - Jaime Pérez García y Francisco Expósito Carmona
-
-	Todos los derechos reservados.
-
-	Los recursos externos utilizados han sido debidamente referenciados.
-*/
+ * Copyright (c) 2023. Jaime Pérez y Francisco Expósito.
+ *
+ * All rights reserved.
+ *
+ * Repository: https://github.com/JaimeUGR/EscapeTheLightrooms
+ */
 
 import * as THREE from "../../libs/three.module.js"
 
@@ -279,9 +279,10 @@ class SalaPrincipal extends Sala
 			this.robot = new Robot(GameState.scene.gui)
 			this.cajoneraRobot.cajoneraO3D.add(this.robot)
 
-			setTimeout(() => {
+			// Iniciar por primera vez la animación
+			/*setTimeout(() => {
 				this.robot.iniciaAnimacionContinua()
-			}, 15000)
+			}, 15000)*/
 		}
 	}
 

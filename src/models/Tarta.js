@@ -1,10 +1,10 @@
 /*
-	Copyright (c) 2023 - Jaime Pérez García y Francisco Expósito Carmona
-
-	Todos los derechos reservados.
-
-	Los recursos externos utilizados han sido debidamente referenciados.
-*/
+ * Copyright (c) 2023. Jaime Pérez y Francisco Expósito.
+ *
+ * All rights reserved.
+ *
+ * Repository: https://github.com/JaimeUGR/EscapeTheLightrooms
+ */
 
 import * as THREE from "../../libs/three.module.js"
 import {CSG} from "../../libs/CSG-v2.js"
@@ -25,7 +25,7 @@ class Tarta extends THREE.Object3D
 
 		let loader = GameState.txLoader
 
-		let texturaTarta = loader.load("../../resources/textures/models/textura_chocolate.jpg")
+		let texturaTarta = loader.load("./resources/textures/models/textura_chocolate.jpg")
 		let material = new THREE.MeshLambertMaterial({map: texturaTarta})
 
 		let geoTarta = new THREE.CylinderGeometry(this.radio, this.radio, this.altura, 20)

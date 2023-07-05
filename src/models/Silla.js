@@ -1,10 +1,10 @@
 /*
-	Copyright (c) 2023 - Jaime Pérez García y Francisco Expósito Carmona
-
-	Todos los derechos reservados.
-
-	Los recursos externos utilizados han sido debidamente referenciados.
-*/
+ * Copyright (c) 2023. Jaime Pérez y Francisco Expósito.
+ *
+ * All rights reserved.
+ *
+ * Repository: https://github.com/JaimeUGR/EscapeTheLightrooms
+ */
 
 import * as THREE from "../../libs/three.module.js"
 import {CSG} from "../../libs/CSG-v2.js"
@@ -68,8 +68,8 @@ class Silla extends THREE.Object3D
 
 		const loader = GameState.txLoader
 
-		let texturaMadera = loader.load("../../resources/textures/models/fondo-madera-natural.jpg")
-		let texturaMetal = loader.load("../../resources/textures/models/textura_metalica.jpg")
+		let texturaMadera = loader.load("./resources/textures/models/fondo-madera-natural.jpg")
+		let texturaMetal = loader.load("./resources/textures/models/textura_metalica.jpg")
 
 		this.materialMadera = new THREE.MeshLambertMaterial({map: texturaMadera})
 		this.materialMetal = new THREE.MeshPhongMaterial({map: texturaMetal})

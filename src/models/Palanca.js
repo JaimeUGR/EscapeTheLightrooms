@@ -1,10 +1,10 @@
 /*
-	Copyright (c) 2023 - Jaime Pérez García y Francisco Expósito Carmona
-
-	Todos los derechos reservados.
-
-	Los recursos externos utilizados han sido debidamente referenciados.
-*/
+ * Copyright (c) 2023. Jaime Pérez y Francisco Expósito.
+ *
+ * All rights reserved.
+ *
+ * Repository: https://github.com/JaimeUGR/EscapeTheLightrooms
+ */
 
 import * as THREE from "../../libs/three.module.js";
 import * as TWEEN from '../../libs/tween.esm.js'
@@ -49,9 +49,9 @@ class Palanca extends THREE.Object3D
 		//
 
 		const txLoader = GameState.txLoader
-		let texturaSoporte = txLoader.load("../../resources/textures/models/textura_soporte.png")
-		let texturaBarra = txLoader.load("../../resources/textures/models/textura_barras.png")
-		let texturaMango = txLoader.load("../../resources/textures/models/textura_mango.png")
+		let texturaSoporte = txLoader.load("./resources/textures/models/textura_soporte.png")
+		let texturaBarra = txLoader.load("./resources/textures/models/textura_barras.png")
+		let texturaMango = txLoader.load("./resources/textures/models/textura_mango.png")
 
 		this.materialSoporte = new THREE.MeshLambertMaterial({map: texturaSoporte})
 		this.materialBarra = new THREE.MeshLambertMaterial({map: texturaBarra})
@@ -113,7 +113,7 @@ class Palanca extends THREE.Object3D
 	{
 		this._sonidos = {}
 
-		GameState.systems.sound.loadPositionalSound("../../resources/sounds/leverPull.mp3", (audio) => {
+		GameState.systems.sound.loadPositionalSound("./resources/sounds/leverPull.mp3", (audio) => {
 			this._sonidos.tirar = audio
 
 			audio.setVolume(0.15)

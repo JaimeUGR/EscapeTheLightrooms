@@ -1,10 +1,10 @@
 /*
-	Copyright (c) 2023 - Jaime Pérez García y Francisco Expósito Carmona
-
-	Todos los derechos reservados.
-
-	Los recursos externos utilizados han sido debidamente referenciados.
-*/
+ * Copyright (c) 2023. Jaime Pérez y Francisco Expósito.
+ *
+ * All rights reserved.
+ *
+ * Repository: https://github.com/JaimeUGR/EscapeTheLightrooms
+ */
 
 import * as THREE from "../../libs/three.module.js"
 import * as TWEEN from '../../libs/tween.esm.js'
@@ -59,7 +59,7 @@ class Taquilla extends THREE.Object3D
 
 		const txLoader = GameState.txLoader
 
-		let texturaTaquilla = txLoader.load("../../resources/textures/models/textura_taquilla.png")
+		let texturaTaquilla = txLoader.load("./resources/textures/models/textura_taquilla.png")
 
 		this.taquillaMaterial = new THREE.MeshLambertMaterial({map: texturaTaquilla})
 
@@ -216,7 +216,7 @@ class Taquilla extends THREE.Object3D
 		this._sonidos = {}
 
 		// Abrir Puerta
-		GameState.systems.sound.loadPositionalSound("../../resources/sounds/openMetalDoor.wav", (audio) => {
+		GameState.systems.sound.loadPositionalSound("./resources/sounds/openMetalDoor.wav", (audio) => {
 			this._sonidos.abrir = audio
 
 			// Configuración
@@ -237,7 +237,7 @@ class Taquilla extends THREE.Object3D
 		})
 
 		// Cerrar Puerta
-		GameState.systems.sound.loadPositionalSound("../../resources/sounds/closeMetalDoor.wav", (audio) => {
+		GameState.systems.sound.loadPositionalSound("./resources/sounds/closeMetalDoor.wav", (audio) => {
 			this._sonidos.cerrar = audio
 
 			// Configuración

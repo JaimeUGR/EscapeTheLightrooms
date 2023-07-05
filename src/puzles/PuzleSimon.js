@@ -1,10 +1,10 @@
 /*
-	Copyright (c) 2023 - Jaime Pérez García y Francisco Expósito Carmona
-
-	Todos los derechos reservados.
-
-	Los recursos externos utilizados han sido debidamente referenciados.
-*/
+ * Copyright (c) 2023. Jaime Pérez y Francisco Expósito.
+ *
+ * All rights reserved.
+ *
+ * Repository: https://github.com/JaimeUGR/EscapeTheLightrooms
+ */
 
 import * as THREE from "../../libs/three.module.js"
 import * as TWEEN from '../../libs/tween.esm.js'
@@ -103,7 +103,7 @@ class PuzleSimon extends THREE.Object3D
 		this._sonidos = {}
 
 		// Iluminar botón
-		GameState.systems.sound.loadPositionalSound("../../resources/sounds/beepCountdown.wav", (audio) => {
+		GameState.systems.sound.loadPositionalSound("./resources/sounds/beepCountdown.wav", (audio) => {
 			this._sonidos.iluminar = audio
 
 			audio.setVolume(0.2)
@@ -119,7 +119,7 @@ class PuzleSimon extends THREE.Object3D
 		})
 
 		// Pulsar botón
-		GameState.systems.sound.loadPositionalSound("../../resources/sounds/beepCountdown.wav", (audio) => {
+		GameState.systems.sound.loadPositionalSound("./resources/sounds/beepCountdown.wav", (audio) => {
 			this._sonidos.pulsar = audio
 
 			audio.setVolume(0.2)

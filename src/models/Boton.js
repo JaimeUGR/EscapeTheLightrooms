@@ -1,10 +1,9 @@
 /*
- * Copyright (c) 2023. Jaime Pérez García y Francisco Expósito Carmona.
+ * Copyright (c) 2023. Jaime Pérez y Francisco Expósito.
  *
- * Escape The Lightrooms
+ * All rights reserved.
  *
- * Todos los derechos reservados sobre la pertenencia del código, modelos y animaciones.
- * Las texturas están debidamente referenciadas a sus autores.
+ * Repository: https://github.com/JaimeUGR/EscapeTheLightrooms
  */
 
 import * as THREE from "../../libs/three.module.js"
@@ -30,10 +29,10 @@ class Boton extends THREE.Object3D
 
 		// Materiales
 		this.materialPulsador = new THREE.MeshLambertMaterial({
-			map: GameState.txLoader.load("../../resources/textures/models/textura_mango.png")
+			map: GameState.txLoader.load("./resources/textures/models/textura_mango.png")
 		})
 		this.materialSoporte = new THREE.MeshLambertMaterial({
-			map: GameState.txLoader.load("../../resources/textures/models/textura_soporte.png")
+			map: GameState.txLoader.load("./resources/textures/models/textura_soporte.png")
 		})
 
 		//
@@ -74,7 +73,7 @@ class Boton extends THREE.Object3D
 	{
 		this._sonidos = {}
 
-		GameState.systems.sound.loadPositionalSound("../../resources/sounds/pressButton.mp3", (audio) => {
+		GameState.systems.sound.loadPositionalSound("./resources/sounds/pressButton.mp3", (audio) => {
 			this._sonidos.pulsar = audio
 
 			audio.setVolume(0.5)

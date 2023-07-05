@@ -1,10 +1,10 @@
 /*
-	Copyright (c) 2023 - Jaime Pérez García y Francisco Expósito Carmona
-
-	Todos los derechos reservados.
-
-	Los recursos externos utilizados han sido debidamente referenciados.
-*/
+ * Copyright (c) 2023. Jaime Pérez y Francisco Expósito.
+ *
+ * All rights reserved.
+ *
+ * Repository: https://github.com/JaimeUGR/EscapeTheLightrooms
+ */
 
 import * as THREE from '../../libs/three.module.js'
 import * as TWEEN from '../../libs/tween.esm.js'
@@ -34,8 +34,8 @@ class Puerta extends THREE.Object3D
 
 		const txLoader = GameState.txLoader
 
-		let texturaPuerta = txLoader.load("../../resources/textures/models/madera-clara.jpg")
-		let texturaPomo = txLoader.load("../../resources/textures/models/oro1.jpeg")
+		let texturaPuerta = txLoader.load("./resources/textures/models/madera-clara.jpg")
+		let texturaPomo = txLoader.load("./resources/textures/models/oro1.jpeg")
 
 		this.materialPuerta = new THREE.MeshLambertMaterial({map: texturaPuerta})
 		this.materialPomo = new THREE.MeshLambertMaterial({map: texturaPomo})
@@ -91,14 +91,14 @@ class Puerta extends THREE.Object3D
 	{
 		this._sonidos = {}
 
-		GameState.systems.sound.loadGlobalSound("../../resources/sounds/doorIsLocked.wav", (audio) => {
+		GameState.systems.sound.loadGlobalSound("./resources/sounds/doorIsLocked.wav", (audio) => {
 			this._sonidos.bloqueada = audio
 
 			audio.setVolume(0.3)
 			audio.setPlaybackRate(0.8)
 		})
 
-		GameState.systems.sound.loadPositionalSound("../../resources/sounds/openWoodDoor.wav", (audio) => {
+		GameState.systems.sound.loadPositionalSound("./resources/sounds/openWoodDoor.wav", (audio) => {
 			this._sonidos.abrir = audio
 
 			audio.setVolume(0.3)

@@ -1,10 +1,10 @@
 /*
-	Copyright (c) 2023 - Jaime Pérez García y Francisco Expósito Carmona
-
-	Todos los derechos reservados.
-
-	Los recursos externos utilizados han sido debidamente referenciados.
-*/
+ * Copyright (c) 2023. Jaime Pérez y Francisco Expósito.
+ *
+ * All rights reserved.
+ *
+ * Repository: https://github.com/JaimeUGR/EscapeTheLightrooms
+ */
 
 import * as THREE from '../../libs/three.module.js'
 import * as TWEEN from '../../libs/tween.esm.js'
@@ -204,13 +204,13 @@ class Robot extends THREE.Object3D
 
 		const txLoader = GameState.txLoader
 
-		let texturaPrincipal = txLoader.load("../../resources/textures/models/metal-gris.jpg")
+		let texturaPrincipal = txLoader.load("./resources/textures/models/metal-gris.jpg")
 		this.materialPrincipal = new THREE.MeshLambertMaterial({map: texturaPrincipal})
 
-		let texturaSecundaria = txLoader.load("../../resources/textures/models/metal-negro.jpg")
+		let texturaSecundaria = txLoader.load("./resources/textures/models/metal-negro.jpg")
 		this.materialSecundario = new THREE.MeshLambertMaterial({map: texturaSecundaria})
 
-		let texturaOjos = txLoader.load("../../resources/textures/models/plastico.jpg")
+		let texturaOjos = txLoader.load("./resources/textures/models/plastico.jpg")
 		this.materialOjos = new THREE.MeshLambertMaterial({map: texturaOjos, color: 0xe8583f})
 		this.materialBoca = new THREE.MeshLambertMaterial({map: texturaSecundaria})
 
@@ -564,13 +564,13 @@ class Robot extends THREE.Object3D
 	{
 		this._sonidos = {}
 
-		GameState.systems.sound.loadGlobalSound("../../resources/sounds/doorUnlock.wav", (audio) => {
+		GameState.systems.sound.loadGlobalSound("./resources/sounds/doorUnlock.wav", (audio) => {
 			this._sonidos.desbloquear = audio
 			audio.setPlaybackRate(1.1)
 			audio.setVolume(0.2)
 		})
 
-		GameState.systems.sound.loadPositionalSound("../../resources/sounds/nightVision.wav", (audio) => {
+		GameState.systems.sound.loadPositionalSound("./resources/sounds/nightVision.wav", (audio) => {
 			this._sonidos.activar = audio
 
 			audio.setVolume(0.12)
@@ -585,7 +585,7 @@ class Robot extends THREE.Object3D
 			this.troncoSuperior.add(audio)
 		})
 
-		GameState.systems.sound.loadPositionalSound("../../resources/sounds/censor.mp3", (audio) => {
+		GameState.systems.sound.loadPositionalSound("./resources/sounds/censor.mp3", (audio) => {
 			this._sonidos.insultar = audio
 
 			audio.setVolume(0.12)

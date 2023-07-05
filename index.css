@@ -151,6 +151,14 @@ h1 {
 	font-size: 1.8rem;
 }
 
+.principal-troubleshooting {
+	text-decoration: underline;
+	margin-top: 1rem;
+	color: #ed4a84;
+	font-weight: bold;
+	font-size: 1.8rem;
+}
+
 #menuJuego {
 	display: none;
 	align-items: center;
@@ -184,6 +192,23 @@ h1 {
 	align-items: center;
 	justify-content: center;
 	row-gap: 2rem;
+}
+
+.juego-troubleshooting {
+	width: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+}
+
+.juego-troubleshooting > a {
+	margin-top: 1rem;
+	text-align: center;
+	text-decoration: underline;
+	color: #ed4a84;
+	font-weight: bold;
+	font-size: 1.8rem;
 }
 
 .menu-boton-volver {

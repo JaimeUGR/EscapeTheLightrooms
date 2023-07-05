@@ -1,10 +1,10 @@
 /*
-	Copyright (c) 2023 - Jaime Pérez García y Francisco Expósito Carmona
-
-	Todos los derechos reservados.
-
-	Los recursos externos utilizados han sido debidamente referenciados.
-*/
+ * Copyright (c) 2023. Jaime Pérez y Francisco Expósito.
+ *
+ * All rights reserved.
+ *
+ * Repository: https://github.com/JaimeUGR/EscapeTheLightrooms
+ */
 
 import * as THREE from '../../../libs/three.module.js'
 import {MTLLoader} from "../../../libs/MTLLoader.js"
@@ -20,15 +20,15 @@ class Destornillador extends THREE.Object3D
 		let materialLoader = new MTLLoader()
 		let objectLoader = new OBJLoader()
 
-		materialLoader.load('../../../resources/models/materials/screwdriver.mtl',
+		materialLoader.load('./resources/models/materials/screwdriver.mtl',
 			(materials) => {
 				objectLoader.setMaterials(materials);
-				objectLoader.load('../../../resources/models/screwdriver.obj',
+				objectLoader.load('./resources/models/screwdriver.obj',
 					(object) => {
 
 						const textureLoader = GameState.txLoader
-						const texture = textureLoader.load('../../../resources/models/textures/Screw_Base_Color.png');
-						const roughnessTexture = textureLoader.load('../../../resources/models/textures/Screw_Roughness.png');
+						const texture = textureLoader.load('./resources/models/textures/Screw_Base_Color.png');
+						const roughnessTexture = textureLoader.load('./resources/models/textures/Screw_Roughness.png');
 
 						for (let i = 0; i < object.children.length; i++)
 						{

@@ -1,10 +1,9 @@
 /*
- * Copyright (c) 2023. Jaime Pérez García y Francisco Expósito Carmona.
+ * Copyright (c) 2023. Jaime Pérez y Francisco Expósito.
  *
- * Escape The Lightrooms
+ * All rights reserved.
  *
- * Todos los derechos reservados sobre la pertenencia del código, modelos y animaciones.
- * Las texturas están debidamente referenciadas a sus autores.
+ * Repository: https://github.com/JaimeUGR/EscapeTheLightrooms
  */
 
 import * as THREE from '../../libs/three.module.js'
@@ -111,7 +110,7 @@ class EndLocation
 	{
 		this._sonidos = {}
 
-		GameState.systems.sound.loadGlobalSound("../../resources/sounds/Hero_Infraction.mp3", (audio) => {
+		GameState.systems.sound.loadGlobalSound("./resources/sounds/Hero_Infraction.mp3", (audio) => {
 			this._sonidos.endingSong = audio
 
 			audio.setVolume(0.12)
@@ -211,7 +210,7 @@ class EndLocation
 		const O3TextoCompleto = new THREE.Object3D()
 
 		// Cargar la fuente
-		GameState.fontLoader.load("../../resources/fonts/RobotoMono/RobotoMono_Bold.json", (font) => {
+		GameState.fontLoader.load("./resources/fonts/RobotoMono/RobotoMono_Bold.json", (font) => {
 			// Configuración de la geometría
 			const geoConfig = {
 				font: font,

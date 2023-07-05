@@ -1,10 +1,10 @@
 /*
-	Copyright (c) 2023 - Jaime Pérez García y Francisco Expósito Carmona
-
-	Todos los derechos reservados.
-
-	Los recursos externos utilizados han sido debidamente referenciados.
-*/
+ * Copyright (c) 2023. Jaime Pérez y Francisco Expósito.
+ *
+ * All rights reserved.
+ *
+ * Repository: https://github.com/JaimeUGR/EscapeTheLightrooms
+ */
 
 
 // Clases de las Bibliotecas
@@ -252,7 +252,7 @@ class EscapeTheLightrooms extends THREE.Scene
 	inicializarSonidoAmbiente()
 	{
 		// Cargar el audio
-		this.soundSystem.loadGlobalSound("../resources/sounds/asteroid-atmosphere.wav", (audio) => {
+		this.soundSystem.loadGlobalSound("./resources/sounds/asteroid-atmosphere.wav", (audio) => {
 			this.sonidos.atmAmbiental = {
 				audio: audio,
 				baseVolume: 0.08,
@@ -386,6 +386,11 @@ class EscapeTheLightrooms extends THREE.Scene
 
 							// Hacer el fade del menú al juego
 							$("#menuPrincipal").css("display", "none")
+
+							// Activar el robot
+							setTimeout(() => {
+								this.salaPrincipal.robot.iniciaAnimacionContinua()
+							}, 2500)
 
 							// Activar los clicks
 							window.addEventListener('click', this._procesarClick.bind(this))

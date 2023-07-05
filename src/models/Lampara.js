@@ -1,10 +1,10 @@
 /*
-	Copyright (c) 2023 - Jaime Pérez García y Francisco Expósito Carmona
-
-	Todos los derechos reservados.
-
-	Los recursos externos utilizados han sido debidamente referenciados.
-*/
+ * Copyright (c) 2023. Jaime Pérez y Francisco Expósito.
+ *
+ * All rights reserved.
+ *
+ * Repository: https://github.com/JaimeUGR/EscapeTheLightrooms
+ */
 
 import * as THREE from '../../libs/three.module.js'
 import {CSG} from '../../libs/CSG-v2.js'
@@ -63,12 +63,12 @@ class Lampara extends THREE.Object3D
 		//
 		const txLoader = GameState.txLoader
 
-		let texturaEnvoltura = txLoader.load("../../resources/textures/models/texturaEnvoltura.jpg")
+		let texturaEnvoltura = txLoader.load("./resources/textures/models/texturaEnvoltura.jpg")
 		texturaEnvoltura.wrapS = THREE.MirroredRepeatWrapping
 		texturaEnvoltura.wrapT = THREE.RepeatWrapping
 		texturaEnvoltura.repeat.set(2, 1)
 
-		let texturaSoporte = txLoader.load("../../resources/textures/models/textura_soporte.png")
+		let texturaSoporte = txLoader.load("./resources/textures/models/textura_soporte.png")
 
 		this.materialEnvoltura = new THREE.MeshLambertMaterial({map: texturaEnvoltura})
 		this.materialSoporte = new THREE.MeshLambertMaterial({map: texturaSoporte})

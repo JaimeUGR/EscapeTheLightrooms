@@ -1,10 +1,10 @@
 /*
-	Copyright (c) 2023 - Jaime Pérez García y Francisco Expósito Carmona
-
-	Todos los derechos reservados.
-
-	Los recursos externos utilizados han sido debidamente referenciados.
-*/
+ * Copyright (c) 2023. Jaime Pérez y Francisco Expósito.
+ *
+ * All rights reserved.
+ *
+ * Repository: https://github.com/JaimeUGR/EscapeTheLightrooms
+ */
 
 import * as THREE from "../../libs/three.module.js"
 import * as TWEEN from '../../libs/tween.esm.js'
@@ -69,7 +69,7 @@ class PuzleFormas extends THREE.Object3D
 
 		const txLoader = GameState.txLoader
 
-		let texturaContenedor = txLoader.load("../../resources/textures/models/madera-oscura.jpg")
+		let texturaContenedor = txLoader.load("./resources/textures/models/madera-oscura.jpg")
 
 		this.materialContenedor = new THREE.MeshLambertMaterial({map: texturaContenedor})
 		this.materialForma = new THREE.MeshBasicMaterial({color: COLOR_FORMA})
@@ -509,7 +509,7 @@ class Rail extends THREE.Object3D
 	{
 		this._sonidos = {}
 
-		GameState.systems.sound.loadPositionalSound("../../resources/sounds/spin.mp3", (audio) => {
+		GameState.systems.sound.loadPositionalSound("./resources/sounds/spin.mp3", (audio) => {
 			this._sonidos.rotar = audio
 
 			audio.duration = 1.5
@@ -524,7 +524,7 @@ class Rail extends THREE.Object3D
 			this.add(audio)
 		})
 
-		GameState.systems.sound.loadPositionalSound("../../resources/sounds/strap.wav", (audio) => {
+		GameState.systems.sound.loadPositionalSound("./resources/sounds/strap.wav", (audio) => {
 			this._sonidos.parar = audio
 
 			audio.setVolume(0.2)

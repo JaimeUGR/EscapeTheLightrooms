@@ -1,10 +1,10 @@
 /*
-	Copyright (c) 2023 - Jaime Pérez García y Francisco Expósito Carmona
-
-	Todos los derechos reservados.
-
-	Los recursos externos utilizados han sido debidamente referenciados.
-*/
+ * Copyright (c) 2023. Jaime Pérez y Francisco Expósito.
+ *
+ * All rights reserved.
+ *
+ * Repository: https://github.com/JaimeUGR/EscapeTheLightrooms
+ */
 
 import * as THREE from "../../libs/three.module.js"
 import {CSG} from "../../libs/CSG-v2.js"
@@ -22,8 +22,8 @@ class Cuadro extends THREE.Object3D
 
 		huecoZ: 0.1
 	},
-		pathCuadro = "../../resources/textures/models/PinkMarble.jpg",
-		pathPoster = "../../resources/textures/models/gigachad_1.png"
+		pathCuadro = "./resources/textures/models/PinkMarble.jpg",
+		pathPoster = "./resources/textures/models/gigachad_1.png"
 	)
 	{
 		super()

@@ -1,10 +1,10 @@
 /*
-	Copyright (c) 2023 - Jaime Pérez García y Francisco Expósito Carmona
-
-	Todos los derechos reservados.
-
-	Los recursos externos utilizados han sido debidamente referenciados.
-*/
+ * Copyright (c) 2023. Jaime Pérez y Francisco Expósito.
+ *
+ * All rights reserved.
+ *
+ * Repository: https://github.com/JaimeUGR/EscapeTheLightrooms
+ */
 
 import * as THREE from "../../libs/three.module.js"
 
@@ -38,9 +38,9 @@ class SalaDerecha extends Sala
 	})
 	{
 		super(largoParedX, largoParedZ, alturaPared, puertas, {
-			suelo: "../../resources/textures/rooms/Madera.jpg",
-			pared: "../../resources/textures/rooms/PapelVerde.png",
-			techo: "../../resources/textures/rooms/AluminioTecho.jpg"
+			suelo: "./resources/textures/rooms/Madera.jpg",
+			pared: "./resources/textures/rooms/PapelVerde.png",
+			techo: "./resources/textures/rooms/AluminioTecho.jpg"
 		})
 
 		// Colocar los materiales
@@ -203,7 +203,7 @@ class SalaDerecha extends Sala
 
 				borde: 2,
 				huecoZ: 0.3
-			}, undefined, "../../resources/textures/models/gigachad_2.jpg")
+			}, undefined, "./resources/textures/models/gigachad_2.jpg")
 
 			cuadroJaime.translateX(this.largoParedX/2 + this.largoParedX/4 - cuadroJaime.baseX/2
 				+ (this.reloj.cajaX/2 + this.reloj.pilarX + this.reloj.trapSup.XSup)/2)
@@ -302,7 +302,7 @@ class SalaDerecha extends Sala
 
 				borde: 1.5,
 				huecoZ: 0.3
-			}, undefined, "../../resources/textures/models/CuadroLargo.png")
+			}, undefined, "./resources/textures/models/CuadroLargo.png")
 
 			cuadroGrande.rotateY(Math.PI)
 
@@ -375,7 +375,7 @@ class SalaDerecha extends Sala
 		this.collidables.push(reloj)
 
 		// Poner el poster con el código detrás
-		let poster = new Poster(10, 5, "../../resources/textures/models/Keypad/textura_codigo.png")
+		let poster = new Poster(10, 5, "./resources/textures/models/Keypad/textura_codigo.png")
 		poster.materialPoster.color.setHex(0x99e550)
 		poster.translateX(this.largoParedX/2)
 		poster.translateY(poster.altura/2 + reloj.cajaY)

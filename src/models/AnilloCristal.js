@@ -1,10 +1,10 @@
 /*
-	Copyright (c) 2023 - Jaime Pérez García y Francisco Expósito Carmona
-
-	Todos los derechos reservados.
-
-	Los recursos externos utilizados han sido debidamente referenciados.
-*/
+ * Copyright (c) 2023. Jaime Pérez y Francisco Expósito.
+ *
+ * All rights reserved.
+ *
+ * Repository: https://github.com/JaimeUGR/EscapeTheLightrooms
+ */
 
 import * as THREE from "../../libs/three.module.js"
 import * as TWEEN from '../../libs/tween.esm.js'
@@ -50,7 +50,7 @@ class AnilloCristal extends THREE.Object3D
 
 		const txLoader = GameState.txLoader
 
-		let texturaOro = txLoader.load("../../resources/textures/models/oro1.jpeg")
+		let texturaOro = txLoader.load("./resources/textures/models/oro1.jpeg")
 
 		this.materialAnillo = new THREE.MeshLambertMaterial({map: texturaOro })
 

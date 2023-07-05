@@ -1,10 +1,9 @@
 /*
- * Copyright (c) 2023. Jaime Pérez García y Francisco Expósito Carmona.
+ * Copyright (c) 2023. Jaime Pérez y Francisco Expósito.
  *
- * Escape The Lightrooms
+ * All rights reserved.
  *
- * Todos los derechos reservados sobre la pertenencia del código, modelos y animaciones.
- * Las texturas están debidamente referenciadas a sus autores.
+ * Repository: https://github.com/JaimeUGR/EscapeTheLightrooms
  */
 
 import * as THREE from "../../libs/three.module.js"
@@ -25,13 +24,13 @@ class SalaFinal extends Sala
 	})
 	{
 		super(largoParedX, largoParedZ, alturaPared, puertas, {
-			suelo: "../../resources/textures/rooms/Madera.jpg",
-			pared: "../../resources/textures/rooms/PapelBlanco.png",
-			techo: "../../resources/textures/rooms/AluminioTecho.jpg"
+			suelo: "./resources/textures/rooms/Madera.jpg",
+			pared: "./resources/textures/rooms/PapelBlanco.png",
+			techo: "./resources/textures/rooms/AluminioTecho.jpg"
 		})
 
-		let txPared = GameState.txLoader.load("../../resources/textures/rooms/PapelBlanco.png")
-		let txTapas = GameState.txLoader.load("../../resources/textures/models/space.jpg")
+		let txPared = GameState.txLoader.load("./resources/textures/rooms/PapelBlanco.png")
+		let txTapas = GameState.txLoader.load("./resources/textures/models/space.jpg")
 
 		txPared.wrapT = THREE.ClampToEdgeWrapping
 		txPared.repeat.set(1, this.alturaPared/25)
@@ -60,7 +59,7 @@ class SalaFinal extends Sala
 	{
 		this._sonidos = {}
 
-		GameState.systems.sound.loadGlobalSound("../../resources/sounds/charge.ogg", (audio) => {
+		GameState.systems.sound.loadGlobalSound("./resources/sounds/charge.ogg", (audio) => {
 			this._sonidos.cargaTeleport = audio
 
 			audio.setVolume(0.2)
@@ -68,7 +67,7 @@ class SalaFinal extends Sala
 			audio.duration = 4.860
 		})
 
-		GameState.systems.sound.loadGlobalSound("../../resources/sounds/warp.wav", (audio) => {
+		GameState.systems.sound.loadGlobalSound("./resources/sounds/warp.wav", (audio) => {
 			this._sonidos.teleport = audio
 
 			audio.setVolume(0.5)

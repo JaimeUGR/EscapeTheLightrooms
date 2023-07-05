@@ -1,10 +1,10 @@
 /*
-	Copyright (c) 2023 - Jaime Pérez García y Francisco Expósito Carmona
-
-	Todos los derechos reservados.
-
-	Los recursos externos utilizados han sido debidamente referenciados.
-*/
+ * Copyright (c) 2023. Jaime Pérez y Francisco Expósito.
+ *
+ * All rights reserved.
+ *
+ * Repository: https://github.com/JaimeUGR/EscapeTheLightrooms
+ */
 
 import * as THREE from "../../libs/three.module.js"
 import * as TWEEN from '../../libs/tween.esm.js'
@@ -74,8 +74,8 @@ class Cajonera extends THREE.Object3D
 
 		const txLoader = GameState.txLoader
 
-		let texturaCajonera = txLoader.load("../../resources/textures/models/textura_mesa_normal.png")
-		let texturaCajones = txLoader.load("../../resources/textures/models/madera_clara_1.jpg")
+		let texturaCajonera = txLoader.load("./resources/textures/models/textura_mesa_normal.png")
+		let texturaCajones = txLoader.load("./resources/textures/models/madera_clara_1.jpg")
 
 		this.cajoneraMaterial = new THREE.MeshLambertMaterial({map: texturaCajonera})
 		this.cajonFrontalMaterial =  new THREE.MeshLambertMaterial({map: texturaCajones})
@@ -223,7 +223,7 @@ class Cajonera extends THREE.Object3D
 		this._sonidos = {}
 
 		// Abrir cajón
-		GameState.systems.sound.loadPositionalSound("../../resources/sounds/drawerClose.wav", (audio) => {
+		GameState.systems.sound.loadPositionalSound("./resources/sounds/drawerClose.wav", (audio) => {
 			this._sonidos.abrir = audio
 
 			audio.setVolume(0.05)
@@ -239,7 +239,7 @@ class Cajonera extends THREE.Object3D
 		})
 
 		// Cerrar cajón
-		GameState.systems.sound.loadPositionalSound("../../resources/sounds/drawerClose.wav", (audio) => {
+		GameState.systems.sound.loadPositionalSound("./resources/sounds/drawerClose.wav", (audio) => {
 			this._sonidos.cerrar = audio
 
 			audio.setVolume(0.075)

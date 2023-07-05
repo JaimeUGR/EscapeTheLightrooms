@@ -1,10 +1,10 @@
 /*
-	Copyright (c) 2023 - Jaime Pérez García y Francisco Expósito Carmona
-
-	Todos los derechos reservados.
-
-	Los recursos externos utilizados han sido debidamente referenciados.
-*/
+ * Copyright (c) 2023. Jaime Pérez y Francisco Expósito.
+ *
+ * All rights reserved.
+ *
+ * Repository: https://github.com/JaimeUGR/EscapeTheLightrooms
+ */
 
 import * as THREE from "../../libs/three.module.js"
 import * as TWEEN from '../../libs/tween.esm.js'
@@ -115,7 +115,7 @@ class CuboCentral extends THREE.Object3D
 		this.materialPalanca = new THREE.MeshBasicMaterial({color: 0x334455})
 
 		// Tornillos
-		let texturaTornillo = txLoader.load("../../resources/textures/models/tornillo.png")
+		let texturaTornillo = txLoader.load("./resources/textures/models/tornillo.png")
 
 		this.materialTornillo = new THREE.MeshBasicMaterial({map: texturaTornillo, color: 0x666666})
 
@@ -128,7 +128,7 @@ class CuboCentral extends THREE.Object3D
 		// TODO: Este material será una textura que se cambiará por los * cada vez que se pulse
 		this.materialKeypadPant = new THREE.MeshBasicMaterial({color: 0x111111})
 
-		const pathTexturasKeyPad = "../../resources/textures/models/Keypad/"
+		const pathTexturasKeyPad = "./resources/textures/models/Keypad/"
 		// Diferente por cada tecla
 		let texturasTeclas = [
 			txLoader.load(pathTexturasKeyPad + "textura_ok.png"),
@@ -515,7 +515,7 @@ class CuboCentral extends THREE.Object3D
 		//
 
 		// NOTE: Posicional no necesario porque se bloquea la interacción
-		GameState.systems.sound.loadGlobalSound("../../resources/sounds/unscrew.wav", (audio) => {
+		GameState.systems.sound.loadGlobalSound("./resources/sounds/unscrew.wav", (audio) => {
 			this._sonidos.tornillo = audio
 
 			audio.setVolume(0.25)
@@ -620,7 +620,7 @@ class CuboCentral extends THREE.Object3D
 		//
 
 		// NOTE: Posicional no necesario porque se bloquea la interacción
-		GameState.systems.sound.loadGlobalSound("../../resources/sounds/abrirPuertaConTarjeta.mp3", (audio) => {
+		GameState.systems.sound.loadGlobalSound("./resources/sounds/abrirPuertaConTarjeta.mp3", (audio) => {
 			this._sonidos.pasarTarjeta = audio
 
 			audio.setVolume(0.15)
@@ -747,13 +747,13 @@ class CuboCentral extends THREE.Object3D
 		//
 
 		// NOTE: Posicional no necesario porque se bloquea la interacción
-		GameState.systems.sound.loadGlobalSound("../../resources/sounds/beepTecla.wav", (audio) => {
+		GameState.systems.sound.loadGlobalSound("./resources/sounds/beepTecla.wav", (audio) => {
 			this._sonidos.beepTecla = audio
 
 			audio.setVolume(0.2)
 		})
 
-		GameState.systems.sound.loadGlobalSound("../../resources/sounds/electronicDoorOpen.wav", (audio) => {
+		GameState.systems.sound.loadGlobalSound("./resources/sounds/electronicDoorOpen.wav", (audio) => {
 			this._sonidos.keypadUnlock = audio
 
 			audio.setVolume(0.2)

@@ -1,10 +1,10 @@
 /*
-	Copyright (c) 2023 - Jaime Pérez García y Francisco Expósito Carmona
-
-	Todos los derechos reservados.
-
-	Los recursos externos utilizados han sido debidamente referenciados.
-*/
+ * Copyright (c) 2023. Jaime Pérez y Francisco Expósito.
+ *
+ * All rights reserved.
+ *
+ * Repository: https://github.com/JaimeUGR/EscapeTheLightrooms
+ */
 
 import * as THREE from "../../libs/three.module.js"
 import {CSG} from "../../libs/CSG-v2.js"
@@ -23,7 +23,7 @@ class Vela extends THREE.Object3D
 		this.numPuntos = numPuntos
 
 		let loader = GameState.txLoader
-		let texturaVela = loader.load("../../resources/textures/models/textura_vela.jpg")
+		let texturaVela = loader.load("./resources/textures/models/textura_vela.jpg")
 		let material = new THREE.MeshBasicMaterial({map: texturaVela})
 
 		let circulo = new shapeCirculo(this.radio, this.altura, this.numPuntos).toGeometry()

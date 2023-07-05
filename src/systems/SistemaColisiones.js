@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2023. Jaime Pérez y Francisco Expósito.
+ *
+ * All rights reserved.
+ *
+ * Repository: https://github.com/JaimeUGR/EscapeTheLightrooms
+ */
 
 import * as THREE from '../../libs/three.module.js'
 import {GameState} from "../GameState.js"

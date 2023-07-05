@@ -1,10 +1,9 @@
 /*
- * Copyright (c) 2023. Jaime Pérez García y Francisco Expósito Carmona.
+ * Copyright (c) 2023. Jaime Pérez y Francisco Expósito.
  *
- * Escape The Lightrooms
+ * All rights reserved.
  *
- * Todos los derechos reservados sobre la pertenencia del código, modelos y animaciones.
- * Las texturas están debidamente referenciadas a sus autores.
+ * Repository: https://github.com/JaimeUGR/EscapeTheLightrooms
  */
 
 import {AudioListener, AudioLoader, Audio, PositionalAudio} from "../../libs/three.module.js"
@@ -23,7 +22,7 @@ class SistemaSonidos
 		//
 		// Carga de sonidos globales compartidos
 		//
-		this.loadGlobalSound("../resources/sounds/pickup.wav", (audio) => {
+		this.loadGlobalSound("./resources/sounds/pickup.wav", (audio) => {
 			GameState.items.pickupSound = audio
 			audio.setVolume(0.2)
 		})
