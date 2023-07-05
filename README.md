@@ -1,10 +1,12 @@
 # Escape The Lightrooms
 Escape the Lightrooms is a web game, where you have to solve a series of puzzles in order to Escape. It has been made for an university (UGR - ETSIIT) project, in which we had to create a `WebGL` based game.
 The authors are:
-- ***Jaime Pérez García***
-- ***Francisco Expósito Carmona***
+- ***Jaime Pérez***
+- ***Francisco Expósito***
 
 If you like this project and would like to support us, consider donating, as it is really helpful for our learning career and development of new projects.
+
+[DONATE](https://www.paypal.com/donate/?hosted_button_id=5P5ZFSUP2UH22)
 
 ## Motivation
 We have decided to release this project as an open source game because we are quite proud of the end result. Furthermore, we have created custom geometries, shader based materials, complex animations and many more features which we are proud about.
