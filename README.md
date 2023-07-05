@@ -65,7 +65,7 @@ The following libraries have been used:
 #### Textures and Sounds
 There arent third party assets in this repository. However, all the assets within the playable bundled game belong to their original authors and have been referenced in the *Credits* section.
 
-## Licencia de uso
+## License
 All the code (except third party libraries) has been made by us, so we reserve all the rights about its authorship. It can **NOT** be used for commercial projects, only for free / open source / school / non-profit ones, as long as you dont make a direct copy and distribute it as yours, and you make sure to reference us and this repository for its license and usage rights.
 
 Any other type of assets that could be extracted from the bundled game belong to their respective authors. Read the game credits in order to know their license, copyright and any special requirements that may apply.
