@@ -1,8 +1,8 @@
 # Escape The Lightrooms
 Escape the Lightrooms is a web game, where you have to solve a series of puzzles in order to Escape. It has been made for an university (UGR - ETSIIT) project, in which we had to create a `WebGL` based game.
 The authors are:
-- ***Jaime Pérez***
-- ***Francisco Expósito***
+- ***Jaime P.***
+- ***Francisco E.***
 
 If you like this project and would like to support us, consider donating, as it is really helpful for our learning career and development of new projects.
 
@@ -12,18 +12,21 @@ If you like this project and would like to support us, consider donating, as it 
 We have decided to release this project as an open source game because we are quite proud of the end result. Furthermore, we have created custom geometries, shader based materials, complex animations and many more features which we are proud about.
 
 ## How to play
-Right now, the game can be played for **FREE** (optionally you can donate) on [Itch.io](https://itch.io/) -> [Escape The Lightrooms]().
+Right now, the game can be played for **FREE** (optionally you can donate) online on Itch.io.
+
+[![Play](https://img.shields.io/badge/Play_Now-Escape_The_Lightrooms-FA5C5C.svg?logo=itchdotio)](https://itch.io/)
+
 We might release a steam version in the future.
 
 ### Troubleshooting
 This small section showcases common problems that you may encounter in the playable web version.
 
-#### Game doesn't load
+#### Game does not load
 If the game is stuck and doesnt load (or there is an error thrown) and you are using `Firefox`, go to "about:config", search "dom.importMaps.enabled" and make sure that this option has the value "true". 
 
 If you are using other browser (Chromium based ones dont have this problem), you must enable dom importMaps. Also, you could switch to another
 
-#### LeftControl doesnt lock the pointer
+#### LeftControl does not lock the pointer
 For security reasons, the pointer lock api has some limitations which may cause behaviours like this. Consider the following:
 - Dont lock/unlock the pointer too fast
 - While the game is playing, dont switch windows or tabs without pressing either `Escape` or `Left Control`.
