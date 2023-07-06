@@ -6,7 +6,7 @@ The authors are:
 
 If you like this project and would like to support us, consider donating, as it is really helpful for our learning career and development of new projects.
 
-[DONATE](https://www.paypal.com/donate/?hosted_button_id=5P5ZFSUP2UH22)
+[![Donate](https://img.shields.io/badge/Donate-PayPal-8A2BE2.svg?logo=paypal)](https://www.paypal.com/donate/?hosted_button_id=5P5ZFSUP2UH22)
 
 ## Motivation
 We have decided to release this project as an open source game because we are quite proud of the end result. Furthermore, we have created custom geometries, shader based materials, complex animations and many more features which we are proud about.
