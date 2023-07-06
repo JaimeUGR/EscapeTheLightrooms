@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023. Jaime Pérez y Francisco Expósito.
+ * Copyright (c) 2023. Jaime P. and Francisco E.
  *
  * All rights reserved.
  *
