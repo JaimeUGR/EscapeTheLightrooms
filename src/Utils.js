@@ -6,6 +6,9 @@
  * Repository: https://github.com/JaimeUGR/EscapeTheLightrooms
  */
 
+import {TextGeometry} from "../libs/TextGeometry.js"
+import * as THREE from "../libs/three.module.js"
+
 function ShuffleArray(array)
 {
 	for (let i = array.length - 1; i > 0; i--)
@@ -35,4 +38,38 @@ function RandomFloatInRange(min, max) {
 	return Math.random() * (max - min + 1) + min
 }
 
-export {ShuffleArray, RandomInt, RandomIntInRange, RandomFloatInRange}
+function RandomNumericString(digits)
+{
+	const numeroAleatorio = Math.floor(Math.random() * Math.pow(10, digits))
+
+	console.log(numeroAleatorio)
+
+	// Rellenar con 0's a la izquierda si es necesario
+	return String(numeroAleatorio).padStart(digits, '0')
+}
+
+export {ShuffleArray, RandomInt, RandomIntInRange, RandomFloatInRange, RandomNumericString}
+
+/*
+	Gestión de textos
+ */
+
+// NOTE: Actualiza las separaciones por el tamaño + palabra
+function TG_GetDimLetra(geoConfigDims)
+{
+	let tmpGeo = new TextGeometry("T", geoConfigDims)
+	tmpGeo.computeBoundingBox()
+
+	return new THREE.Vector3(
+		tmpGeo.boundingBox.max.x - tmpGeo.boundingBox.min.x,
+		tmpGeo.boundingBox.max.y - tmpGeo.boundingBox.min.y,
+		tmpGeo.boundingBox.max.z - tmpGeo.boundingBox.min.z
+	)
+}
+
+function TG_GetTamPalabra(palabra, dimensionesLetra, separacionLetras = 0)
+{
+	return palabra.length*(dimensionesLetra.x + separacionLetras) - separacionLetras
+}
+
+export {TG_GetDimLetra, TG_GetTamPalabra}

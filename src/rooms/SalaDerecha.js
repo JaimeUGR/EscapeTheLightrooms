@@ -7,10 +7,11 @@
  */
 
 import * as THREE from "../../libs/three.module.js"
+import {TextGeometry} from "../../libs/TextGeometry.js"
 
 import {Sala} from "./Sala.js"
 import {Cajonera} from "../models/Cajonera.js"
-import {Reloj, ManecillaHora, ManecillaMinuto} from "../models/Reloj.js"
+import {Reloj, ManecillaHora} from "../models/Reloj.js"
 import {Taquilla} from "../models/Taquilla.js"
 import {Cuadro} from "../models/Cuadro.js"
 import {Poster} from "../models/Poster.js"
@@ -21,7 +22,7 @@ import {Lampara} from "../models/Lampara.js"
 
 import {GameState} from "../GameState.js"
 import {MSG_COGER_MANECILLA_HORA} from "../messages/messages.js"
-import {RandomInt} from "../Utils.js"
+import {RandomInt, TG_GetDimLetra, TG_GetTamPalabra} from "../Utils.js"
 import {Sofa} from "../models/Sofa.js"
 import {MesaCristal} from "../models/Mesa.js"
 import {Silla} from "../models/Silla.js"
@@ -370,17 +371,42 @@ class SalaDerecha extends Sala
 		this.reloj = reloj
 		this.add(reloj)
 
-		// TODO: Poner el póster con el código detrás
 		GameState.systems.interaction.allInteractables.push(reloj)
 		this.collidables.push(reloj)
 
 		// Poner el poster con el código detrás
-		let poster = new Poster(10, 5, "./resources/textures/models/Keypad/textura_codigo.png")
-		poster.materialPoster.color.setHex(0x99e550)
-		poster.translateX(this.largoParedX/2)
-		poster.translateY(poster.altura/2 + reloj.cajaY)
+		{
+			GameState.fontLoader.load("./resources/fonts/RobotoMono/RobotoMono_Bold.json", (font) => {
+				// Configuración de la geometría
+				const geoConfig = {
+					font: font,
+					size: 4,
+					height: 0.4,
+					curveSegments: 10,
+					bevelEnabled: false
+				}
 
-		this.add(poster)
+				// Crear el texto
+				let geoTexto = new TextGeometry(GameState.gameData.keypadCode, geoConfig)
+				geoTexto.translate(-(TG_GetTamPalabra(GameState.gameData.keypadCode, TG_GetDimLetra(geoConfig)))/2, 0, 0)
+
+				let meshTexto = new THREE.Mesh(geoTexto, new THREE.MeshLambertMaterial({color: 0x242424}))
+
+				meshTexto.translateX(this.largoParedX/2)
+				meshTexto.translateY(reloj.cajaY)
+
+				this.add(meshTexto)
+			}, undefined, () => {
+				GameState.gameData.keypadCode = "6969"
+
+				let poster = new Poster(10, 5, "./resources/textures/models/Keypad/textura_codigo.png")
+				poster.materialPoster.color.setHex(0x99e550)
+				poster.translateX(this.largoParedX/2)
+				poster.translateY(poster.altura/2 + reloj.cajaY)
+
+				this.add(poster)
+			})
+		}
 
 		//
 		// Laser

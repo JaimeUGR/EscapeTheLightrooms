@@ -69,11 +69,11 @@ class EscapeTheLightrooms extends THREE.Scene
 		// Lo primero, crear el visualizador, pasándole el lienzo sobre el que realizar los renderizados.
 		this.renderer = this.createRenderer(myCanvas)
 
-		// Se crea la interfaz gráfica de usuario
-		this.gui = this.createGUI()
-
 		this.inicializarMenus()
 		this.inicializarGameState()
+
+		// Se crea la interfaz gráfica de usuario
+		this.gui = this.createGUI()
 
 		//
 		// Crear las luces
@@ -494,16 +494,37 @@ class EscapeTheLightrooms extends THREE.Scene
 				}
 			}
 
-			const folder = gui.addFolder("Debug")
+			// Debug
+			{
+				const folder = gui.addFolder("Debug")
 
-			folder.add(this.guiMenuDebug, "controlesVuelo")
-				.name("Fly (R - F): ").onChange((value) => GameState.debug.controlesVuelo = value)
+				folder.add(this.guiMenuDebug, "controlesVuelo")
+					.name("Fly (R - F): ").onChange((value) => GameState.debug.controlesVuelo = value)
 
-			folder.add(this.guiMenuDebug, "toggleColisiones")
-				.name("[ TOGGLE COLLISIONS ]")
+				folder.add(this.guiMenuDebug, "toggleColisiones")
+					.name("[ TOGGLE COLLISIONS ]")
 
-			folder.add(this.guiMenuDebug, "toggleRangoInteraccion")
-				.name("[ TOGGLE INTERACTION RANGE ]")
+				folder.add(this.guiMenuDebug, "toggleRangoInteraccion")
+					.name("[ TOGGLE INTERACTION RANGE ]")
+
+				const subFolder = folder.addFolder("Flags")
+				subFolder.add(GameState.flags, "tieneDestornillador")
+					.name("tieneDestornillador").listen()
+				subFolder.add(GameState.flags, "tieneTarjeta")
+					.name("tieneTarjeta").listen()
+				subFolder.add(GameState.flags, "tieneManecillaHora")
+					.name("tieneManecillaHora").listen()
+				subFolder.add(GameState.flags, "tieneManecillaMinuto")
+					.name("tieneManecillaMinuto").listen()
+				subFolder.add(GameState.flags, "tienePrisma")
+					.name("tienePrisma").listen()
+				subFolder.add(GameState.flags, "tienePila")
+					.name("tienePila").listen()
+				subFolder.add(GameState.flags, "robotConPila")
+					.name("robotConPila").listen()
+				subFolder.add(GameState.flags, "salidaAbierta")
+					.name("salidaAbierta").listen()
+			}
 		}
 
 		return gui

@@ -321,6 +321,21 @@ class Reloj extends THREE.Object3D
 	{
 		this._sonidos = {}
 
+		GameState.systems.sound.loadPositionalSound("./resources/sounds/clockDoor.mp3", (audio) => {
+			this._sonidos.puerta = audio
+
+			audio.setVolume(0.3)
+
+			audio.setDistanceModel('linear')
+			audio.setRefDistance(10)
+			audio.setMaxDistance(60)
+			audio.setRolloffFactor(0.8)
+
+			audio.translateY(this.cajaY/2)
+
+			this.meshPuertaReloj.add(audio)
+		})
+
 		GameState.systems.sound.loadPositionalSound("./resources/sounds/clockTick.mp3", (audio) => {
 			this._sonidos.tick = audio
 
@@ -433,6 +448,9 @@ class Reloj extends THREE.Object3D
 
 			let animacionAbrir = new TWEEN.Tween(framePuertaCerrada).to(framePuertaAbierta, 750)
 				.easing(TWEEN.Easing.Quadratic.Out)
+				.onStart(() => {
+					this._sonidos.puerta.play()
+				})
 				.onUpdate(() => {
 					this.meshPuertaReloj.rotation.y = framePuertaCerrada.rY
 				})

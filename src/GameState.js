@@ -14,7 +14,7 @@ import {Rect} from "./structures/Rect.js"
 import {Tarjeta} from "./models/items/Tarjeta.js"
 import {Prisma} from "./models/items/Prisma.js"
 import {Pila} from "./models/Pila.js"
-import {EndLocation} from "./locations/EndLocation.js"
+import {RandomNumericString} from "./Utils.js"
 
 class GameState
 {
@@ -69,7 +69,7 @@ class GameState
 			colsEnabled: true,
 			gameStarted: false,
 			inputEnabled: true,
-			keypadCode: "6969",
+			keypadCode: RandomNumericString(4),
 		}
 
 		this.luces = {
