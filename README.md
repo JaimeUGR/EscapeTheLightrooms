@@ -60,12 +60,12 @@ The following libraries have been used:
 - [Three JS](https://threejs.org/): provides all the basic elements for geometry creation, rendering and cameras, scenes, etc.
 - [Tween](https://createjs.com/tweenjs): used for animations.
 - [PointerLockControls](https://threejs.org/docs/#examples/en/controls/PointerLockControls): used by one of the camera controllers. Simplifies the interaction with the pointer lock API.
-- CSG.V2: modified by our teacher (it merges all the files). Used for boolean geometry [CSG](https://github.com/looeee/threejs-csg)
+- CSG.V2: modified from the original version (it merges all the files). Used for boolean geometry [CSG](https://github.com/looeee/threejs-csg)
 
 #### Textures and Sounds
 There arent third party assets in this repository. However, all the assets within the playable bundled game belong to their original authors and have been referenced in the *Credits* section.
 
-## Licencia de uso
+## License
 All the code (except third party libraries) has been made by us, so we reserve all the rights about its authorship. It can **NOT** be used for commercial projects, only for free / open source / school / non-profit ones, as long as you dont make a direct copy and distribute it as yours, and you make sure to reference us and this repository for its license and usage rights.
 
 Any other type of assets that could be extracted from the bundled game belong to their respective authors. Read the game credits in order to know their license, copyright and any special requirements that may apply.
