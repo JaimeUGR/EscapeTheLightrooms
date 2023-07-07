@@ -1,4 +1,9 @@
-# Escape The Lightrooms
+# <img src="./resources/web/favicon.ico" width=25> Escape The Lightrooms
+
+<p align="center">
+  <a href="https://thejaimex.itch.io/escape-the-lightrooms" target="_blank"><img src="./resources/web/Cover2x.png" width=400 height=317></a>
+</p>
+
 Escape the Lightrooms is a web game, where you have to solve a series of puzzles in order to Escape. It has been made for an university (UGR - ETSIIT) project, in which we had to create a `WebGL` based game.
 The authors are:
 - ***Jaime P.***
@@ -6,15 +11,15 @@ The authors are:
 
 If you like this project and would like to support us, consider donating, as it is really helpful for our learning career and development of new projects.
 
-[![Donate](https://img.shields.io/badge/Donate-PayPal-8A2BE2.svg?logo=paypal)](https://www.paypal.com/donate/?hosted_button_id=5P5ZFSUP2UH22)
+<a href="https://www.paypal.com/donate/?hosted_button_id=5P5ZFSUP2UH22" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-8A2BE2.svg?logo=paypal" height=35></a>
 
 ## Motivation
 We have decided to release this project as an open source game because we are quite proud of the end result. Furthermore, we have created custom geometries, shader based materials, complex animations and many more features which we are proud about.
 
 ## How to play
-Right now, the game can be played for **FREE** (optionally you can donate) online on Itch.io.
+Right now, the game can be played for **FREE** on Itch.io.
 
-[![Play](https://img.shields.io/badge/Play_Now-Escape_The_Lightrooms-FA5C5C.svg?logo=itchdotio)](https://itch.io/)
+<a href="https://thejaimex.itch.io/escape-the-lightrooms" target="_blank"><img src="https://img.shields.io/badge/Play_Now-Escape_The_Lightrooms-FA5C5C.svg?logo=itchdotio" height=35></a>
 
 We might release a steam version in the future.
 
